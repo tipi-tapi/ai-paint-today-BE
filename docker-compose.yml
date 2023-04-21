@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  db:
+    image: mysql:8
+    container_name: draw-my-today
+    restart: always
+    environment:
+      MYSQL_DATABASE: draw-my-today-db
+      MYSQL_ROOT_PASSWORD: root
+      TZ: Asia/Seoul
+    volumes:
+      - .dbdata:/var/lib/mysql
+    ports:
+      - '3306:3306'
