@@ -15,7 +15,7 @@ import tipitapi.drawmytoday.emotion.domain.Emotion;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
+@Entity(name = "emotion_record")
 public class EmotionRecord {
 
   @Id
