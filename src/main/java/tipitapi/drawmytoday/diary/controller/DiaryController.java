@@ -34,7 +34,8 @@ public class DiaryController {
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = DiaryResponse.class))),
   })
   @GetMapping("/{id}")
-  public ResponseEntity<SuccessResponse<DiaryResponse>> getDiary(Authentication authentication, @PathVariable("id") Long diaryId) {
+  public ResponseEntity<SuccessResponse<DiaryResponse>> getDiary(Authentication authentication,
+      @PathVariable("id") Long diaryId) {
     Long userId = parseUserId(authentication);
     return SuccessResponse.of(diaryService.getDiary(diaryId)).asHttp(HttpStatus.OK);
   }

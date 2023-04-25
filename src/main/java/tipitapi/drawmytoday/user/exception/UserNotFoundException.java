@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.user;
+package tipitapi.drawmytoday.user.exception;
 
 import tipitapi.drawmytoday.common.exception.CustomException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;

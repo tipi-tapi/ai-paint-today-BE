@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
 
 @Entity

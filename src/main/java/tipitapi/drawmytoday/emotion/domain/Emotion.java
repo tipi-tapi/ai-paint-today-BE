@@ -1,26 +1,15 @@
 package tipitapi.drawmytoday.emotion.domain;
 
-import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
-import tipitapi.drawmytoday.diary.domain.ReviewType;
-import tipitapi.drawmytoday.user.domain.User;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,11 +21,11 @@ public class Emotion extends BaseEntity {
   private Long emotionId;
 
   @NotNull
-  @Column(nullable = false,length = 30)
+  @Column(nullable = false, length = 30)
   private String name;
 
   @NotNull
-  @Column(nullable = false,length = 30)
+  @Column(nullable = false, length = 30)
   private String color;
 
   @NotNull
@@ -60,7 +49,8 @@ public class Emotion extends BaseEntity {
     this.colorPrompt = colorPrompt;
   }
 
-  public static Emotion create(String name, String color, boolean isActive, String emotionPrompt, String colorPrompt) {
+  public static Emotion create(String name, String color, boolean isActive, String emotionPrompt,
+      String colorPrompt) {
     return new Emotion(name, color, isActive, emotionPrompt, colorPrompt);
   }
 }

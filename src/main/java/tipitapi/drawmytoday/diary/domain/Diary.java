@@ -18,9 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
-import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 
 @Getter
@@ -36,7 +34,7 @@ public class Diary extends BaseEntityWithUpdate {
 
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id",nullable = false)
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
   @NotNull

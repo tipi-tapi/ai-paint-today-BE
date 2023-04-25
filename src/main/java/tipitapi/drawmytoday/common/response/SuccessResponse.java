@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 @Getter
 @NoArgsConstructor
 public class SuccessResponse<T> {
+
   private final boolean status = true;
 
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
