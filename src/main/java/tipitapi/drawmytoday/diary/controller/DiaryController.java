@@ -1,8 +1,8 @@
 package tipitapi.drawmytoday.diary.controller;
 
-import static tipitapi.drawmytoday.common.util.ParseUserId.parseUserId;
-
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,9 +33,10 @@ public class DiaryController {
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = DiaryResponse.class))),
   })
   @GetMapping("/{id}")
-  public ResponseEntity<SuccessResponse<DiaryResponse>> getDiary(Authentication authentication,
-      @PathVariable("id") Long diaryId) {
-    Long userId = parseUserId(authentication);
+  public ResponseEntity<SuccessResponse<DiaryResponse>> getDiary(
+      @Parameter(description = "가게 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId) {
+    // TODO : Authentication에서 가져오도록, Spring Security 추가 후 수정 필요.
+    Long userId = 1L;
     return SuccessResponse.of(
         diaryService.getDiary(userId, diaryId)
     ).asHttp(HttpStatus.OK);
