@@ -38,3 +38,6 @@ out/
 
 ### mac ###
 .DS_Store
+
+### Docker ###
+.dbdata
