@@ -37,6 +37,8 @@ public class DiaryController {
   public ResponseEntity<SuccessResponse<DiaryResponse>> getDiary(Authentication authentication,
       @PathVariable("id") Long diaryId) {
     Long userId = parseUserId(authentication);
-    return SuccessResponse.of(diaryService.getDiary(diaryId)).asHttp(HttpStatus.OK);
+    return SuccessResponse.of(
+        diaryService.getDiary(userId, diaryId)
+    ).asHttp(HttpStatus.OK);
   }
 }
