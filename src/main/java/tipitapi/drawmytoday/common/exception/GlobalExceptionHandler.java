@@ -19,8 +19,8 @@ import tipitapi.drawmytoday.common.response.ErrorResponse.ValidationError;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-  @ExceptionHandler(CustomException.class)
-  public ResponseEntity<Object> handleCustomException(CustomException e) {
+  @ExceptionHandler(BusinessException.class)
+  public ResponseEntity<Object> handleBusinessException(BusinessException e) {
     ErrorCode errorCode = e.getErrorCode();
     return handleExceptionInternal(errorCode);
   }
