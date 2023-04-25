@@ -1,19 +1,29 @@
 package tipitapi.drawmytoday.diary.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.diary.domain.Diary;
+import tipitapi.drawmytoday.diary.domain.EmotionRecord;
+import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.diary.dto.DiaryResponse;
+import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
+import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DiaryService {
-//  private final DiaryRepository diaryRepository;
+
+  private final DiaryRepository diaryRepository;
+  private final ImageService imageService;
+  private final EmotionRecordService emotionRecordService;
 
   public DiaryResponse getDiary(Long diaryId) {
-    return new DiaryResponse(diaryId, "", LocalDateTime.now(), LocalDateTime.now(), "", new ArrayList<>());
+    Diary diary = diaryRepository.findById(diaryId).orElseThrow(DiaryNotFoundException::new);
+    Image image = imageService.getImage(diary);
+    List<EmotionRecord> records = emotionRecordService.getEmotionRecords(diary);
+    return DiaryResponse.of(diary, image, records);
   }
 }
