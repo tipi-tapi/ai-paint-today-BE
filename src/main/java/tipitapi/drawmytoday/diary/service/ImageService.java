@@ -16,6 +16,6 @@ public class ImageService {
   private final ImageRepository imageRepository;
 
   public Image getImage(Diary diary) {
-    return imageRepository.findByDiaryAndSelected(diary).orElseThrow(ImageNotFoundException::new);
+    return imageRepository.findByIsSelectedTrueAndDiary(diary).orElseThrow(ImageNotFoundException::new);
   }
 }
