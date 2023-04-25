@@ -32,7 +32,7 @@ public class DiaryService {
 
   private void ownedByUser(Long userId, Diary diary) {
     if (!Objects.equals(diary.getUser().getUserId(), userId)) {
-      throw new NotOwnerOfDiaryException;
+      throw new NotOwnerOfDiaryException();
     }
   }
 }
