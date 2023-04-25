@@ -22,6 +22,10 @@ public enum ErrorCode {
   USER_ALREADY_EXISTS(409, "U002", "이미 존재하는 유저입니다."),
 
   // Diary
+  DIARY_NOT_FOUND(404, "D001", "일기를 찾을 수 없습니다."),
+
+  // Image
+  IMAGE_NOT_FOUND(404, "I001", "선택된 이미지를 찾을 수 없습니다."),
 
   // Emotion
 
