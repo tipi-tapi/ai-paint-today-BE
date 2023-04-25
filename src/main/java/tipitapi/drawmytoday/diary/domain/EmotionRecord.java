@@ -33,15 +33,15 @@ public class EmotionRecord {
   private Emotion emotion;
 
   @NotNull
-  private int order;
+  private int seq;
 
-  public EmotionRecord(Diary diary, Emotion emotion, int order) {
+  public EmotionRecord(Diary diary, Emotion emotion, int seq) {
     this.diary = diary;
     this.emotion = emotion;
-    this.order = order;
+    this.seq = seq;
   }
 
-  public static EmotionRecord create(Diary diary, Emotion emotion, int order) {
-    return new EmotionRecord(diary, emotion, order);
+  public static EmotionRecord create(Diary diary, Emotion emotion, int seq) {
+    return new EmotionRecord(diary, emotion, seq);
   }
 }
