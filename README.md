@@ -39,53 +39,16 @@
 ## 4. 패키지 구조
 
 - `draw_my_today`
-
-  - `domain`
-    - `도메인명`
-      - `adapter`
-        - `in.web` : 웹 어댑터.
-        - `out` : 예외 등
-      - `application` :
-        - `port`
-          - `in` : Query, DTO(Request, Response), UseCase
-          - `out`
-        - `service`
-        - `domain`
-  - `global`
-    - `common`
+  - `도메인명`
+    - `controller`
+    - `domain`
+    - `repository`
+    - `service`
+  - `common`
     - `config`
+    - `entity`
+    - `exception`
     - `util`
-
-- Web Adapter
-  - 컨트롤러 등이 속한다.
-  - HTTP 요청을 자바 객체로 매핑한다.
-  - 권한을 검사한다.
-  - 입력에 대해 유효성 검사를 한다.
-  - UseCase를 호출한다.
-  - HTTP의 응답을 반환한다.
-- Persistence Adapter
-  - out port의 구현체, Repository 등이 속한다.
-  - 데이터베이스에 쿼리를 날리고 쿼리 결과를 받아온다.
-  - DB의 출력을 어플리케이션 포맷으로 매핑한다.
-  - 출력을 반환한다.
-  - 포트 인터페이스를 통해 입력을 받을 수 있다.
-- UseCase
-  - 비즈니스 규칙을 검증한다.
-  - 모델의 상태를 조작한다.
-  - 출력을 반환한다.
-  - 웹으로부터 입력을 전달받는다.
-  - 인터페이스로, Service가 이를 구현한다.
-- Query
-  - UseCase와 수행하는 역할은 동일하나, 조회 전용 작업은 Query로 분류한다.
-  - UseCase는 쓰기도 가능한 일반적인 작업이다.
-- Port
-  - 내부 비즈니스 영역을 외부 영역에 노출한 API
-  - 인바운드 포트 : 내부 영역 사용을 위해 노출된 API. 인터페이스이며, Service가 이를 구현한다.
-  - 아웃바운드 포트 : 내부 영역이 외부 영역을 사용하기 위한 API. 인터페이스이며, Persistence Adapter가 이를 구현한다.
-- Adapter
-  - 외부 세계와 포트 간 교환을 조정한다.
-  - 인바운드 어댑터 : 외부 애플리케이션/서비스와 내부 비즈니스 영역(인바운드 포트) 간 데이터 교환을 조정한다.
-  - 아웃바운드 어댑터 : 내부 비즈니스 영역(아웃바운드 포트)과 외부 애플리케이션/서비스 간 데이터 교환을 조정한다.
 
 ## 5. 인텔리제이 자동 재시작 설정
 
@@ -98,13 +61,11 @@
 
 ```shell
 # mysql 실행
-$ cd docker
 $ docker-compose up --build
 ```
 
 ```shell
 # mysql 종료
-$ cd docker
 $ docker-compose down
 ```
 
