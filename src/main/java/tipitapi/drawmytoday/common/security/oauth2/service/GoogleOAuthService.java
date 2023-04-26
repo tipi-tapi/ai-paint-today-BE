@@ -1,0 +1,177 @@
+package tipitapi.drawmytoday.common.security.oauth2.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
+import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
+import tipitapi.drawmytoday.common.security.oauth2.dto.ResponseAccessToken;
+import tipitapi.drawmytoday.common.security.oauth2.dto.ResponseJwtToken;
+import tipitapi.drawmytoday.common.security.oauth2.dto.UserProfile;
+import tipitapi.drawmytoday.common.security.oauth2.entity.GoogleProperties;
+import tipitapi.drawmytoday.user.domain.Auth;
+import tipitapi.drawmytoday.user.domain.OAuthType;
+import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.user.repository.AuthRepository;
+import tipitapi.drawmytoday.user.repository.UserRepository;
+
+@Slf4j
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class GoogleOAuthService {
+
+    private final GoogleProperties properties;
+
+    private final RestTemplate restTemplate;
+
+    private final ObjectMapper objectMapper;
+
+    private final UserRepository userRepository;
+
+    private final AuthRepository authRepository;
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+
+    @Transactional
+    public ResponseJwtToken login(HttpServletRequest request) throws JsonProcessingException {
+        // Authorization Code로 Access Token 요청
+        ResponseAccessToken accessToken = getAccessToken(request);
+        log.info("accessToken: {}", objectMapper.writeValueAsString(accessToken));
+
+        // Access Token으로 User Info 요청
+        UserProfile userProfile = getUserProfile(accessToken);
+        log.info("userProfile: {}", objectMapper.writeValueAsString(userProfile));
+
+        // save user info to database
+        User user = userRepository.findByEmail(userProfile.getEmail())
+            .orElseGet(() -> {
+                return userRepository.save(User.builder()
+                    .email(userProfile.getEmail())
+                    .oauthType(OAuthType.GOOGLE)
+                    .build());
+            });
+
+        // save refresh token to database
+        if (StringUtils.hasText(accessToken.getAccessToken())) {
+            log.info("save refresh token to database = {}", accessToken.getRefreshToken());
+            authRepository.save(new Auth(user, accessToken.getRefreshToken()));
+        }
+
+        // // create JWT token
+        String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
+            user.getUserRole());
+        String jwtRefreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(),
+            user.getUserRole());
+
+        log.info("jwtAccessToken: {}", jwtAccessToken);
+        return ResponseJwtToken.of(jwtAccessToken, jwtRefreshToken);
+    }
+
+    /**
+     * delete account success: response = "" delete account fail: response =
+     * {"error":"invalid_token","error_description":"Invalid Value"}
+     *
+     * @param user
+     */
+    @Transactional
+    public void deleteAccount(User user) {
+        Auth auth = authRepository.findByUser(user)
+            .orElseThrow(() -> new RuntimeException("User refresh token not found"));
+        String refreshToken = auth.getRefreshToken();
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("token", refreshToken);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        String url = "https://oauth2.googleapis.com/revoke";
+
+        String response = restTemplate.postForObject(url, request, String.class);
+        if (!StringUtils.hasText(response)) {
+            throw new RuntimeException("Failed to delete account");
+        }
+    }
+
+    private ResponseAccessToken getAccessToken(HttpServletRequest request)
+        throws JsonProcessingException {
+        String authorization = request.getHeader("Authorization");
+        Assert.hasText(authorization, "Authorization header must not be empty");
+        String authorizationCode = getAuthorizationCode(authorization);
+        log.info("authorizationCode: {}", authorizationCode);
+
+        String tokenUri = "https://oauth2.googleapis.com/token";
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/x-www-form-urlencoded");
+        MultiValueMap<String, String> httpBody = new LinkedMultiValueMap<>();
+        httpBody.add("code", authorizationCode);
+        httpBody.add("client_id", properties.getClientId());
+        httpBody.add("client_secret", properties.getClientSecret());
+        httpBody.add("redirect_uri", "https://draw-my-today.firebaseapp.com/__/auth/handler");
+        httpBody.add("grant_type", "authorization_code");
+
+        HttpEntity<MultiValueMap<String, String>> requestToken = new HttpEntity<>(httpBody,
+            httpHeaders);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(tokenUri, requestToken,
+            String.class);
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("Failed to get access token from Google");
+        }
+
+        String tokenResponse = response.getBody();
+        log.info("tokenResponse: {}", tokenResponse); //넘어옴. 파싱 오류인듯.
+        return objectMapper.readValue(tokenResponse, ResponseAccessToken.class);
+    }
+
+    private UserProfile getUserProfile(ResponseAccessToken accessToken)
+        throws JsonProcessingException {
+
+        String tokenUri = "https://www.googleapis.com/oauth2/v3/userinfo";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken.getAccessToken());
+
+        HttpEntity<?> httpEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> userInfoResponse = restTemplate.exchange(tokenUri, HttpMethod.GET,
+            httpEntity, String.class);
+
+        if (userInfoResponse.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("Failed to get user info from Google");
+        }
+
+        String userInfo = userInfoResponse.getBody();
+        UserProfile userProfile = objectMapper.readValue(userInfo, UserProfile.class);
+        return userProfile;
+    }
+
+
+    private String getAuthorizationCode(String authorization) {
+        String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
+        Assert.isTrue(tokens.length == 2, "Authorization header must be two tokens");
+        Assert.isTrue("Bearer".equals(tokens[0]), "Authorization header must start with Bearer");
+        return tokens[1];
+    }
+}

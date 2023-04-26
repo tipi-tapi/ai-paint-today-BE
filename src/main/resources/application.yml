@@ -1,3 +1,4 @@
 spring:
   profiles:
     active: ${profile}
+    include: oauth

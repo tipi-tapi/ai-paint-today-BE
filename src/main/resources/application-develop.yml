@@ -1,15 +1,15 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/draw-my-today-db?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/draw_my_today_db?serverTimezone=UTC&characterEncoding=UTF-8
     username: root
-    password: root
+    password: 0518lovE!
   
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 
   logging.level:
     org.hibernate.SQL: debug

@@ -1,0 +1,22 @@
+oauth2:
+  google:
+    client-id:
+    client-secret:
+  apple:
+    #    web:
+    #      client-id:
+    #      client-secret:
+    ios:
+      client-id:
+      client-secret:
+
+jwt:
+  secret:
+  access-token-expire-time: 180000000
+  refresh-token-expire-time: 6048000000
+
+
+# UserDetailsService 빈 자동등록을 해제하여 자동으로 생성되는 보안 비밀번호와 관련된 경고 메시지가 표시되지 않도록 한다.
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
