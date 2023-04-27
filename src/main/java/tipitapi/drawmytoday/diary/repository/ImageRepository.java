@@ -7,5 +7,5 @@ import tipitapi.drawmytoday.diary.domain.Image;
 
 public interface ImageRepository extends JpaRepository<Image, Long> {
 
-  Optional<Image> findByIsSelectedTrueAndDiary(Diary diary);
+    Optional<Image> findByIsSelectedTrueAndDiary(Diary diary);
 }

@@ -13,9 +13,10 @@ import tipitapi.drawmytoday.diary.repository.ImageRepository;
 @RequiredArgsConstructor
 public class ImageService {
 
-  private final ImageRepository imageRepository;
+    private final ImageRepository imageRepository;
 
-  public Image getImage(Diary diary) {
-    return imageRepository.findByIsSelectedTrueAndDiary(diary).orElseThrow(ImageNotFoundException::new);
-  }
+    public Image getImage(Diary diary) {
+        return imageRepository.findByIsSelectedTrueAndDiary(diary)
+            .orElseThrow(ImageNotFoundException::new);
+    }
 }

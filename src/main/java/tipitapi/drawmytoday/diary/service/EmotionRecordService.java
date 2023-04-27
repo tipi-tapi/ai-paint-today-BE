@@ -13,9 +13,9 @@ import tipitapi.drawmytoday.diary.repository.EmotionRecordRepository;
 @RequiredArgsConstructor
 public class EmotionRecordService {
 
-  private final EmotionRecordRepository recordRepository;
+    private final EmotionRecordRepository recordRepository;
 
-  public List<EmotionRecord> getEmotionRecords(Diary diary) {
-    return recordRepository.findAllByDiary(diary);
-  }
+    public List<EmotionRecord> getEmotionRecords(Diary diary) {
+        return recordRepository.findAllByDiary(diary);
+    }
 }

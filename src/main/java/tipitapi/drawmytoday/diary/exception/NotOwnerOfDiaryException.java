@@ -5,7 +5,7 @@ import tipitapi.drawmytoday.common.exception.ErrorCode;
 
 public class NotOwnerOfDiaryException extends BusinessException {
 
-  public NotOwnerOfDiaryException() {
-    super(ErrorCode.DIARY_NOT_OWNER);
-  }
+    public NotOwnerOfDiaryException() {
+        super(ErrorCode.DIARY_NOT_OWNER);
+    }
 }

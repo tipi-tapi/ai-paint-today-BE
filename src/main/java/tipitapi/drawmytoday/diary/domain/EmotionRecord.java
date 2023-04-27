@@ -18,30 +18,30 @@ import tipitapi.drawmytoday.emotion.domain.Emotion;
 @Entity(name = "emotion_record")
 public class EmotionRecord {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long recordId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long recordId;
 
-  @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "diary_id", nullable = false)
-  private Diary diary;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diary_id", nullable = false)
+    private Diary diary;
 
-  @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "emotion_id", nullable = false)
-  private Emotion emotion;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "emotion_id", nullable = false)
+    private Emotion emotion;
 
-  @NotNull
-  private int seq;
+    @NotNull
+    private int seq;
 
-  public EmotionRecord(Diary diary, Emotion emotion, int seq) {
-    this.diary = diary;
-    this.emotion = emotion;
-    this.seq = seq;
-  }
+    public EmotionRecord(Diary diary, Emotion emotion, int seq) {
+        this.diary = diary;
+        this.emotion = emotion;
+        this.seq = seq;
+    }
 
-  public static EmotionRecord create(Diary diary, Emotion emotion, int seq) {
-    return new EmotionRecord(diary, emotion, seq);
-  }
+    public static EmotionRecord create(Diary diary, Emotion emotion, int seq) {
+        return new EmotionRecord(diary, emotion, seq);
+    }
 }

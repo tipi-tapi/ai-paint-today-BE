@@ -5,7 +5,7 @@ import tipitapi.drawmytoday.common.exception.ErrorCode;
 
 public class DiaryNotFoundException extends BusinessException {
 
-  public DiaryNotFoundException() {
-    super(ErrorCode.DIARY_NOT_FOUND);
-  }
+    public DiaryNotFoundException() {
+        super(ErrorCode.DIARY_NOT_FOUND);
+    }
 }
