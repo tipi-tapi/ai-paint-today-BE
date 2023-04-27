@@ -7,5 +7,5 @@ import tipitapi.drawmytoday.diary.domain.EmotionRecord;
 
 public interface EmotionRecordRepository extends JpaRepository<EmotionRecord, Long> {
 
-  List<EmotionRecord> findAllByDiary(Diary diary);
+    List<EmotionRecord> findAllByDiary(Diary diary);
 }

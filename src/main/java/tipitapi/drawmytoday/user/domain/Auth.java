@@ -19,15 +19,15 @@ import tipitapi.drawmytoday.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Auth extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long authId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long authId;
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  private User user;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-  @NotNull
-  @Column(nullable = false)
-  private String refreshToken;
+    @NotNull
+    @Column(nullable = false)
+    private String refreshToken;
 }

@@ -18,21 +18,21 @@ import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 @RequiredArgsConstructor
 public class DiaryService {
 
-  private final DiaryRepository diaryRepository;
-  private final ImageService imageService;
-  private final EmotionRecordService emotionRecordService;
+    private final DiaryRepository diaryRepository;
+    private final ImageService imageService;
+    private final EmotionRecordService emotionRecordService;
 
-  public DiaryResponse getDiary(Long userId, Long diaryId) {
-    Diary diary = diaryRepository.findById(diaryId).orElseThrow(DiaryNotFoundException::new);
-    ownedByUser(userId, diary);
-    Image image = imageService.getImage(diary);
-    List<EmotionRecord> records = emotionRecordService.getEmotionRecords(diary);
-    return DiaryResponse.of(diary, image, records);
-  }
-
-  private void ownedByUser(Long userId, Diary diary) {
-    if (!Objects.equals(diary.getUser().getUserId(), userId)) {
-      throw new NotOwnerOfDiaryException();
+    public DiaryResponse getDiary(Long userId, Long diaryId) {
+        Diary diary = diaryRepository.findById(diaryId).orElseThrow(DiaryNotFoundException::new);
+        ownedByUser(userId, diary);
+        Image image = imageService.getImage(diary);
+        List<EmotionRecord> records = emotionRecordService.getEmotionRecords(diary);
+        return DiaryResponse.of(diary, image, records);
     }
-  }
+
+    private void ownedByUser(Long userId, Diary diary) {
+        if (!Objects.equals(diary.getUser().getUserId(), userId)) {
+            throw new NotOwnerOfDiaryException();
+        }
+    }
 }

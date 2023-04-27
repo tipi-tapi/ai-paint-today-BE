@@ -28,46 +28,46 @@ import tipitapi.drawmytoday.user.domain.User;
 @Where(clause = "deleted_at = null")
 public class Diary extends BaseEntityWithUpdate {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long diaryId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long diaryId;
 
-  @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-  @NotNull
-  @Column(nullable = false)
-  private LocalDateTime diaryDate;
+    @NotNull
+    @Column(nullable = false)
+    private LocalDateTime diaryDate;
 
-  @Column(length = 6010)
-  private String notes;
+    @Column(length = 6010)
+    private String notes;
 
-  @NotNull
-  @Column(nullable = false)
-  private boolean isAi;
+    @NotNull
+    @Column(nullable = false)
+    private boolean isAi;
 
-  @Column(length = 42)
-  private String title;
+    @Column(length = 42)
+    private String title;
 
-  @Column(length = 32)
-  private String weather;
+    @Column(length = 32)
+    private String weather;
 
-  @Enumerated(EnumType.STRING)
-  private ReviewType review;
+    @Enumerated(EnumType.STRING)
+    private ReviewType review;
 
-  private LocalDateTime deletedAt;
+    private LocalDateTime deletedAt;
 
-  @Builder
-  public Diary(User user, LocalDateTime diaryDate, String notes, boolean isAi, String title,
-      String weather, ReviewType review) {
-    this.user = user;
-    this.diaryDate = diaryDate;
-    this.notes = notes;
-    this.isAi = isAi;
-    this.title = title;
-    this.weather = weather;
-    this.review = review;
-  }
+    @Builder
+    public Diary(User user, LocalDateTime diaryDate, String notes, boolean isAi, String title,
+        String weather, ReviewType review) {
+        this.user = user;
+        this.diaryDate = diaryDate;
+        this.notes = notes;
+        this.isAi = isAi;
+        this.title = title;
+        this.weather = weather;
+        this.review = review;
+    }
 }

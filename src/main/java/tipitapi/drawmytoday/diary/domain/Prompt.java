@@ -19,29 +19,29 @@ import tipitapi.drawmytoday.common.entity.BaseEntity;
 @Entity
 public class Prompt extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long promptId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long promptId;
 
-  @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "diary_id", nullable = true)
-  private Diary diary;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diary_id", nullable = true)
+    private Diary diary;
 
-  @NotNull
-  @Column(length = 300)
-  private String promptText;
+    @NotNull
+    @Column(length = 300)
+    private String promptText;
 
-  @NotNull
-  private boolean isSuccess;
+    @NotNull
+    private boolean isSuccess;
 
-  private Prompt(Diary diary, String promptText, boolean isSuccess) {
-    this.diary = diary;
-    this.promptText = promptText;
-    this.isSuccess = isSuccess;
-  }
+    private Prompt(Diary diary, String promptText, boolean isSuccess) {
+        this.diary = diary;
+        this.promptText = promptText;
+        this.isSuccess = isSuccess;
+    }
 
-  public static Prompt create(Diary diary, String promptText, boolean isSuccess) {
-    return new Prompt(diary, promptText, isSuccess);
-  }
+    public static Prompt create(Diary diary, String promptText, boolean isSuccess) {
+        return new Prompt(diary, promptText, isSuccess);
+    }
 }
