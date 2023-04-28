@@ -19,80 +19,80 @@ import tipitapi.drawmytoday.common.response.ErrorResponse.ValidationError;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-  @ExceptionHandler(BusinessException.class)
-  public ResponseEntity<Object> handleBusinessException(BusinessException e) {
-    ErrorCode errorCode = e.getErrorCode();
-    return handleExceptionInternal(errorCode);
-  }
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Object> handleBusinessException(BusinessException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return handleExceptionInternal(errorCode);
+    }
 
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException e) {
-    log.warn("handleIllegalArgument", e);
-    ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
-    return handleExceptionInternal(errorCode, e.getMessage());
-  }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException e) {
+        log.warn("handleIllegalArgument", e);
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+        return handleExceptionInternal(errorCode, e.getMessage());
+    }
 
-  // @Valid 예외처리
-  @Override
-  public ResponseEntity<Object> handleMethodArgumentNotValid(
-      MethodArgumentNotValidException e,
-      HttpHeaders headers,
-      HttpStatus status,
-      WebRequest request) {
-    log.warn("handleIllegalArgument", e);
-    ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
-    return handleExceptionInternal(e, errorCode);
-  }
+    // @Valid 예외처리
+    @Override
+    public ResponseEntity<Object> handleMethodArgumentNotValid(
+        MethodArgumentNotValidException e,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request) {
+        log.warn("handleIllegalArgument", e);
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+        return handleExceptionInternal(e, errorCode);
+    }
 
-  // 이 외의 500 에러 처리
-  @ExceptionHandler({Exception.class})
-  public ResponseEntity<Object> handleAllException(Exception ex) {
-    log.warn("handleAllException", ex);
-    ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-    return handleExceptionInternal(errorCode);
-  }
+    // 이 외의 500 에러 처리
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<Object> handleAllException(Exception ex) {
+        log.warn("handleAllException", ex);
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        return handleExceptionInternal(errorCode);
+    }
 
-  private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
-    return ResponseEntity.status(errorCode.getStatus())
-        .body(makeErrorResponse(errorCode));
-  }
+    private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
+        return ResponseEntity.status(errorCode.getStatus())
+            .body(makeErrorResponse(errorCode));
+    }
 
-  private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, String message) {
-    return ResponseEntity.status(errorCode.getStatus())
-        .body(makeErrorResponse(errorCode, message));
-  }
+    private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, String message) {
+        return ResponseEntity.status(errorCode.getStatus())
+            .body(makeErrorResponse(errorCode, message));
+    }
 
-  private ResponseEntity<Object> handleExceptionInternal(BindException e, ErrorCode errorCode) {
-    return ResponseEntity.status(errorCode.getStatus())
-        .body(makeErrorResponse(e, errorCode));
-  }
+    private ResponseEntity<Object> handleExceptionInternal(BindException e, ErrorCode errorCode) {
+        return ResponseEntity.status(errorCode.getStatus())
+            .body(makeErrorResponse(e, errorCode));
+    }
 
-  private ErrorResponse makeErrorResponse(ErrorCode errorCode) {
-    return ErrorResponse.builder()
-        .code(errorCode.name())
-        .message(errorCode.getMessage())
-        .build();
-  }
+    private ErrorResponse makeErrorResponse(ErrorCode errorCode) {
+        return ErrorResponse.builder()
+            .code(errorCode.name())
+            .message(errorCode.getMessage())
+            .build();
+    }
 
-  private ErrorResponse makeErrorResponse(ErrorCode errorCode, String message) {
-    return ErrorResponse.builder()
-        .code(errorCode.name())
-        .message(message)
-        .build();
-  }
+    private ErrorResponse makeErrorResponse(ErrorCode errorCode, String message) {
+        return ErrorResponse.builder()
+            .code(errorCode.name())
+            .message(message)
+            .build();
+    }
 
-  private ErrorResponse makeErrorResponse(BindException e, ErrorCode errorCode) {
-    List<ValidationError> validationErrorList = e.getBindingResult()
-        .getFieldErrors()
-        .stream()
-        .map(ErrorResponse.ValidationError::of)
-        .collect(Collectors.toList());
+    private ErrorResponse makeErrorResponse(BindException e, ErrorCode errorCode) {
+        List<ValidationError> validationErrorList = e.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(ErrorResponse.ValidationError::of)
+            .collect(Collectors.toList());
 
-    return ErrorResponse.builder()
-        .code(errorCode.name())
-        .message(errorCode.getMessage())
-        .errors(validationErrorList)
-        .build();
-  }
+        return ErrorResponse.builder()
+            .code(errorCode.name())
+            .message(errorCode.getMessage())
+            .errors(validationErrorList)
+            .build();
+    }
 
 }

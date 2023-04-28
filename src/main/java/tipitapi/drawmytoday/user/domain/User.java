@@ -19,41 +19,41 @@ import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntityWithUpdate {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
 
-  private String email;
+    private String email;
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private SocialCode socialCode;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SocialCode socialCode;
 
-  private LocalDateTime lastDiaryDate;
+    private LocalDateTime lastDiaryDate;
 
-  private User(SocialCode socialCode) {
-    this.socialCode = socialCode;
-  }
+    private User(SocialCode socialCode) {
+        this.socialCode = socialCode;
+    }
 
-  private User(String email, SocialCode socialCode) {
-    this.email = email;
-    this.socialCode = socialCode;
-  }
+    private User(String email, SocialCode socialCode) {
+        this.email = email;
+        this.socialCode = socialCode;
+    }
 
-  public static User create(SocialCode socialCode) {
-    return new User(socialCode);
-  }
+    public static User create(SocialCode socialCode) {
+        return new User(socialCode);
+    }
 
-  public static User createWithEmail(String email, SocialCode socialCode) {
-    return new User(email, socialCode);
-  }
+    public static User createWithEmail(String email, SocialCode socialCode) {
+        return new User(email, socialCode);
+    }
 
-  public void setEmail(String email) {
-    this.email = email;
-  }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-  public void setLastDiaryDate(LocalDateTime date) {
-    this.lastDiaryDate = date;
-  }
+    public void setLastDiaryDate(LocalDateTime date) {
+        this.lastDiaryDate = date;
+    }
 }

@@ -18,47 +18,47 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class SwaggerConfiguration {
 
-  @Bean
-  public GroupedOpenApi usersOpenApi() {
-    String[] paths = {"/users/**"};
+    @Bean
+    public GroupedOpenApi usersOpenApi() {
+        String[] paths = {"/users/**"};
 
-    return GroupedOpenApi
-        .builder()
-        .group("유저 API")
-        .pathsToMatch(paths)
-        .addOpenApiCustomiser(buildSecurityOpenApi()).build();
-  }
+        return GroupedOpenApi
+            .builder()
+            .group("유저 API")
+            .pathsToMatch(paths)
+            .addOpenApiCustomiser(buildSecurityOpenApi()).build();
+    }
 
-  @Bean
-  public GroupedOpenApi diaryOpenAPi() {
-    String[] paths = {"/diary/**"};
+    @Bean
+    public GroupedOpenApi diaryOpenAPi() {
+        String[] paths = {"/diary/**"};
 
-    return GroupedOpenApi
-        .builder()
-        .group("일기 API")
-        .pathsToMatch(paths)
-        .addOpenApiCustomiser(buildSecurityOpenApi()).build();
-  }
+        return GroupedOpenApi
+            .builder()
+            .group("일기 API")
+            .pathsToMatch(paths)
+            .addOpenApiCustomiser(buildSecurityOpenApi()).build();
+    }
 
-  @Bean
-  public GroupedOpenApi emotionsOpenAPi() {
-    String[] paths = {"/emotions/**"};
+    @Bean
+    public GroupedOpenApi emotionsOpenAPi() {
+        String[] paths = {"/emotions/**"};
 
-    return GroupedOpenApi
-        .builder()
-        .group("감정 API")
-        .pathsToMatch(paths)
-        .addOpenApiCustomiser(buildSecurityOpenApi()).build();
-  }
+        return GroupedOpenApi
+            .builder()
+            .group("감정 API")
+            .pathsToMatch(paths)
+            .addOpenApiCustomiser(buildSecurityOpenApi()).build();
+    }
 
-  public OpenApiCustomiser buildSecurityOpenApi() {
-    // jwt token 을 한번 설정하면 header 에 값을 넣어주는 코드
-    return OpenApi -> OpenApi.addSecurityItem(new SecurityRequirement().addList("jwt token"))
-        .getComponents().addSecuritySchemes("jwt token", new SecurityScheme()
-            .name("Authorization")
-            .type(SecurityScheme.Type.HTTP)
-            .in(SecurityScheme.In.HEADER)
-            .bearerFormat("JWT")
-            .scheme("bearer"));
-  }
+    public OpenApiCustomiser buildSecurityOpenApi() {
+        // jwt token 을 한번 설정하면 header 에 값을 넣어주는 코드
+        return OpenApi -> OpenApi.addSecurityItem(new SecurityRequirement().addList("jwt token"))
+            .getComponents().addSecuritySchemes("jwt token", new SecurityScheme()
+                .name("Authorization")
+                .type(SecurityScheme.Type.HTTP)
+                .in(SecurityScheme.In.HEADER)
+                .bearerFormat("JWT")
+                .scheme("bearer"));
+    }
 }

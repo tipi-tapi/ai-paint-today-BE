@@ -19,29 +19,29 @@ import tipitapi.drawmytoday.common.entity.BaseEntity;
 @Entity
 public class Image extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long imageId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long imageId;
 
-  @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "diary_id", nullable = false)
-  private Diary diary;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diary_id", nullable = false)
+    private Diary diary;
 
-  @NotNull
-  @Column(nullable = false)
-  private String imageUrl;
+    @NotNull
+    @Column(nullable = false)
+    private String imageUrl;
 
-  @NotNull
-  private boolean isSelected;
+    @NotNull
+    private boolean isSelected;
 
-  private Image(Diary diary, String imageUrl, boolean isSelected) {
-    this.diary = diary;
-    this.imageUrl = imageUrl;
-    this.isSelected = isSelected;
-  }
+    private Image(Diary diary, String imageUrl, boolean isSelected) {
+        this.diary = diary;
+        this.imageUrl = imageUrl;
+        this.isSelected = isSelected;
+    }
 
-  public static Image create(Diary diary, String imageUrl, boolean isSelected) {
-    return new Image(diary, imageUrl, isSelected);
-  }
+    public static Image create(Diary diary, String imageUrl, boolean isSelected) {
+        return new Image(diary, imageUrl, isSelected);
+    }
 }

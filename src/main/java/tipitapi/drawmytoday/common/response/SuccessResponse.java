@@ -11,20 +11,20 @@ import org.springframework.http.ResponseEntity;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SuccessResponse<T> {
 
-  private final boolean status = true;
+    private final boolean status = true;
 
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private T data;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private T data;
 
-  public static <T> SuccessResponse<T> of(T data) {
-    SuccessResponse<T> SuccessResponse = new SuccessResponse<>();
+    public static <T> SuccessResponse<T> of(T data) {
+        SuccessResponse<T> SuccessResponse = new SuccessResponse<>();
 
-    SuccessResponse.data = data;
+        SuccessResponse.data = data;
 
-    return SuccessResponse;
-  }
+        return SuccessResponse;
+    }
 
-  public ResponseEntity<SuccessResponse<T>> asHttp(HttpStatus httpStatus) {
-    return ResponseEntity.status(httpStatus).body(this);
-  }
+    public ResponseEntity<SuccessResponse<T>> asHttp(HttpStatus httpStatus) {
+        return ResponseEntity.status(httpStatus).body(this);
+    }
 }
