@@ -23,6 +23,7 @@ public enum ErrorCode {
     EXPIRED_JWT_ACCESS_TOKEN(400, "S005", "jwt access token has expired"),
     EXPIRED_JWT_REFRESH_TOKEN(400, "S006", "jwt refresh token has expired"),
 
+
     // User
     USER_NOT_FOUND(404, "U001", "회원을 찾을 수 없습니다."),
     USER_ALREADY_EXISTS(409, "U002", "이미 존재하는 유저입니다."),

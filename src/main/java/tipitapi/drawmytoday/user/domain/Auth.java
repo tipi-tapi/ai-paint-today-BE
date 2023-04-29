@@ -35,4 +35,5 @@ public class Auth extends BaseEntity {
         this.user = user;
         this.refreshToken = refreshToken;
     }
+
 }

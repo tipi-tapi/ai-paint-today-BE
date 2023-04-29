@@ -46,6 +46,7 @@ public class DiaryController {
         @Parameter(description = "가게 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
         @AuthUser JwtTokenInfo tokenInfo) {
         Long userId = tokenInfo.getUserId();
+
         return SuccessResponse.of(
             diaryService.getDiary(userId, diaryId)
         ).asHttp(HttpStatus.OK);
