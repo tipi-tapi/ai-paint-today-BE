@@ -32,7 +32,6 @@ public class SecurityConfig {
         return new ObjectMapper();
     }
 
-    //아.. 이거 deprecate 되니 requestMatchers 써야하는데 왜 안 되는거야
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
@@ -57,19 +56,13 @@ public class SecurityConfig {
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-//
-//            .requestMatchers(matchers -> matchers
-//                .antMatchers("/")
-//                .antMatchers("/oauth2/login")
-//                .antMatchers("/oauth2/google/login")
-//                .antMatchers("/oauth2/apple/login")
-//                .antMatchers("/refresh")
-//            )
-
-            .authorizeRequests(
-                request -> request.anyRequest().permitAll()
-            )
-
+//            .authorizeHttpRequests(authorize -> authorize
+//                .antMatchers("/swagger-ui/**").permitAll()
+//                .antMatchers("/v3/api-docs/**").permitAll()
+//                .antMatchers("/oauth2/login").permitAll()
+//                .antMatchers("/oauth2/google/login").permitAll()
+//                .antMatchers("/oauth2/apple/login").permitAll()
+//                .antMatchers("/refresh").permitAll())
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                 UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtAuthenticationEntryPoint(objectMapper()),
