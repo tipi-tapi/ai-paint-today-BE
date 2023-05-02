@@ -139,10 +139,6 @@ public class JwtTokenProvider {
             .build()
             .parseClaimsJws(accessToken)
             .getBody();
-        // return Jwts.parser()
-        // 	.setSigningKey(key)
-        // 	.parseClaimsJws(accessToken)
-        // 	.getBody();
     }
 
 }
