@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -136,12 +135,8 @@ public class GoogleOAuthService {
         ResponseEntity<String> response = restTemplate.postForEntity(tokenUri, requestToken,
             String.class);
 
-        if (response.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException("Failed to get access token from Google");
-        }
-
         String tokenResponse = response.getBody();
-        log.info("tokenResponse: {}", tokenResponse); //넘어옴. 파싱 오류인듯.
+        log.info("tokenResponse: {}", tokenResponse);
         return objectMapper.readValue(tokenResponse, ResponseAccessToken.class);
     }
 
@@ -158,10 +153,6 @@ public class GoogleOAuthService {
         ResponseEntity<String> userInfoResponse = restTemplate.exchange(tokenUri, HttpMethod.GET,
             httpEntity, String.class);
 
-        if (userInfoResponse.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException("Failed to get user info from Google");
-        }
-
         String userInfo = userInfoResponse.getBody();
         UserProfile userProfile = objectMapper.readValue(userInfo, UserProfile.class);
         return userProfile;
@@ -169,6 +160,8 @@ public class GoogleOAuthService {
 
 
     private String getAuthorizationCode(String authorization) {
+        Assert.hasText(authorization, "Authorization header must not be empty");
+
         String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
         Assert.isTrue(tokens.length == 2, "Authorization header must be two tokens");
         Assert.isTrue("Bearer".equals(tokens[0]), "Authorization header must start with Bearer");
