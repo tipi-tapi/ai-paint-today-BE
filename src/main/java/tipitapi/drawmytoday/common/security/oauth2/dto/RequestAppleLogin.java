@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestAppleLogin {
-	private String idToken;
-	private String osPlatform;
+
+    private String idToken;
+    private String osPlatform;
 }
