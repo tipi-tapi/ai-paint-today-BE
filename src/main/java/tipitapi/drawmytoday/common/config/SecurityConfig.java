@@ -36,20 +36,20 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
-            .antMatchers("/")
+            .antMatchers("/swagger-ui/**")
+            .antMatchers("/v3/api-docs/**")
             .antMatchers("/oauth2/login")
             .antMatchers("/oauth2/google/login")
             .antMatchers("/oauth2/apple/login")
             .antMatchers("/refresh");
     }
 
+    /**
+     * csrf, rememberMe, logout, formLogin, headers 비활성화
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors()
-            .and()
-            .csrf().disable() // h2 console 접속을 위해
-            .headers().frameOptions().disable() // h2 console 접속을 위해
-            .and()
+        http.csrf().disable()
             .rememberMe().disable()
             .logout().disable()
             .formLogin().disable()

@@ -1,6 +1,11 @@
 package tipitapi.drawmytoday.common.security.oauth2.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.io.IOException;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
@@ -31,6 +37,7 @@ import tipitapi.drawmytoday.user.repository.UserRepository;
 
 @Slf4j
 @RestController
+@RequestMapping("/oauth2")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -39,7 +46,18 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
-    @PostMapping(value = "/oauth2/google/login")
+
+    @Operation(summary = "구글 로그인", description = "프론트로부터 Authorization code를 받아 구글 로그인을 진행합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "구글 로그인 성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "C001 : Authorization header 값이 Bearer 토큰이 아니거나 없습니다.",
+            content = @Content(schema = @Schema(hidden = true)))
+    })
+    @PostMapping(value = "/google/login")
     @ResponseStatus(HttpStatus.OK)
     public ResponseJwtToken googleLogin(HttpServletRequest request) throws JsonProcessingException {
         log.info("google login");
@@ -48,7 +66,17 @@ public class AuthController {
         return jwtToken;
     }
 
-    @PostMapping(value = "/oauth2/apple/login")
+    @Operation(summary = "애플 로그인", description = "프론트로부터 Authorization code, idToken을 받아 애플 로그인을 진행합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "애플 로그인 성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "C001 : Authorization header 값이 Bearer 토큰이 아니거나 없습니다.",
+            content = @Content(schema = @Schema(hidden = true)))
+    })
+    @PostMapping(value = "/apple/login")
     @ResponseStatus(HttpStatus.OK)
     public ResponseJwtToken appleLogin(HttpServletRequest request,
         @RequestBody RequestAppleLogin requestAppleLogin)
@@ -66,6 +94,19 @@ public class AuthController {
     // 		JwtProperties.REFRESH_TOKEN_HEADER);
     // }
 
+    @Operation(summary = "jwt access token 재발급",
+        description = "프론트로부터 jwt refresh token을 받아 jwt access token을 재발급합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "jwt access token 재발급 성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "C001 : Authorization header 값이 JWT 토큰이 아니거나 없습니다.\t\n"
+                + "S002 : JWT refresh token이 유효하지 않습니다.\t\n"
+                + "S006 : JWT refresh token이 만료되었습니다.",
+            content = @Content(schema = @Schema(hidden = true)))
+    })
     @GetMapping("/refresh")
     public ResponseJwtToken getAccessToken(HttpServletRequest request) {
         log.info("refresh token");
@@ -78,6 +119,7 @@ public class AuthController {
         return ResponseJwtToken.of(accessToken, "");
     }
 
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 로직 미검증(검증되면 작성하겠습니다)")
     @DeleteMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public void deleteAccount(@AuthUser JwtTokenInfo tokenInfo) {
