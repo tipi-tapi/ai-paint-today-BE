@@ -127,7 +127,6 @@ public class AppleOAuthService {
         body.add("code", authorizationCode);
         body.add("client_id", clientId);
         body.add("client_secret", clientSecret);
-        body.add("redirect_uri", "https://www.example.com");
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(appleTokenUrl, entity,
             String.class);
