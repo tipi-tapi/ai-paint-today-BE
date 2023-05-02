@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class RequestAppleLogin {
 
     private String idToken;
-    private String osPlatform;
 }

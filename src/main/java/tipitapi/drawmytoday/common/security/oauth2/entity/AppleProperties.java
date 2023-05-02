@@ -16,8 +16,5 @@ public class AppleProperties {
     private String iosClientId;
     @Value("${oauth2.apple.ios.client-secret}")
     private String iosClientSecret;
-//	@Value("${oauth2.apple.web.client-id}")
-//	private String webClientId;
-//	@Value("${oauth2.apple.web.client-secret}")
-//	private String webClientSecret;
+
 }

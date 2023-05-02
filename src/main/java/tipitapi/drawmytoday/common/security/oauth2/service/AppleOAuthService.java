@@ -54,8 +54,7 @@ public class AppleOAuthService {
         String authorizationCode = getAuthorizationCode(request);
 
         // authorization code로 refresh token 가져오기
-        ResponseAccessToken responseAccessToken = getRefreshToken(authorizationCode,
-            requestAppleLogin.getOsPlatform());
+        ResponseAccessToken responseAccessToken = getRefreshToken(authorizationCode);
 
         // appleIdToken 파싱
         AppleIdToken appleIdToken = getAppleIdToken(requestAppleLogin.getIdToken());
@@ -107,16 +106,10 @@ public class AppleOAuthService {
         }
     }
 
-    private ResponseAccessToken getRefreshToken(String authorizationCode, String osPlatform)
+    private ResponseAccessToken getRefreshToken(String authorizationCode)
         throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-//        나중에 android도 애플로그인 지원하면 추가
-//        String clientId =
-//            osPlatform.equals("ios") ? properties.getIosClientId() : properties.getWebClientId();
-//        String clientSecret = osPlatform.equals("ios") ? properties.getIosClientSecret()
-//            : properties.getWebClientSecret();
 
         String clientId = properties.getIosClientId();
         String clientSecret = properties.getIosClientSecret();
