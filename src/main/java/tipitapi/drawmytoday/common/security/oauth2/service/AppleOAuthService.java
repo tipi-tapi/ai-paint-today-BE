@@ -97,7 +97,7 @@ public class AppleOAuthService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        String url = "https://appleid.apple.com/auth/revoke";
+        String url = properties.getIosDeleteAccountUrl();
 
         String response = restTemplate.postForObject(url, request, String.class);
         if (!StringUtils.hasText(response)) {
@@ -112,7 +112,7 @@ public class AppleOAuthService {
 
         String clientId = properties.getIosClientId();
         String clientSecret = properties.getIosClientSecret();
-        String appleTokenUrl = "https://appleid.apple.com/auth/token";
+        String appleTokenUrl = "";
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");

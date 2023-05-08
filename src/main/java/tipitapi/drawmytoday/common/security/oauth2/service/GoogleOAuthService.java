@@ -103,7 +103,7 @@ public class GoogleOAuthService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        String url = "https://oauth2.googleapis.com/revoke";
+        String url = properties.getDeleteAccountUrl();
 
         String response = restTemplate.postForObject(url, request, String.class);
         if (!StringUtils.hasText(response)) {
@@ -118,7 +118,7 @@ public class GoogleOAuthService {
         String authorizationCode = getAuthorizationCode(authorization);
         log.info("authorizationCode: {}", authorizationCode);
 
-        String tokenUri = "https://oauth2.googleapis.com/token";
+        String tokenUri = properties.getTokenUrl();
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/x-www-form-urlencoded");
@@ -126,7 +126,7 @@ public class GoogleOAuthService {
         httpBody.add("code", authorizationCode);
         httpBody.add("client_id", properties.getClientId());
         httpBody.add("client_secret", properties.getClientSecret());
-        httpBody.add("redirect_uri", "https://draw-my-today.firebaseapp.com/__/auth/handler");
+        httpBody.add("redirect_uri", properties.getRedirectUri());
         httpBody.add("grant_type", "authorization_code");
 
         HttpEntity<MultiValueMap<String, String>> requestToken = new HttpEntity<>(httpBody,
@@ -143,14 +143,14 @@ public class GoogleOAuthService {
     private UserProfile getUserProfile(ResponseAccessToken accessToken)
         throws JsonProcessingException {
 
-        String tokenUri = "https://www.googleapis.com/oauth2/v3/userinfo";
+        String userInfoUrl = properties.getUserInfoUrl();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken.getAccessToken());
 
         HttpEntity<?> httpEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> userInfoResponse = restTemplate.exchange(tokenUri, HttpMethod.GET,
+        ResponseEntity<String> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET,
             httpEntity, String.class);
 
         String userInfo = userInfoResponse.getBody();

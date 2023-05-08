@@ -16,4 +16,12 @@ public class GoogleProperties {
     private String clientId;
     @Value("${oauth2.google.client-secret}")
     private String clientSecret;
+    @Value("${oauth2.google.token-url}")
+    private String tokenUrl;
+    @Value("${oauth2.google.user-info-url}")
+    private String userInfoUrl;
+    @Value("${oauth2.google.redirect-uri}")
+    private String redirectUri;
+    @Value("${oauth2.google.delete-account-url}")
+    private String deleteAccountUrl;
 }

@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.common.security.oauth2.entity;
 
+import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,5 +17,11 @@ public class AppleProperties {
     private String iosClientId;
     @Value("${oauth2.apple.ios.client-secret}")
     private String iosClientSecret;
+    @Value("${oauth2.apple.ios.token-url}")
+    private String tokenUrl;
+    @Value("${oauth2.apple.ios.delete-account-url}")
+    private String iosDeleteAccountUrl;
+
+    private Date iosClientSecretExpireDate;
 
 }
