@@ -16,12 +16,12 @@ public enum ErrorCode {
     HANDLE_ACCESS_DENIED(403, "C006", "접근이 거부됐습니다."),
 
     // Security
-    AUTHORITY_NOT_FOUND(404, "S001", "Authority not found"),
-    INVALID_TOKEN(400, "S002", "Invalid Token"),
-    JWT_ACCESS_TOKEN_NOT_FOUND(404, "S003", "jwt access token not found"),
-    JWT_REFRESH_TOKEN_NOT_FOUND(404, "S004", "jwt refresh token not found"),
-    EXPIRED_JWT_ACCESS_TOKEN(400, "S005", "jwt access token has expired"),
-    EXPIRED_JWT_REFRESH_TOKEN(400, "S006", "jwt refresh token has expired"),
+    AUTHORITY_NOT_FOUND(404, "S001", "유저 권한이 없습니다."),
+    INVALID_TOKEN(400, "S002", "유효하지 않은 토큰입니다."),
+    JWT_ACCESS_TOKEN_NOT_FOUND(404, "S003", "jwt access token이 없습니다."),
+    JWT_REFRESH_TOKEN_NOT_FOUND(404, "S004", "jwt refresh token이 없습니다."),
+    EXPIRED_JWT_ACCESS_TOKEN(400, "S005", "jwt access token이 만료되었습니다."),
+    EXPIRED_JWT_REFRESH_TOKEN(400, "S006", "jwt refresh token이 만료되었습니다."),
 
 
     // User
