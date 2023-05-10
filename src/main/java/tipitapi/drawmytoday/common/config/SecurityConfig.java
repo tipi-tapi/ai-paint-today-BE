@@ -16,7 +16,7 @@ import tipitapi.drawmytoday.common.security.jwt.JwtAuthenticationFilter;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfig {
 
@@ -32,7 +32,7 @@ public class SecurityConfig {
         return new ObjectMapper();
     }
 
-    //    @Bean
+    @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
             .antMatchers("/swagger-ui/**")
