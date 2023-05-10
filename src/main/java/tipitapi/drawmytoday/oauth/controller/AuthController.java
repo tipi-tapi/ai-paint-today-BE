@@ -31,6 +31,7 @@ import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
 import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
+import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.service.AppleOAuthService;
 import tipitapi.drawmytoday.oauth.service.GoogleOAuthService;
@@ -107,14 +108,14 @@ public class AuthController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @GetMapping("/refresh")
-    public ResponseJwtToken getAccessToken(HttpServletRequest request) {
+    public ResponseAccessToken getAccessToken(HttpServletRequest request) {
         String refreshToken = getRefreshToken(request);
 
         jwtTokenProvider.validRefreshToken(refreshToken);
 
         String accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
 
-        return ResponseJwtToken.of(accessToken, "");
+        return ResponseAccessToken.of(accessToken);
     }
 
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 로직 미검증(검증되면 작성하겠습니다)")
