@@ -154,8 +154,7 @@ public class GoogleOAuthService {
             httpEntity, String.class);
 
         String userInfo = userInfoResponse.getBody();
-        UserProfile userProfile = objectMapper.readValue(userInfo, UserProfile.class);
-        return userProfile;
+        return objectMapper.readValue(userInfo, UserProfile.class);
     }
 
 

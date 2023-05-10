@@ -131,8 +131,7 @@ public class AppleOAuthService {
         String[] jwtParts = idToken.split("\\.");
         byte[] bytes = Base64.getDecoder().decode(jwtParts[1].getBytes());
         ObjectMapper mapper = new ObjectMapper();
-        AppleIdToken appleIDToken = mapper.readValue(bytes, AppleIdToken.class);
-        return appleIDToken;
+        return mapper.readValue(bytes, AppleIdToken.class);
     }
 
     private String getAuthorizationCode(HttpServletRequest request) {

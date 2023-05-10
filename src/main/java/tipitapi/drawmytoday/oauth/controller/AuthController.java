@@ -61,9 +61,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseJwtToken googleLogin(HttpServletRequest request) throws JsonProcessingException {
         log.info("google login");
-        ResponseJwtToken jwtToken = googleOAuthService.login(request);
-        log.info("jwtToken = {}", jwtToken);
-        return jwtToken;
+        return googleOAuthService.login(request);
     }
 
     @Operation(summary = "애플 로그인", description = "프론트로부터 Authorization code, idToken을 받아 애플 로그인을 진행합니다.")
@@ -82,8 +80,7 @@ public class AuthController {
         @RequestBody RequestAppleLogin requestAppleLogin)
         throws IOException {
         log.info("apple login");
-        ResponseJwtToken jwtToken = appleOAuthService.login(request, requestAppleLogin);
-        return jwtToken;
+        return appleOAuthService.login(request, requestAppleLogin);
     }
 
     // @GetMapping("/logout")
