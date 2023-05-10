@@ -90,7 +90,6 @@ public class AppleOAuthService {
         Auth auth = authRepository.findByUser(user).orElseThrow(() -> new UserNotFoundException());
         String refreshToken = auth.getRefreshToken();
 
-        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
