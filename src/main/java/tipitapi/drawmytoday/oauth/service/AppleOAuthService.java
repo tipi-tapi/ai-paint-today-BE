@@ -25,8 +25,8 @@ import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
 import tipitapi.drawmytoday.oauth.domain.Auth;
 import tipitapi.drawmytoday.oauth.dto.AppleIdToken;
+import tipitapi.drawmytoday.oauth.dto.OAuthAccessToken;
 import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
-import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.properties.AppleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
@@ -59,7 +59,7 @@ public class AppleOAuthService {
         String authorizationCode = getAuthorizationCode(request);
 
         // authorization code로 refresh token 가져오기
-        ResponseAccessToken responseAccessToken = getRefreshToken(authorizationCode);
+        OAuthAccessToken OAuthAccessToken = getRefreshToken(authorizationCode);
 
         // appleIdToken 파싱
         AppleIdToken appleIdToken = getAppleIdToken(requestAppleLogin.getIdToken());
@@ -74,7 +74,7 @@ public class AppleOAuthService {
             });
 
         // save refresh token to database
-        authRepository.save(new Auth(user, responseAccessToken.getRefreshToken()));
+        authRepository.save(new Auth(user, OAuthAccessToken.getRefreshToken()));
 
         // // create JWT token
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
@@ -109,7 +109,7 @@ public class AppleOAuthService {
         }
     }
 
-    private ResponseAccessToken getRefreshToken(String authorizationCode)
+    private OAuthAccessToken getRefreshToken(String authorizationCode)
         throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -128,7 +128,7 @@ public class AppleOAuthService {
             String.class);
 
         String tokenResponse = response.getBody();
-        return objectMapper.readValue(tokenResponse, ResponseAccessToken.class);
+        return objectMapper.readValue(tokenResponse, OAuthAccessToken.class);
     }
 
     private AppleIdToken getAppleIdToken(String idToken) throws IOException {

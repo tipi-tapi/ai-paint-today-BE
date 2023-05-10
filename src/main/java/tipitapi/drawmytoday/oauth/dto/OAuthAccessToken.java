@@ -20,20 +20,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ResponseAccessToken {
+public class OAuthAccessToken {
 
     private String accessToken;
     private int expiresIn;
     private String refreshToken;
     private String tokenType;
 
-    @Override
-    public String toString() {
-        return "ResponseAccessToken{" +
-            "accessToken='" + accessToken + '\'' +
-            ", expiresIn=" + expiresIn +
-            ", refreshToken='" + refreshToken + '\'' +
-            ", tokenType='" + tokenType + '\'' +
-            '}';
-    }
 }

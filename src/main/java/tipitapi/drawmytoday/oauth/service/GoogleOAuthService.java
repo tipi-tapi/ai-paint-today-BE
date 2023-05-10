@@ -24,9 +24,9 @@ import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
 import tipitapi.drawmytoday.oauth.domain.Auth;
-import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
+import tipitapi.drawmytoday.oauth.dto.OAuthAccessToken;
+import tipitapi.drawmytoday.oauth.dto.OAuthUserProfile;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
-import tipitapi.drawmytoday.oauth.dto.UserProfile;
 import tipitapi.drawmytoday.oauth.properties.GoogleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
 import tipitapi.drawmytoday.user.domain.OAuthType;
@@ -56,16 +56,16 @@ public class GoogleOAuthService {
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request) throws JsonProcessingException {
         // Authorization Code로 Access Token 요청
-        ResponseAccessToken accessToken = getAccessToken(request);
+        OAuthAccessToken accessToken = getAccessToken(request);
 
         // Access Token으로 User Info 요청
-        UserProfile userProfile = getUserProfile(accessToken);
+        OAuthUserProfile OAuthUserProfile = getUserProfile(accessToken);
 
         // save user info to database
-        User user = userRepository.findByEmail(userProfile.getEmail())
+        User user = userRepository.findByEmail(OAuthUserProfile.getEmail())
             .orElseGet(() -> {
                 return userRepository.save(User.builder()
-                    .email(userProfile.getEmail())
+                    .email(OAuthUserProfile.getEmail())
                     .oauthType(OAuthType.GOOGLE)
                     .build());
             });
@@ -111,7 +111,7 @@ public class GoogleOAuthService {
         }
     }
 
-    private ResponseAccessToken getAccessToken(HttpServletRequest request)
+    private OAuthAccessToken getAccessToken(HttpServletRequest request)
         throws JsonProcessingException {
         String authorizationCode = getAuthorizationCode(request);
 
@@ -132,10 +132,10 @@ public class GoogleOAuthService {
         ResponseEntity<String> response = restTemplate.postForEntity(tokenUri, requestToken,
             String.class);
 
-        return objectMapper.readValue(response.getBody(), ResponseAccessToken.class);
+        return objectMapper.readValue(response.getBody(), OAuthAccessToken.class);
     }
 
-    private UserProfile getUserProfile(ResponseAccessToken accessToken)
+    private OAuthUserProfile getUserProfile(OAuthAccessToken accessToken)
         throws JsonProcessingException {
 
         String userInfoUrl = properties.getUserInfoUrl();
@@ -149,7 +149,7 @@ public class GoogleOAuthService {
             httpEntity, String.class);
 
         String userInfo = userInfoResponse.getBody();
-        return objectMapper.readValue(userInfo, UserProfile.class);
+        return objectMapper.readValue(userInfo, OAuthUserProfile.class);
     }
 
 
