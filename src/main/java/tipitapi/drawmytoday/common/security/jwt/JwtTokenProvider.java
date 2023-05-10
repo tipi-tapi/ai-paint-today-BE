@@ -67,8 +67,8 @@ public class JwtTokenProvider {
             .setClaims(claims) // 토큰 발행 유저 정보
             .setIssuedAt(date) // 토큰 발행 시간
             .setExpiration(new Date(date.getTime() + tokenValid)) // 토큰 만료 시간
-            .signWith(SignatureAlgorithm.HS512, key)
-            .compact();// 알고리즘과 키 설정
+            .signWith(key, SignatureAlgorithm.HS512) // 알고리즘과 키 설정
+            .compact();
     }
 
     public String createAccessToken(Long userId, UserRole userRole) {
