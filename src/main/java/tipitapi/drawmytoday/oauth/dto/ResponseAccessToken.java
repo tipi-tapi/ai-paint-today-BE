@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.common.security.oauth2.dto;
+package tipitapi.drawmytoday.oauth.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

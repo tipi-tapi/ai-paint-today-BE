@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.common.security.oauth2.dto;
+package tipitapi.drawmytoday.oauth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

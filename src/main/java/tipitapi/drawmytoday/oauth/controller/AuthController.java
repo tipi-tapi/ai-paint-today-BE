@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.common.security.oauth2.controller;
+package tipitapi.drawmytoday.oauth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,10 +27,10 @@ import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.JwtTokenNotFoundException;
-import tipitapi.drawmytoday.common.security.oauth2.dto.RequestAppleLogin;
-import tipitapi.drawmytoday.common.security.oauth2.dto.ResponseJwtToken;
-import tipitapi.drawmytoday.common.security.oauth2.service.AppleOAuthService;
-import tipitapi.drawmytoday.common.security.oauth2.service.GoogleOAuthService;
+import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
+import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
+import tipitapi.drawmytoday.oauth.service.AppleOAuthService;
+import tipitapi.drawmytoday.oauth.service.GoogleOAuthService;
 import tipitapi.drawmytoday.user.domain.OAuthType;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.repository.UserRepository;

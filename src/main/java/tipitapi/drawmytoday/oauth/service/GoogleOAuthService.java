@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.common.security.oauth2.service;
+package tipitapi.drawmytoday.oauth.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,10 +18,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
-import tipitapi.drawmytoday.common.security.oauth2.dto.ResponseAccessToken;
-import tipitapi.drawmytoday.common.security.oauth2.dto.ResponseJwtToken;
-import tipitapi.drawmytoday.common.security.oauth2.dto.UserProfile;
-import tipitapi.drawmytoday.common.security.oauth2.entity.GoogleProperties;
+import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
+import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
+import tipitapi.drawmytoday.oauth.dto.UserProfile;
+import tipitapi.drawmytoday.oauth.entity.GoogleProperties;
 import tipitapi.drawmytoday.user.domain.Auth;
 import tipitapi.drawmytoday.user.domain.OAuthType;
 import tipitapi.drawmytoday.user.domain.User;
