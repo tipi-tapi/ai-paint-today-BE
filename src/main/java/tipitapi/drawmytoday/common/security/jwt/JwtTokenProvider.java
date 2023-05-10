@@ -102,9 +102,6 @@ public class JwtTokenProvider {
             throw new BusinessException(ErrorCode.AUTHORITY_NOT_FOUND); //유저권한없음
         }
 
-        log.debug("access claims : username={}, authority={}", claims.getSubject(),
-            claims.get(CLAIM_USER_ROLE));
-
         Collection<? extends GrantedAuthority> authorities =
             Arrays.stream(claims.get(CLAIM_USER_ROLE).toString().split(","))
                 .map(SimpleGrantedAuthority::new)

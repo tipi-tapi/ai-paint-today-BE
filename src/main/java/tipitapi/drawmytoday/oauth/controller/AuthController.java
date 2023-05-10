@@ -60,7 +60,6 @@ public class AuthController {
     @PostMapping(value = "/google/login")
     @ResponseStatus(HttpStatus.OK)
     public ResponseJwtToken googleLogin(HttpServletRequest request) throws JsonProcessingException {
-        log.info("google login");
         return googleOAuthService.login(request);
     }
 
@@ -79,7 +78,6 @@ public class AuthController {
     public ResponseJwtToken appleLogin(HttpServletRequest request,
         @RequestBody RequestAppleLogin requestAppleLogin)
         throws IOException {
-        log.info("apple login");
         return appleOAuthService.login(request, requestAppleLogin);
     }
 
@@ -106,7 +104,6 @@ public class AuthController {
     })
     @GetMapping("/refresh")
     public ResponseJwtToken getAccessToken(HttpServletRequest request) {
-        log.info("refresh token");
         String refreshToken = getRefreshToken(request);
 
         jwtTokenProvider.validRefreshToken(refreshToken);
@@ -120,7 +117,6 @@ public class AuthController {
     @DeleteMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public void deleteAccount(@AuthUser JwtTokenInfo tokenInfo) {
-        log.info("delete account");
         User user = userRepository.findById(tokenInfo.getUserId()).orElseThrow(
             () -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다. id=" + tokenInfo.getUserId())
         );

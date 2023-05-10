@@ -51,11 +51,9 @@ public class GoogleOAuthService {
     public ResponseJwtToken login(HttpServletRequest request) throws JsonProcessingException {
         // Authorization Code로 Access Token 요청
         ResponseAccessToken accessToken = getAccessToken(request);
-        log.info("accessToken: {}", objectMapper.writeValueAsString(accessToken));
 
         // Access Token으로 User Info 요청
         UserProfile userProfile = getUserProfile(accessToken);
-        log.info("userProfile: {}", objectMapper.writeValueAsString(userProfile));
 
         // save user info to database
         User user = userRepository.findByEmail(userProfile.getEmail())
@@ -68,7 +66,6 @@ public class GoogleOAuthService {
 
         // save refresh token to database
         if (StringUtils.hasText(accessToken.getAccessToken())) {
-            log.info("save refresh token to database = {}", accessToken.getRefreshToken());
             authRepository.save(new Auth(user, accessToken.getRefreshToken()));
         }
 
@@ -78,7 +75,6 @@ public class GoogleOAuthService {
         String jwtRefreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(),
             user.getUserRole());
 
-        log.info("jwtAccessToken: {}", jwtAccessToken);
         return ResponseJwtToken.of(jwtAccessToken, jwtRefreshToken);
     }
 
@@ -116,7 +112,6 @@ public class GoogleOAuthService {
         String authorization = request.getHeader("Authorization");
         Assert.hasText(authorization, "Authorization header must not be empty");
         String authorizationCode = getAuthorizationCode(authorization);
-        log.info("authorizationCode: {}", authorizationCode);
 
         String tokenUri = properties.getTokenUrl();
 
@@ -136,7 +131,6 @@ public class GoogleOAuthService {
             String.class);
 
         String tokenResponse = response.getBody();
-        log.info("tokenResponse: {}", tokenResponse);
         return objectMapper.readValue(tokenResponse, ResponseAccessToken.class);
     }
 
