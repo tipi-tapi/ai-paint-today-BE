@@ -16,7 +16,7 @@ import tipitapi.drawmytoday.common.security.jwt.JwtAuthenticationFilter;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @AllArgsConstructor
 public class SecurityConfig {
 
@@ -32,7 +32,7 @@ public class SecurityConfig {
         return new ObjectMapper();
     }
 
-    @Bean
+    //    @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
             .antMatchers("/swagger-ui/**")
@@ -52,17 +52,16 @@ public class SecurityConfig {
             .rememberMe().disable()
             .logout().disable()
             .formLogin().disable()
-            .headers().disable()
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-//            .authorizeHttpRequests(authorize -> authorize
-//                .antMatchers("/swagger-ui/**").permitAll()
-//                .antMatchers("/v3/api-docs/**").permitAll()
-//                .antMatchers("/oauth2/login").permitAll()
-//                .antMatchers("/oauth2/google/login").permitAll()
-//                .antMatchers("/oauth2/apple/login").permitAll()
-//                .antMatchers("/refresh").permitAll())
+            .authorizeHttpRequests(authorize -> authorize
+                .antMatchers("/swagger-ui/**").permitAll()
+                .antMatchers("/v3/api-docs/**").permitAll()
+                .antMatchers("/oauth2/login").permitAll()
+                .antMatchers("/oauth2/google/login").permitAll()
+                .antMatchers("/oauth2/apple/login").permitAll()
+                .antMatchers("/refresh").permitAll())
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                 UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtAuthenticationEntryPoint(objectMapper()),
