@@ -18,14 +18,14 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
+import tipitapi.drawmytoday.oauth.domain.Auth;
 import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.dto.UserProfile;
-import tipitapi.drawmytoday.oauth.entity.GoogleProperties;
-import tipitapi.drawmytoday.user.domain.Auth;
+import tipitapi.drawmytoday.oauth.properties.GoogleProperties;
+import tipitapi.drawmytoday.oauth.repository.AuthRepository;
 import tipitapi.drawmytoday.user.domain.OAuthType;
 import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.repository.AuthRepository;
 import tipitapi.drawmytoday.user.repository.UserRepository;
 
 @Slf4j

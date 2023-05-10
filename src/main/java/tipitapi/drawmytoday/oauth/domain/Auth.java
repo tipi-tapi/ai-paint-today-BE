@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.user.domain;
+package tipitapi.drawmytoday.oauth.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
+import tipitapi.drawmytoday.user.domain.User;
 
 @Entity
 @Getter

@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.oauth.entity;
+package tipitapi.drawmytoday.oauth.properties;
 
 import java.util.Date;
 import lombok.Getter;
