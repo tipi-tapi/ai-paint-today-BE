@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@Schema(description = "accessToke, refreshToken Response")
+@Schema(description = "AccessToken, RefreshToken Response")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseJwtToken {
 
