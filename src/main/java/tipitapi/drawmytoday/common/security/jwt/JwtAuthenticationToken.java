@@ -37,8 +37,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     @Override
     public void setAuthenticated(boolean authenticated) {
         if (authenticated) {
-            throw new IllegalArgumentException(
-                "can't change authenticate because authenticate already true");
+            throw new IllegalArgumentException("authenticated는 true로 설정할 수 없습니다.");
         }
         super.setAuthenticated(false);
     }

@@ -17,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.common.security.jwt.exception.ExpiredAccessTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
-import tipitapi.drawmytoday.common.security.jwt.exception.JwtTokenNotFoundException;
+import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * @throws JwtTokenNotFoundException   - 헤더에 토큰이 없는 경우
+     * @throws TokenNotFoundException      - 헤더에 토큰이 없는 경우
      * @throws InvalidTokenException       - 헤더에 토큰이 있지만 유효하지 않은 경우
      * @throws ExpiredAccessTokenException - 헤더에 토큰이 있지만 만료된 경우
      */
@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorization = getRequest().getHeader(JwtProperties.ACCESS_TOKEN_HEADER);
 
         if (Objects.isNull(authorization)) {
-            throw new JwtTokenNotFoundException(ErrorCode.JWT_ACCESS_TOKEN_NOT_FOUND);
+            throw new TokenNotFoundException(ErrorCode.JWT_ACCESS_TOKEN_NOT_FOUND);
         }
 
         String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");

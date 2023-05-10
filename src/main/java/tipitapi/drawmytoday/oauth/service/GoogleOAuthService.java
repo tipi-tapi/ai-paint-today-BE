@@ -1,5 +1,7 @@
 package tipitapi.drawmytoday.oauth.service;
 
+import static tipitapi.drawmytoday.common.exception.ErrorCode.INTERNAL_SERVER_ERROR;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.servlet.http.HttpServletRequest;
@@ -12,12 +14,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import tipitapi.drawmytoday.common.exception.BusinessException;
+import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
+import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
+import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
 import tipitapi.drawmytoday.oauth.domain.Auth;
 import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
@@ -26,6 +31,7 @@ import tipitapi.drawmytoday.oauth.properties.GoogleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
 import tipitapi.drawmytoday.user.domain.OAuthType;
 import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.repository.UserRepository;
 
 @Slf4j
@@ -86,8 +92,7 @@ public class GoogleOAuthService {
      */
     @Transactional
     public void deleteAccount(User user) {
-        Auth auth = authRepository.findByUser(user)
-            .orElseThrow(() -> new RuntimeException("User refresh token not found"));
+        Auth auth = authRepository.findByUser(user).orElseThrow(() -> new UserNotFoundException());
         String refreshToken = auth.getRefreshToken();
         RestTemplate restTemplate = new RestTemplate();
 
@@ -102,16 +107,14 @@ public class GoogleOAuthService {
         String url = properties.getDeleteAccountUrl();
 
         String response = restTemplate.postForObject(url, request, String.class);
-        if (!StringUtils.hasText(response)) {
-            throw new RuntimeException("Failed to delete account");
+        if (StringUtils.hasText(response)) {
+            throw new BusinessException(INTERNAL_SERVER_ERROR);
         }
     }
 
     private ResponseAccessToken getAccessToken(HttpServletRequest request)
         throws JsonProcessingException {
-        String authorization = request.getHeader("Authorization");
-        Assert.hasText(authorization, "Authorization header must not be empty");
-        String authorizationCode = getAuthorizationCode(authorization);
+        String authorizationCode = getAuthorizationCode(request);
 
         String tokenUri = properties.getTokenUrl();
 
@@ -130,8 +133,7 @@ public class GoogleOAuthService {
         ResponseEntity<String> response = restTemplate.postForEntity(tokenUri, requestToken,
             String.class);
 
-        String tokenResponse = response.getBody();
-        return objectMapper.readValue(tokenResponse, ResponseAccessToken.class);
+        return objectMapper.readValue(response.getBody(), ResponseAccessToken.class);
     }
 
     private UserProfile getUserProfile(ResponseAccessToken accessToken)
@@ -152,12 +154,16 @@ public class GoogleOAuthService {
     }
 
 
-    private String getAuthorizationCode(String authorization) {
-        Assert.hasText(authorization, "Authorization header must not be empty");
+    private String getAuthorizationCode(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (!StringUtils.hasText(authorization)) {
+            throw new TokenNotFoundException(ErrorCode.AUTH_CODE_NOT_FOUND);
+        }
 
         String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
-        Assert.isTrue(tokens.length == 2, "Authorization header must be two tokens");
-        Assert.isTrue("Bearer".equals(tokens[0]), "Authorization header must start with Bearer");
+        if (tokens.length != 2 || !"Bearer".equals(tokens[0])) {
+            throw new InvalidTokenException();
+        }
         return tokens[1];
     }
 }

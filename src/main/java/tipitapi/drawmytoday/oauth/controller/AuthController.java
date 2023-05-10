@@ -1,5 +1,8 @@
 package tipitapi.drawmytoday.oauth.controller;
 
+import static tipitapi.drawmytoday.common.exception.ErrorCode.INTERNAL_SERVER_ERROR;
+import static tipitapi.drawmytoday.common.exception.ErrorCode.JWT_REFRESH_TOKEN_NOT_FOUND;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,19 +23,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import tipitapi.drawmytoday.common.exception.ErrorCode;
+import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.security.jwt.JwtProperties;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
-import tipitapi.drawmytoday.common.security.jwt.exception.JwtTokenNotFoundException;
+import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
 import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.service.AppleOAuthService;
 import tipitapi.drawmytoday.oauth.service.GoogleOAuthService;
 import tipitapi.drawmytoday.user.domain.OAuthType;
 import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.repository.UserRepository;
 
 @Slf4j
@@ -118,7 +122,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteAccount(@AuthUser JwtTokenInfo tokenInfo) {
         User user = userRepository.findById(tokenInfo.getUserId()).orElseThrow(
-            () -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다. id=" + tokenInfo.getUserId())
+            () -> new UserNotFoundException()
         );
 
         if (user.getOauthType() == OAuthType.GOOGLE) {
@@ -126,7 +130,7 @@ public class AuthController {
         } else if (user.getOauthType() == OAuthType.APPLE) {
             appleOAuthService.deleteAccount(user);
         } else {
-            throw new RuntimeException("해당 사용자는 OAuth2 로그인이 아닙니다.");
+            throw new BusinessException(INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -134,7 +138,7 @@ public class AuthController {
         String authorization = request.getHeader(JwtProperties.REFRESH_TOKEN_HEADER);
 
         if (Objects.isNull(authorization)) {
-            throw new JwtTokenNotFoundException(ErrorCode.JWT_REFRESH_TOKEN_NOT_FOUND);
+            throw new TokenNotFoundException(JWT_REFRESH_TOKEN_NOT_FOUND);
         }
 
         String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
