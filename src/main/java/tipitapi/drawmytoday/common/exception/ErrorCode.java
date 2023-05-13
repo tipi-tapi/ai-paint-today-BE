@@ -15,7 +15,15 @@ public enum ErrorCode {
     INVALID_TYPE_VALUE(400, "C005", "잘못된 타입의 값입니다."),
     HANDLE_ACCESS_DENIED(403, "C006", "접근이 거부됐습니다."),
 
-    // Authentication
+    // Security
+    AUTHORITY_NOT_FOUND(404, "S001", "유저 권한이 없습니다."),
+    INVALID_TOKEN(400, "S002", "유효하지 않은 토큰입니다."),
+    JWT_ACCESS_TOKEN_NOT_FOUND(404, "S003", "jwt access token이 없습니다."),
+    JWT_REFRESH_TOKEN_NOT_FOUND(404, "S004", "jwt refresh token이 없습니다."),
+    EXPIRED_JWT_ACCESS_TOKEN(400, "S005", "jwt access token이 만료되었습니다."),
+    EXPIRED_JWT_REFRESH_TOKEN(400, "S006", "jwt refresh token이 만료되었습니다."),
+    AUTH_CODE_NOT_FOUND(404, "S007", "인증 코드가 authorization header에 없습니다."),
+
 
     // User
     USER_NOT_FOUND(404, "U001", "회원을 찾을 수 없습니다."),

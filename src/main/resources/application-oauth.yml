@@ -1,0 +1,26 @@
+oauth2:
+    google:
+        client-id:
+        client-secret:
+        token-url: https://oauth2.googleapis.com/token
+        user-info-url: https://www.googleapis.com/oauth2/v3/userinfo
+        redirect-uri: https://draw-my-today.firebaseapp.com/__/auth/handler
+        delete-account-url: https://oauth2.googleapis.com/revoke
+    apple:
+        ios:
+            client-id:
+            client-secret:
+            token-url: https://appleid.apple.com/auth/token
+            delete-account-url: https://appleid.apple.com/auth/revoke
+
+
+jwt:
+    secret:
+    access-token-expire-time: 180000000
+    refresh-token-expire-time: 6048000000
+
+
+# UserDetailsService 빈 자동등록을 해제하여 자동으로 생성되는 보안 비밀번호와 관련된 경고 메시지가 표시되지 않도록 한다.
+spring:
+    autoconfigure:
+        exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
