@@ -1,23 +1,23 @@
 oauth2:
     google:
-        client-id:
-        client-secret:
-        token-url: https://oauth2.googleapis.com/token
-        user-info-url: https://www.googleapis.com/oauth2/v3/userinfo
-        redirect-uri: https://draw-my-today.firebaseapp.com/__/auth/handler
-        delete-account-url: https://oauth2.googleapis.com/revoke
+        client-id: ${GOOGLE_CLIENT_ID}
+        client-secret: ${GOOGLE_CLIENT_SECRET}
+        token-url: ${GOOGLE_TOKEN_URL}
+        user-info-url: ${GOOGLE_USER_INFO_URL}
+        redirect-uri: ${GOOGLE_REDIRECT_URI}
+        delete-account-url: ${GOOGLE_DELETE_ACCOUNT_URL}
     apple:
         ios:
-            client-id:
-            client-secret:
-            token-url: https://appleid.apple.com/auth/token
-            delete-account-url: https://appleid.apple.com/auth/revoke
+            client-id: ${APPLE_IOS_CLIENT_ID}
+            client-secret: ${APPLE_IOS_CLIENT_SECRET}
+            token-url: ${APPLE_IOS_TOKEN_URL}
+            delete-account-url: ${APPLE_IOS_DELETE_ACCOUNT_URL}
 
 
 jwt:
-    secret:
-    access-token-expire-time: 180000000
-    refresh-token-expire-time: 6048000000
+    secret: ${JWT_SECRET}
+    access-token-expire-time: 3600000
+    refresh-token-expire-time: 5184000000
 
 
 # UserDetailsService 빈 자동등록을 해제하여 자동으로 생성되는 보안 비밀번호와 관련된 경고 메시지가 표시되지 않도록 한다.
