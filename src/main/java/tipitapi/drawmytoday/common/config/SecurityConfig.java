@@ -41,7 +41,7 @@ public class SecurityConfig {
     }
 
     /**
-     * csrf, rememberMe, logout, formLogin, headers 비활성화
+     * csrf, rememberMe, logout, formLogin, httpBasic 비활성화
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -49,6 +49,7 @@ public class SecurityConfig {
             .rememberMe().disable()
             .logout().disable()
             .formLogin().disable()
+            .httpBasic().disable()
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
