@@ -1,12 +1,11 @@
 package tipitapi.drawmytoday.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -17,10 +16,19 @@ import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final String[] permitAllEndpointList = {
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/oauth2/login",
+        "/oauth2/google/login",
+        "/oauth2/apple/login",
+        "/refresh"
+    };
 
     @Bean
     public RestTemplate restTemplate() {
@@ -30,17 +38,6 @@ public class SecurityConfig {
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring()
-            .antMatchers("/swagger-ui/**")
-            .antMatchers("/v3/api-docs/**")
-            .antMatchers("/oauth2/login")
-            .antMatchers("/oauth2/google/login")
-            .antMatchers("/oauth2/apple/login")
-            .antMatchers("/refresh");
     }
 
     /**
@@ -55,14 +52,7 @@ public class SecurityConfig {
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-            .authorizeHttpRequests(authorize -> authorize
-                .antMatchers("/swagger-ui/**").permitAll()
-                .antMatchers("/v3/api-docs/**").permitAll()
-                .antMatchers("/oauth2/login").permitAll()
-                .antMatchers("/oauth2/google/login").permitAll()
-                .antMatchers("/oauth2/apple/login").permitAll()
-                .antMatchers("/refresh").permitAll())
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, permitAllEndpointList),
                 UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtAuthenticationEntryPoint(objectMapper()),
                 JwtAuthenticationFilter.class);
