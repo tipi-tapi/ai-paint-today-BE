@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -25,6 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final String[] permitAllEndpointList;
+
     private static HttpServletRequest getRequest() {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         return servletRequestAttributes.getRequest();
@@ -35,6 +38,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         FilterChain filterChain) throws ServletException, IOException {
         authentication();
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+
+        for (String permitAllEndpoint : permitAllEndpointList) {
+            if (pathMatcher.match(permitAllEndpoint, requestURI)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -66,4 +82,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         return tokens[1];
     }
+
 }
