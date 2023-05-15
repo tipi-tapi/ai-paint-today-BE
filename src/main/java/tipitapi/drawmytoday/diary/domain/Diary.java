@@ -61,9 +61,11 @@ public class Diary extends BaseEntityWithUpdate {
 
 
     @Builder
-    public Diary(User user, LocalDateTime diaryDate, String notes, boolean isAi, String title,
+    public Diary(User user, Emotion emotion, LocalDateTime diaryDate, String notes, boolean isAi,
+        String title,
         String weather, ReviewType review) {
         this.user = user;
+        this.emotion = emotion;
         this.diaryDate = diaryDate;
         this.notes = notes;
         this.isAi = isAi;
