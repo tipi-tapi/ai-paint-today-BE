@@ -2,13 +2,11 @@ package tipitapi.drawmytoday.diary.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.domain.EmotionRecord;
 import tipitapi.drawmytoday.diary.domain.Image;
+import tipitapi.drawmytoday.emotion.domain.Emotion;
 
 @Getter
 @Schema(description = "일기 상세 Response")
@@ -28,16 +26,13 @@ public class DiaryResponse {
     private final LocalDateTime createdAt;
 
     @Schema(description = "감정 목록")
-    private final List<String> emotions;
+    private final String emotion;
 
     @Schema(description = "일기 내용")
     private String notes;
 
-    public static DiaryResponse of(Diary diary, Image image, List<EmotionRecord> records) {
-        List<String> emotions = records.stream()
-            .map((eachRecord) -> eachRecord.getEmotion().getName())
-            .collect(Collectors.toList());
+    public static DiaryResponse of(Diary diary, Image image, Emotion emotion) {
         return new DiaryResponse(diary.getDiaryId(), image.getImageUrl(), diary.getDiaryDate(),
-            diary.getCreatedAt(), emotions, diary.getNotes());
+            diary.getCreatedAt(), emotion.getName(), diary.getNotes());
     }
 }
