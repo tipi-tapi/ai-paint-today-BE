@@ -46,9 +46,10 @@ public class DiaryController {
     })
     @GetMapping("/{id}")
         @Parameter(description = "가게 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
-        @AuthUser JwtTokenInfo tokenInfo) {
-        Long userId = tokenInfo.getUserId();
     public ResponseEntity<SuccessResponse<GetDiaryResponse>> getDiary(
+        , @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+    ) {
+
         User user = validateUserService.validateUserById(tokenInfo.getUserId());
 
         return SuccessResponse.of(
