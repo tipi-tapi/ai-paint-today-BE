@@ -45,8 +45,8 @@ public class DiaryController {
             content = @Content(schema = @Schema(hidden = true))),
     })
     @GetMapping("/{id}")
-        @Parameter(description = "가게 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
     public ResponseEntity<SuccessResponse<GetDiaryResponse>> getDiary(
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
         , @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
 
