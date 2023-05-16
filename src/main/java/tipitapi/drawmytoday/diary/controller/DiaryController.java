@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
-import tipitapi.drawmytoday.diary.dto.DiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.service.DiaryService;
 
 @RestController
@@ -42,10 +42,10 @@ public class DiaryController {
             content = @Content(schema = @Schema(hidden = true))),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<SuccessResponse<DiaryResponse>> getDiary(
         @Parameter(description = "가게 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
         @AuthUser JwtTokenInfo tokenInfo) {
         Long userId = tokenInfo.getUserId();
+    public ResponseEntity<SuccessResponse<GetDiaryResponse>> getDiary(
 
         return SuccessResponse.of(
             diaryService.getDiary(userId, diaryId)
