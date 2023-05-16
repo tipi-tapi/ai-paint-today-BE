@@ -19,6 +19,8 @@ import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.service.DiaryService;
+import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.user.service.ValidateUserService;
 
 @RestController
 @RequestMapping("/diary")
@@ -26,6 +28,7 @@ import tipitapi.drawmytoday.diary.service.DiaryService;
 public class DiaryController {
 
     private final DiaryService diaryService;
+    private final ValidateUserService validateUserService;
 
     @Operation(summary = "일기 조회", description = "특정 일기의 내용을 반환한다.")
     @ApiResponses(value = {
@@ -46,6 +49,7 @@ public class DiaryController {
         @AuthUser JwtTokenInfo tokenInfo) {
         Long userId = tokenInfo.getUserId();
     public ResponseEntity<SuccessResponse<GetDiaryResponse>> getDiary(
+        User user = validateUserService.validateUserById(tokenInfo.getUserId());
 
         return SuccessResponse.of(
             diaryService.getDiary(userId, diaryId)
