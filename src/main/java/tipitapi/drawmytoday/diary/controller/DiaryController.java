@@ -53,7 +53,7 @@ public class DiaryController {
         User user = validateUserService.validateUserById(tokenInfo.getUserId());
 
         return SuccessResponse.of(
-            diaryService.getDiary(userId, diaryId)
+            diaryService.getDiary(user, diaryId)
         ).asHttp(HttpStatus.OK);
     }
 }
