@@ -22,7 +22,16 @@ public class DiaryService {
         Diary diary = diaryRepository.findByDiaryIdAndUser(diaryId, user)
             .orElseThrow(DiaryNotFoundException::new);
 
+        Diary diary = diaryRepository.findById(diaryId)
+            .orElseThrow(DiaryNotFoundException::new);
+        ownedByUser(diary, user);
         Image image = imageService.getImage(diary);
         return GetDiaryResponse.of(diary, image, diary.getEmotion());
+    }
+
+    private void ownedByUser(Diary diary, User user) {
+        if (diary.getUser() != user) {
+            throw new NotOwnerOfDiaryException();
+        }
     }
 }
