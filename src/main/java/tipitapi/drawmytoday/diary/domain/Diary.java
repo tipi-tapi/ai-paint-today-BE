@@ -16,16 +16,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
+import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.User;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@SQLDelete(sql = "UPDATE diary SET deleted = CURRENT_TIMESTAMP WHERE id = ?")
-@Where(clause = "deleted_at = null")
 public class Diary extends BaseEntityWithUpdate {
 
     @Id
@@ -36,6 +33,11 @@ public class Diary extends BaseEntityWithUpdate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "emotion_id", nullable = false)
+    private Emotion emotion;
 
     @NotNull
     @Column(nullable = false)
@@ -57,12 +59,13 @@ public class Diary extends BaseEntityWithUpdate {
     @Enumerated(EnumType.STRING)
     private ReviewType review;
 
-    private LocalDateTime deletedAt;
 
     @Builder
-    public Diary(User user, LocalDateTime diaryDate, String notes, boolean isAi, String title,
+    public Diary(User user, Emotion emotion, LocalDateTime diaryDate, String notes, boolean isAi,
+        String title,
         String weather, ReviewType review) {
         this.user = user;
+        this.emotion = emotion;
         this.diaryDate = diaryDate;
         this.notes = notes;
         this.isAi = isAi;
