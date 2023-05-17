@@ -36,6 +36,10 @@ public class DiaryController {
             responseCode = "200",
             description = "일기 상세 정보"),
         @ApiResponse(
+            responseCode = "403",
+            description = "D002 : 자신의 일기에만 접근할 수 있습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
             responseCode = "404",
             description = "D001 : 일기를 찾을 수 없습니다.\t\nI001 : 선택된 이미지를 찾을 수 없습니다.",
             content = @Content(schema = @Schema(hidden = true))),
