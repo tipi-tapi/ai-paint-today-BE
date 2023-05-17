@@ -19,7 +19,7 @@ public class DiaryService {
     private final ImageService imageService;
 
     public GetDiaryResponse getDiary(User user, Long diaryId) {
-        Diary diary = diaryRepository.findByIdAndUser(diaryId, user)
+        Diary diary = diaryRepository.findByDiaryIdAndUser(diaryId, user)
             .orElseThrow(DiaryNotFoundException::new);
 
         Image image = imageService.getImage(diary);

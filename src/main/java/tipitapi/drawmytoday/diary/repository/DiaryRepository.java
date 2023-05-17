@@ -7,5 +7,5 @@ import tipitapi.drawmytoday.user.domain.User;
 
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
-    Optional<Diary> findByIdAndUser(Long id, User user);
+    Optional<Diary> findByDiaryIdAndUser(Long diaryId, User user);
 }
