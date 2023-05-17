@@ -44,4 +44,8 @@ public class Image extends BaseEntity {
     public static Image create(Diary diary, String imageUrl, boolean isSelected) {
         return new Image(diary, imageUrl, isSelected);
     }
+
+    public void setSelected(boolean isSelected) {
+        this.isSelected = isSelected;
+    }
 }
