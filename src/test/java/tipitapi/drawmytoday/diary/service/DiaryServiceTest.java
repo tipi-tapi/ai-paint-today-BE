@@ -64,7 +64,6 @@ class DiaryServiceTest {
             @Test
             @DisplayName("일기를 반환한다.")
             void it_returns_diary() {
-                // given
                 User user = createUser();
                 Diary diary = createDiary(1L, user);
                 Image image = createImage(diary);
@@ -73,10 +72,8 @@ class DiaryServiceTest {
                     Optional.of(diary));
                 given(imageService.getImage(diary)).willReturn(image);
 
-                // when
                 GetDiaryResponse getDiaryResponse = diaryService.getDiary(user, 1L);
 
-                // then
                 assertThat(getDiaryResponse.getId()).isEqualTo(diary.getDiaryId());
             }
         }
@@ -88,12 +85,10 @@ class DiaryServiceTest {
             @Test
             @DisplayName("예외를 발생시킨다.")
             void it_throws_exception() {
-                // given
                 User user = createUser();
 
                 given(diaryRepository.findByDiaryIdAndUser(1L, user)).willReturn(Optional.empty());
 
-                // when & then
                 assertThatThrownBy(() -> diaryService.getDiary(user, 1L))
                     .isInstanceOf(DiaryNotFoundException.class);
             }
@@ -106,7 +101,6 @@ class DiaryServiceTest {
             @Test
             @DisplayName("예외를 발생시킨다.")
             void it_throws_exception() {
-                // given
                 User user = createUser();
                 Diary diary = createDiary(1L, user);
 
@@ -114,7 +108,6 @@ class DiaryServiceTest {
                     Optional.of(diary));
                 given(imageService.getImage(diary)).willThrow(ImageNotFoundException.class);
 
-                // when & then
                 assertThatThrownBy(() -> diaryService.getDiary(user, 1L))
                     .isInstanceOf(ImageNotFoundException.class);
             }
