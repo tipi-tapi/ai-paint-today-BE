@@ -31,7 +31,6 @@ public enum ErrorCode {
 
     // Diary
     DIARY_NOT_FOUND(404, "D001", "일기를 찾을 수 없습니다."),
-    DIARY_NOT_OWNER(403, "D002", "자신의 일기에만 접근할 수 있습니다."),
 
     // Image
     IMAGE_NOT_FOUND(404, "I001", "선택된 이미지를 찾을 수 없습니다."),
