@@ -1,0 +1,21 @@
+spring:
+    datasource:
+        driver-class-name: org.h2.Driver
+        url: jdbc:h2:mem:draw_my_today_db;MODE=MySQL;
+
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        open-in-view: false
+        properties:
+            hibernate:
+                auto_quote_keyword: true
+                format_sql: true
+                show-sql: true
+        hibernate:
+            ddl-auto: create-drop
+        show-sql: true
+
+logging:
+    level:
+        org.hibernate.sql: debug
+        org.hibernate.type: trace
