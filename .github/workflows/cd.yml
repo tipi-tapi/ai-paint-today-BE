@@ -7,6 +7,7 @@ on:
 env:
     PROD_PATH: ./src/main/resources/application-prod.yml
     OAUTH_PATH: ./src/main/resources/application-oauth.yml
+    DEPLOY_PATH: /home/ubuntu/SpringServer/draw-my-today-0.0.1-SNAPSHOT.jar
 
 jobs:
     deploy:
@@ -68,7 +69,7 @@ jobs:
                     key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
                     port: 22
                     source: build/libs/draw-my-today-0.0.1-SNAPSHOT.jar
-                    target: /home/ubuntu/SpringServer/draw-my-today-0.0.1-SNAPSHOT.jar
+                    target: ${{ env.DEPLOY_PATH }}
 
             -   name: Deploy EC2
                 uses: appleboy/ssh-action@master
