@@ -66,6 +66,7 @@ jobs:
                     host: ${{ secrets.EC2_HOST }}
                     username: ${{ secrets.EC2_USERNAME }}
                     key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+                    port: 22
                     source: build/libs/draw-my-today-0.0.1-SNAPSHOT.jar
                     target: /home/ubuntu/SpringServer/draw-my-today-0.0.1-SNAPSHOT.jar
 
