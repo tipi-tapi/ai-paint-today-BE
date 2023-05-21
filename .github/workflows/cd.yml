@@ -36,10 +36,10 @@ jobs:
                     oauth2.google.user-info-url: ${{ secrets.GOOGLE_USER_INFO_URL }}
                     oauth2.google.redirect-uri: ${{ secrets.GOOGLE_REDIRECT_URI }}
                     oauth2.google.delete-account-url: ${{ secrets.GOOGLE_DELETE_ACCOUNT_URL }}
-                    oauth2.apple.client-id: ${{ secrets.APPLE_IOS_CLIENT_ID }}
-                    oauth2.apple.client-secret: ${{ secrets.APPLE_IOS_CLIENT_SECRET }}
-                    oauth2.apple.token-url: ${{ secrets.APPLE_IOS_TOKEN_URL }}
-                    oauth2.apple.delete-account-url: ${{ secrets.APPLE_IOS_DELETE_ACCOUNT_URL }}
+                    oauth2.apple.ios.client-id: ${{ secrets.APPLE_IOS_CLIENT_ID }}
+                    oauth2.apple.ios.client-secret: ${{ secrets.APPLE_IOS_CLIENT_SECRET }}
+                    oauth2.apple.ios.token-url: ${{ secrets.APPLE_IOS_TOKEN_URL }}
+                    oauth2.apple.ios.delete-account-url: ${{ secrets.APPLE_IOS_DELETE_ACCOUNT_URL }}
                     jwt.secret: ${{ secrets.JWT_SECRET }}
 
             -   name: Cache Gradle packages
