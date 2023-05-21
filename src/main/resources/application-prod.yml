@@ -10,4 +10,4 @@ spring:
         open-in-view: false
         show-sql: true
         hibernate:
-            ddl-auto: create
+            ddl-auto: validate
