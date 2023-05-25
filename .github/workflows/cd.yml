@@ -2,7 +2,7 @@ name: main branch cd
 
 on:
     push:
-        branches: [ "main", "feature/21" ]
+        branches: [ "main" ]
 
 env:
     PROD_PATH: ./src/main/resources/application-prod.yml
