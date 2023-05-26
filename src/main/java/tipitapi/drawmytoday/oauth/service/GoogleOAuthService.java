@@ -29,7 +29,7 @@ import tipitapi.drawmytoday.oauth.dto.OAuthUserProfile;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.properties.GoogleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
-import tipitapi.drawmytoday.user.domain.OAuthType;
+import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.repository.UserRepository;
@@ -66,7 +66,7 @@ public class GoogleOAuthService {
             .orElseGet(() -> {
                 return userRepository.save(User.builder()
                     .email(OAuthUserProfile.getEmail())
-                    .oauthType(OAuthType.GOOGLE)
+                    .socialCode(SocialCode.GOOGLE)
                     .build());
             });
 

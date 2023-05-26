@@ -30,7 +30,7 @@ import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.properties.AppleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
-import tipitapi.drawmytoday.user.domain.OAuthType;
+import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.repository.UserRepository;
@@ -69,7 +69,7 @@ public class AppleOAuthService {
             .orElseGet(() -> {
                 return userRepository.save(User.builder()
                     .email(appleIdToken.getEmail())
-                    .oauthType(OAuthType.APPLE)
+                    .socialCode(SocialCode.APPLE)
                     .build());
             });
 

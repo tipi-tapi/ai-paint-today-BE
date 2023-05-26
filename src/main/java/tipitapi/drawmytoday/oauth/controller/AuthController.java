@@ -35,7 +35,7 @@ import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.service.AppleOAuthService;
 import tipitapi.drawmytoday.oauth.service.GoogleOAuthService;
-import tipitapi.drawmytoday.user.domain.OAuthType;
+import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.repository.UserRepository;
@@ -126,9 +126,9 @@ public class AuthController {
             () -> new UserNotFoundException()
         );
 
-        if (user.getOauthType() == OAuthType.GOOGLE) {
+        if (user.getSocialCode() == SocialCode.GOOGLE) {
             googleOAuthService.deleteAccount(user);
-        } else if (user.getOauthType() == OAuthType.APPLE) {
+        } else if (user.getSocialCode() == SocialCode.APPLE) {
             appleOAuthService.deleteAccount(user);
         } else {
             throw new BusinessException(INTERNAL_SERVER_ERROR);
