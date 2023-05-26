@@ -12,11 +12,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
+import tipitapi.drawmytoday.diary.dto.CreateDiaryRequest;
+import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.service.DiaryService;
 
@@ -49,5 +53,23 @@ public class DiaryController {
         return SuccessResponse.of(
             diaryService.getDiary(tokenInfo.getUserId(), diaryId)
         ).asHttp(HttpStatus.OK);
+    }
+
+    @Operation(summary = "일기 생성", description = "dall-e API를 사용하여 이미지를 발급하여 일기를 생성한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "성공적으로 생성된 일기 정보")
+    })
+    @PostMapping()
+    public ResponseEntity<SuccessResponse<CreateDiaryResponse>> createDiary(
+        @RequestBody CreateDiaryRequest createDiaryRequest,
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+    ) throws Exception {
+        // TODO : Swagger Error 명세 필요
+        return SuccessResponse.of(
+            diaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
+                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes())
+        ).asHttp(HttpStatus.CREATED);
     }
 }
