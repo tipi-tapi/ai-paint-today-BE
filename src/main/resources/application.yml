@@ -1,4 +1,4 @@
 spring:
-  profiles:
-    active: ${profile}
-    include: oauth
+    profiles:
+        active: ${profile}
+        include: oauth, aws, openai
