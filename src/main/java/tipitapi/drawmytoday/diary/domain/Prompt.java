@@ -23,7 +23,6 @@ public class Prompt extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long promptId;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id", nullable = true)
     private Diary diary;
