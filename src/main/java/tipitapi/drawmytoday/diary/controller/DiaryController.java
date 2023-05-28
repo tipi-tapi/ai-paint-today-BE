@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +64,7 @@ public class DiaryController {
     })
     @PostMapping()
     public ResponseEntity<SuccessResponse<CreateDiaryResponse>> createDiary(
-        @RequestBody CreateDiaryRequest createDiaryRequest,
+        @RequestBody @Valid CreateDiaryRequest createDiaryRequest,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) throws Exception {
         // TODO : Swagger Error 명세 필요
