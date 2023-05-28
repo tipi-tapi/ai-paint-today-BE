@@ -56,18 +56,25 @@ public class DiaryController {
         ).asHttp(HttpStatus.OK);
     }
 
-    @Operation(summary = "일기 생성", description = "dall-e API를 사용하여 이미지를 발급하여 일기를 생성한다.")
+    @Operation(summary = "일기 생성", description = "DALL-E API를 사용하여 이미지를 발급하여 일기를 생성한다.")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "201",
-            description = "성공적으로 생성된 일기 정보")
+            description = "성공적으로 생성된 일기 정보"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "E001 : 감정을 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "DE001 : DALL-E 이미지 생성에 실패하였습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
     })
     @PostMapping()
     public ResponseEntity<SuccessResponse<CreateDiaryResponse>> createDiary(
         @RequestBody @Valid CreateDiaryRequest createDiaryRequest,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
-    ) throws Exception {
-        // TODO : Swagger Error 명세 필요
+    ) {
         return SuccessResponse.of(
             diaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes())
