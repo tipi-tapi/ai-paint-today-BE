@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import tipitapi.drawmytoday.common.response.ErrorResponse;
 import tipitapi.drawmytoday.common.response.ErrorResponse.ValidationError;
+import tipitapi.drawmytoday.s3.exception.S3FailedException;
 
 @RestControllerAdvice
 @Slf4j
@@ -50,6 +53,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn("handleAllException", ex);
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         return handleExceptionInternal(errorCode);
+    }
+
+    @ExceptionHandler(SdkClientException.class)
+    public ResponseEntity<Object> handleS3SdkClientException(SdkClientException e) {
+        log.error("S3SdkClientException", e);
+        return handleExceptionInternal(ErrorCode.S3_SDK_ERROR);
+    }
+
+    @ExceptionHandler(S3Exception.class)
+    public ResponseEntity<Object> handleS3Exception(S3Exception e) {
+        log.error("S3Exception", e);
+        return handleExceptionInternal(ErrorCode.S3_SERVICE_ERROR);
+    }
+
+    @ExceptionHandler(S3FailedException.class)
+    public ResponseEntity<Object> handleS3FailedException(S3FailedException e) {
+        log.error("S3FailedException", e);
+        return handleExceptionInternal(ErrorCode.S3_FAILED);
     }
 
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
