@@ -5,6 +5,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.dalle.service.DallEService;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
@@ -30,6 +31,7 @@ public class DiaryService {
     private final ValidateEmotionService validateEmotionService;
     private final S3Service s3Service;
     private final DallEService dallEService;
+    private final PromptService promptService;
 
     public GetDiaryResponse getDiary(Long userId, Long diaryId) {
         User user = validateUserService.validateUserById(userId);
@@ -38,36 +40,36 @@ public class DiaryService {
             .orElseThrow(DiaryNotFoundException::new);
         ownedByUser(diary, user);
         Image image = imageService.getImage(diary);
-        
+
         return GetDiaryResponse.of(diary, image, diary.getEmotion());
     }
 
+    @Transactional(noRollbackFor = DallERequestFailException.class)
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
         String notes) {
+        // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
         User user = validateUserService.validateUserById(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
-        // 일기 객체 생성
-        Diary diary = diaryRepository.save(
-            Diary.builder().user(user).emotion(emotion).diaryDate(LocalDateTime.now()).notes(notes)
-                .isAi(true).build()
-        );
+        String prompt = createPromptText(emotion, keyword);
+
         try {
-            // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
-            // 이미지 생성 요청
-            String prompt = createPrompt(emotionId, keyword);
             byte[] dallEImage = dallEService.getDallEImage(prompt);
-            // 생성 요청 성공시, S3 업로드
+
+            Diary diary = diaryRepository.save(
+                Diary.builder().user(user).emotion(emotion).diaryDate(LocalDateTime.now())
+                    .notes(notes)
+                    .isAi(true).build());
+            promptService.createPrompt(diary, prompt, true);
+
             String imagePath = getImagePath(diary.getDiaryId(), 1);
             s3Service.uploadFromBase64(dallEImage, imagePath);
-            // 이미지 업로드 성공 후, 이미지 객체 생성
             imageService.createImage(diary, imagePath, true);
-        } catch (Exception e) {
-            // TODO: Dall-E 에러 핸들링 필요
-            // TODO: S3 에러 핸들링 필요
+
+            return new CreateDiaryResponse(diary.getDiaryId());
+        } catch (DallERequestFailException e) {
+            promptService.createPrompt(prompt, false);
+            throw e;
         }
-        // TODO: PromptLog 생성 필요
-        // TODO: Dall-E 생성 실패시 Diary 생성 안되게 롤백 필요
-        return new CreateDiaryResponse(diary.getDiaryId());
     }
 
     private void ownedByUser(Diary diary, User user) {
@@ -82,7 +84,9 @@ public class DiaryService {
     }
 
     // TODO: 별도의 서비스로 분리, 로직 구현 필요
-    private String createPrompt(long emotionId, String keyword) {
-        return "";
+    private String createPromptText(Emotion emotion, String keyword) {
+        return String.format(
+            "%s illustration in %s tones, painted in watercolor fairy tale style, with %s",
+            emotion.getEmotionPrompt(), emotion.getColorPrompt(), keyword);
     }
 }
