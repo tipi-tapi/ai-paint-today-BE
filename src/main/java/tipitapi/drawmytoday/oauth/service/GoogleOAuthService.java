@@ -4,6 +4,7 @@ import static tipitapi.drawmytoday.common.exception.ErrorCode.INTERNAL_SERVER_ER
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,21 +58,25 @@ public class GoogleOAuthService {
     public ResponseJwtToken login(HttpServletRequest request) throws JsonProcessingException {
         // Authorization Code로 Access Token 요청
         OAuthAccessToken accessToken = getAccessToken(request);
+        log.info("getAccessToken = {}", accessToken.getAccessToken());
+        log.info("getRefreshToken = {}", accessToken.getRefreshToken());
 
         // Access Token으로 User Info 요청
-        OAuthUserProfile OAuthUserProfile = getUserProfile(accessToken);
+        OAuthUserProfile oAuthUserProfile = getUserProfile(accessToken);
+        log.info("oAuthUserProfile = {}", oAuthUserProfile.getEmail());
 
         // save user info to database
-        User user = userRepository.findByEmail(OAuthUserProfile.getEmail())
-            .orElseGet(() -> {
-                return userRepository.save(User.builder()
-                    .email(OAuthUserProfile.getEmail())
-                    .socialCode(SocialCode.GOOGLE)
-                    .build());
-            });
-
-        // save refresh token to database
-        if (StringUtils.hasText(accessToken.getAccessToken())) {
+        Optional<User> findUser = userRepository.findByEmail(oAuthUserProfile.getEmail());
+        User user = null;
+        if (findUser.isPresent()) {
+            user = findUser.get();
+            Auth auth = authRepository.findByUser(user).get();
+            auth.setRefreshToken(accessToken.getRefreshToken());
+        } else {
+            user = userRepository.save(User.builder()
+                .email(user.getEmail())
+                .socialCode(SocialCode.APPLE)
+                .build());
             authRepository.save(new Auth(user, accessToken.getRefreshToken()));
         }
 
@@ -114,6 +119,7 @@ public class GoogleOAuthService {
     private OAuthAccessToken getAccessToken(HttpServletRequest request)
         throws JsonProcessingException {
         String authorizationCode = getAuthorizationCode(request);
+        log.info("authorizationCode: {}", authorizationCode);
 
         String tokenUri = properties.getTokenUrl();
 

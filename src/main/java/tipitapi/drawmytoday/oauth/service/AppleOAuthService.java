@@ -7,8 +7,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -35,6 +37,7 @@ import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.repository.UserRepository;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -57,24 +60,30 @@ public class AppleOAuthService {
         throws IOException {
         // authorization code 가져오기
         String authorizationCode = getAuthorizationCode(request);
+        log.info("authorizationCode={}", authorizationCode);
 
         // authorization code로 refresh token 가져오기
-        OAuthAccessToken OAuthAccessToken = getRefreshToken(authorizationCode);
+        OAuthAccessToken oAuthAccessToken = getRefreshToken(authorizationCode);
+        log.info("getRefreshToken={}", oAuthAccessToken.getRefreshToken());
 
         // appleIdToken 파싱
         AppleIdToken appleIdToken = getAppleIdToken(requestAppleLogin.getIdToken());
+        log.info("getEmail={}", appleIdToken.getEmail());
 
         // save user info to database
-        User user = userRepository.findByEmail(appleIdToken.getEmail())
-            .orElseGet(() -> {
-                return userRepository.save(User.builder()
-                    .email(appleIdToken.getEmail())
-                    .socialCode(SocialCode.APPLE)
-                    .build());
-            });
-
-        // save refresh token to database
-        authRepository.save(new Auth(user, OAuthAccessToken.getRefreshToken()));
+        Optional<User> findUser = userRepository.findByEmail(appleIdToken.getEmail());
+        User user = null;
+        if (findUser.isPresent()) {
+            user = findUser.get();
+            Auth auth = authRepository.findByUser(user).get();
+            auth.setRefreshToken(oAuthAccessToken.getRefreshToken());
+        } else {
+            user = userRepository.save(User.builder()
+                .email(appleIdToken.getEmail())
+                .socialCode(SocialCode.APPLE)
+                .build());
+            authRepository.save(new Auth(user, oAuthAccessToken.getRefreshToken()));
+        }
 
         // // create JWT token
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
