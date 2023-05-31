@@ -3,6 +3,9 @@ package tipitapi.drawmytoday.dalle.service;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -24,7 +27,10 @@ public class DallEService {
     }
 
     public byte[] getDallEImage(String prompt) {
-        CreateImageRequest request = CreateImageRequest.of(prompt);
+        HttpHeaders requestHeader = new HttpHeaders();
+        requestHeader.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<CreateImageRequest> request = new HttpEntity<>(CreateImageRequest.of(prompt),
+            requestHeader);
 
         CreateImageResponse response = restTemplate
             .postForObject(apiUrl, request, CreateImageResponse.class);
