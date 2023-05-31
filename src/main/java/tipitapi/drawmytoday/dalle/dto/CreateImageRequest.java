@@ -12,6 +12,6 @@ public class CreateImageRequest {
     private String response_format;
 
     public static CreateImageRequest of(String prompt) {
-        return new CreateImageRequest(prompt, 1, "1024*1024", "b64_json");
+        return new CreateImageRequest(prompt, 1, "1024x1024", "b64_json");
     }
 }
