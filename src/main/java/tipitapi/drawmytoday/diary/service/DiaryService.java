@@ -79,7 +79,7 @@ public class DiaryService {
     }
 
     private String getImagePath(Long diaryId, int index) {
-        return String.format("/post/%d/%s_%d.png", diaryId,
+        return String.format("post/%d/%s_%d.png", diaryId,
             new Date().getTime(), index);
     }
 
