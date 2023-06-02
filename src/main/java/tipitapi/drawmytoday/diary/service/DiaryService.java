@@ -1,10 +1,15 @@
 package tipitapi.drawmytoday.diary.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
+import tipitapi.drawmytoday.diary.dto.GetDiariesResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
@@ -28,8 +33,18 @@ public class DiaryService {
             .orElseThrow(DiaryNotFoundException::new);
         ownedByUser(diary, user);
         Image image = imageService.getImage(diary);
-        
+
         return GetDiaryResponse.of(diary, image, diary.getEmotion());
+    }
+
+    public List<GetDiariesResponse> getDiaries(Long userId, int year, int month) {
+        User user = validateUserService.validateUserById(userId);
+        LocalDateTime startMonth = DateUtils.getStartDate(year, month);
+        LocalDateTime endMonth = DateUtils.getEndDate(year, month);
+        return diaryRepository.findAllByUserUserIdAndDiaryDateBetween(user.getUserId(),
+                startMonth, endMonth).stream()
+            .map(GetDiariesResponse::of)
+            .collect(Collectors.toList());
     }
 
     private void ownedByUser(Diary diary, User user) {
