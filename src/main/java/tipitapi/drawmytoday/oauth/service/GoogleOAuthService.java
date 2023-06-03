@@ -111,7 +111,7 @@ public class GoogleOAuthService {
         String url = properties.getDeleteAccountUrl();
 
         String response = restTemplate.postForObject(url, request, String.class);
-        if (StringUtils.hasText(response)) {
+        if (response.contains("error")) {
             throw new BusinessException(INTERNAL_SERVER_ERROR);
         }
     }
