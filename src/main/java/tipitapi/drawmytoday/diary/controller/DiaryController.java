@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
+import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
+import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
@@ -69,12 +71,16 @@ public class DiaryController {
             responseCode = "500",
             description = "DE001 : DALL-E 이미지 생성에 실패하였습니다.",
             content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "IIS001 : 이미지 스트림을 가져오는데 실패하였습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
     })
     @PostMapping()
     public ResponseEntity<SuccessResponse<CreateDiaryResponse>> createDiary(
         @RequestBody @Valid CreateDiaryRequest createDiaryRequest,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
-    ) {
+    ) throws DallERequestFailException, ImageInputStreamFailException {
         return SuccessResponse.of(
             diaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes())
