@@ -25,8 +25,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
-import tipitapi.drawmytoday.diary.dto.GetDiariesResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
@@ -121,7 +121,7 @@ class DiaryServiceTest {
                 given(validateUserService.validateUserById(1L)).willThrow(
                     new UserNotFoundException());
 
-                assertThatThrownBy(() -> diaryService.getDiaries(1L, 2023, 6))
+                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, 6))
                     .isInstanceOf(UserNotFoundException.class);
             }
         }
@@ -137,7 +137,7 @@ class DiaryServiceTest {
                 User user = createUser();
                 given(validateUserService.validateUserById(1L)).willReturn(user);
 
-                assertThatThrownBy(() -> diaryService.getDiaries(1L, 2023, value))
+                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, value))
                     .isInstanceOf(BusinessException.class);
             }
 
@@ -148,7 +148,7 @@ class DiaryServiceTest {
                 User user = createUser();
                 given(validateUserService.validateUserById(1L)).willReturn(user);
 
-                assertThatThrownBy(() -> diaryService.getDiaries(1L, 2023, value))
+                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, value))
                     .isInstanceOf(BusinessException.class);
             }
         }
@@ -167,7 +167,7 @@ class DiaryServiceTest {
                     any(Long.class), any(LocalDateTime.class), any(LocalDateTime.class)))
                     .willReturn(List.of(diary));
 
-                assertThatThrownBy(() -> diaryService.getDiaries(1L, 2023, 6))
+                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, 6))
                     .isInstanceOf(ImageNotFoundException.class);
             }
 
@@ -182,7 +182,9 @@ class DiaryServiceTest {
                     any(Long.class), any(LocalDateTime.class), any(LocalDateTime.class)))
                     .willReturn(List.of(diary));
 
-                List<GetDiariesResponse> getDiaryResponses = diaryService.getDiaries(1L, 2023, 6);
+                List<GetMonthlyDiariesResponse> getDiaryResponses = diaryService.getMonthlyDiaries(
+                    1L,
+                    2023, 6);
 
                 assertThat(getDiaryResponses).hasSize(1);
                 assertThat(getDiaryResponses.get(0).getId()).isEqualTo(diary.getDiaryId());

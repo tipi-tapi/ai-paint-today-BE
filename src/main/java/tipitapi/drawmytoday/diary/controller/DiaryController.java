@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
-import tipitapi.drawmytoday.diary.dto.GetDiariesResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.service.DiaryService;
 
 @RestController
@@ -69,13 +69,13 @@ public class DiaryController {
             content = @Content(schema = @Schema(hidden = true))),
     })
     @GetMapping("/calendar/monthly")
-    public ResponseEntity<SuccessResponse<List<GetDiariesResponse>>> getDiaries(
+    public ResponseEntity<SuccessResponse<List<GetMonthlyDiariesResponse>>> getMonthlyDiaries(
         @Parameter(description = "조회할 연도", in = ParameterIn.PATH) @RequestParam("year") int year,
         @Parameter(description = "조회할 달", in = ParameterIn.PATH) @RequestParam("month") int month
         , @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
-            diaryService.getDiaries(tokenInfo.getUserId(), year, month)
+            diaryService.getMonthlyDiaries(tokenInfo.getUserId(), year, month)
         ).asHttp(HttpStatus.OK);
     }
 }

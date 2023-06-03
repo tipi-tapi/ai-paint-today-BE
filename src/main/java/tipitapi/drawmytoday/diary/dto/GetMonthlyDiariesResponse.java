@@ -15,7 +15,7 @@ import tipitapi.drawmytoday.diary.domain.Diary;
 @Getter
 @Schema(description = "월별 일기 목록 Response")
 @AllArgsConstructor
-public class GetDiariesResponse {
+public class GetMonthlyDiariesResponse {
 
     @Schema(description = "일기 아이디", requiredMode = RequiredMode.REQUIRED)
     private final Long id;
@@ -29,8 +29,9 @@ public class GetDiariesResponse {
     @Schema(description = "일기 날짜", requiredMode = RequiredMode.REQUIRED)
     private final LocalDateTime date;
 
-    public static GetDiariesResponse of(Diary diary) {
-        return new GetDiariesResponse(diary.getDiaryId(), diary.getImageList().get(0).getImageUrl(),
+    public static GetMonthlyDiariesResponse of(Diary diary) {
+        return new GetMonthlyDiariesResponse(diary.getDiaryId(),
+            diary.getImageList().get(0).getImageUrl(),
             diary.getDiaryDate());
     }
 }

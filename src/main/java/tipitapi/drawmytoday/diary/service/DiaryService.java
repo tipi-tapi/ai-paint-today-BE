@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
-import tipitapi.drawmytoday.diary.dto.GetDiariesResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
@@ -38,7 +38,7 @@ public class DiaryService {
         return GetDiaryResponse.of(diary, image, diary.getEmotion());
     }
 
-    public List<GetDiariesResponse> getDiaries(Long userId, int year, int month) {
+    public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
         User user = validateUserService.validateUserById(userId);
         LocalDateTime startMonth = DateUtils.getStartDate(year, month);
         LocalDateTime endMonth = DateUtils.getEndDate(year, month);
@@ -50,7 +50,7 @@ public class DiaryService {
                 }
                 return true;
             })
-            .map(GetDiariesResponse::of)
+            .map(GetMonthlyDiariesResponse::of)
             .collect(Collectors.toList());
     }
 
