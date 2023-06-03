@@ -12,6 +12,7 @@ import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.diary.dto.GetDiariesResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
+import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.user.domain.User;
@@ -43,6 +44,12 @@ public class DiaryService {
         LocalDateTime endMonth = DateUtils.getEndDate(year, month);
         return diaryRepository.findAllByUserUserIdAndDiaryDateBetween(user.getUserId(),
                 startMonth, endMonth).stream()
+            .filter(diary -> {
+                if (diary.getImageList().isEmpty()) {
+                    throw new ImageNotFoundException();
+                }
+                return true;
+            })
             .map(GetDiariesResponse::of)
             .collect(Collectors.toList());
     }
