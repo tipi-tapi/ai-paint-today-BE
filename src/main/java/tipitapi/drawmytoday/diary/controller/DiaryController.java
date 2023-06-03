@@ -25,6 +25,7 @@ import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.diary.service.DiaryService;
 
 @RestController
@@ -33,6 +34,7 @@ import tipitapi.drawmytoday.diary.service.DiaryService;
 public class DiaryController {
 
     private final DiaryService diaryService;
+    private final CreateDiaryService createDiaryService;
 
     @Operation(summary = "일기 조회", description = "특정 일기의 내용을 반환한다.")
     @ApiResponses(value = {
@@ -82,7 +84,7 @@ public class DiaryController {
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) throws DallERequestFailException, ImageInputStreamFailException {
         return SuccessResponse.of(
-            diaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
+            createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes())
         ).asHttp(HttpStatus.CREATED);
     }
