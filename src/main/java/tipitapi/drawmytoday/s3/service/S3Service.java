@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.s3.service;
 
-import java.io.InputStream;
-import java.net.URL;
+import static software.amazon.awssdk.services.s3.model.ObjectCannedACL.PUBLIC_READ;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,23 +21,9 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    public void uploadFromUrl(String imageUrl, String filePath) {
-        try (InputStream inputStream = new URL(imageUrl).openStream()) {
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName)
-                .key(filePath).build();
-            s3Client.putObject(putObjectRequest,
-                RequestBody.fromInputStream(inputStream, inputStream.available()));
-        } catch (SdkClientException | S3Exception e) {
-            throw e;
-        } catch (Exception e) {
-            throw new S3FailedException(e);
-        }
-    }
-
-    public void uploadFromBase64(byte[] imageBytes, String filePath) {
+    public void uploadImage(byte[] imageBytes, String filePath) {
         try {
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName)
-                .key(filePath).build();
+            PutObjectRequest putObjectRequest = buildPutObjectRequest(filePath);
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(imageBytes));
         } catch (SdkClientException | S3Exception e) {
             throw e;
@@ -46,4 +32,11 @@ public class S3Service {
         }
     }
 
+    private PutObjectRequest buildPutObjectRequest(String filePath) {
+        return PutObjectRequest.builder()
+            .bucket(bucketName)
+            .key(filePath)
+            .contentType("image/png")
+            .acl(PUBLIC_READ).build();
+    }
 }
