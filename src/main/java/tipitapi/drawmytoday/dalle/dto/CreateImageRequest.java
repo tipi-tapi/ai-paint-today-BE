@@ -15,7 +15,11 @@ public class CreateImageRequest {
     private String size;
     private String response_format;
 
-    public static CreateImageRequest of(String prompt) {
+    public static CreateImageRequest withBase64(String prompt) {
         return new CreateImageRequest(prompt, 1, "1024x1024", "b64_json");
+    }
+
+    public static CreateImageRequest withUrl(String prompt) {
+        return new CreateImageRequest(prompt, 1, "1024x1024", "url");
     }
 }
