@@ -28,6 +28,7 @@ import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.diary.dto.GetDiariesResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
+import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.user.domain.User;
@@ -157,10 +158,25 @@ class DiaryServiceTest {
         class if_diary_of_user_exists {
 
             @Test
+            @DisplayName("일기에 해당하는 이미지가 없을 경우")
+            void it_returns_diaries_without_image() {
+                User user = createUserWithId(1L);
+                Diary diary = createDiaryWithId(1L, user, createEmotion());
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
+                    any(Long.class), any(LocalDateTime.class), any(LocalDateTime.class)))
+                    .willReturn(List.of(diary));
+
+                assertThatThrownBy(() -> diaryService.getDiaries(1L, 2023, 6))
+                    .isInstanceOf(ImageNotFoundException.class);
+            }
+
+            @Test
             @DisplayName("일기들을 반환한다.")
             void it_returns_diaries() {
                 User user = createUserWithId(1L);
                 Diary diary = createDiaryWithId(1L, user, createEmotion());
+                createImage(diary);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
                     any(Long.class), any(LocalDateTime.class), any(LocalDateTime.class)))
