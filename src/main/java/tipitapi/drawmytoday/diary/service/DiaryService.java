@@ -42,8 +42,13 @@ public class DiaryService {
         User user = validateUserService.validateUserById(userId);
         LocalDateTime startMonth = DateUtils.getStartDate(year, month);
         LocalDateTime endMonth = DateUtils.getEndDate(year, month);
-        return diaryRepository.findAllByUserUserIdAndDiaryDateBetween(user.getUserId(),
-                startMonth, endMonth).stream()
+        List<Diary> getDiaryList = diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
+            user.getUserId(), startMonth, endMonth);
+        return convertDiariesToResponse(getDiaryList);
+    }
+
+    private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {
+        return getDiaryList.stream()
             .filter(diary -> {
                 if (diary.getImageList().isEmpty()) {
                     throw new ImageNotFoundException();
