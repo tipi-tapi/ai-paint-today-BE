@@ -16,6 +16,7 @@ import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import tipitapi.drawmytoday.common.response.ErrorResponse;
 import tipitapi.drawmytoday.common.response.ErrorResponse.ValidationError;
+import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.s3.exception.S3FailedException;
 
 @RestControllerAdvice
@@ -71,6 +72,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleS3FailedException(S3FailedException e) {
         log.error("S3FailedException", e);
         return handleExceptionInternal(ErrorCode.S3_FAILED);
+    }
+
+    @ExceptionHandler(DallERequestFailException.class)
+    public ResponseEntity<Object> handleDallERequestFailException(DallERequestFailException e) {
+        log.error("DallERequestFailException", e);
+        return handleExceptionInternal(ErrorCode.DALLE_REQUEST_FAIL);
     }
 
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
