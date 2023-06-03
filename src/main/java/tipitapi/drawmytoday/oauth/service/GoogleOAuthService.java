@@ -74,8 +74,8 @@ public class GoogleOAuthService {
             auth.setRefreshToken(accessToken.getRefreshToken());
         } else {
             user = userRepository.save(User.builder()
-                .email(user.getEmail())
-                .socialCode(SocialCode.APPLE)
+                .email(oAuthUserProfile.getEmail())
+                .socialCode(SocialCode.GOOGLE)
                 .build());
             authRepository.save(new Auth(user, accessToken.getRefreshToken()));
         }
