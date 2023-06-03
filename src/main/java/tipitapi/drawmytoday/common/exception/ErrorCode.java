@@ -45,7 +45,10 @@ public enum ErrorCode {
     S3_FAILED(500, "S3003", "S3 처리에 실패하였습니다."),
 
     // DALL-E
-    DALLE_REQUEST_FAIL(500, "DE001", "DALL-E 요청에 실패하였습니다.");
+    DALLE_REQUEST_FAIL(500, "DE001", "DALL-E 요청에 실패하였습니다."),
+
+    // Image InputStream
+    IMAGE_INPUT_STREAM_FAIL(500, "IIS001", "이미지 스트림을 가져오는데 실패하였습니다.");
 
     private final int status;
     private final String code;
