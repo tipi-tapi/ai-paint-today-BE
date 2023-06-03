@@ -28,7 +28,7 @@ public class DiaryService {
             .orElseThrow(DiaryNotFoundException::new);
         ownedByUser(diary, user);
         Image image = imageService.getImage(diary);
-
+        
         return GetDiaryResponse.of(diary, image, diary.getEmotion());
     }
 
