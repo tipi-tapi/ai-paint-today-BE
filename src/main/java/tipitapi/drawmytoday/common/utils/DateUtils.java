@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.common.utils;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.exception.BusinessException;
@@ -27,16 +27,14 @@ public class DateUtils {
     }
 
     private static int getMaxDay(int month) {
-        boolean is31 = List.of(1, 3, 5, 7, 8, 10, 12).stream()
-            .anyMatch(m -> m == month);
-        boolean is30 = List.of(4, 6, 9, 11).stream()
-            .anyMatch(m -> m == month);
-        if (is31) {
-            return 31;
-        } else if (is30) {
-            return 30;
-        } else {
+        if (month == 2) {
             return 28;
+        }
+        if (Stream.of(1, 3, 5, 7, 8, 10, 12)
+            .anyMatch(m -> m == month)) {
+            return 31;
+        } else {
+            return 30;
         }
     }
 }
