@@ -2,9 +2,12 @@ package tipitapi.drawmytoday.common.utils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DateUtils {
 
     public static LocalDateTime getStartDate(int year, int month) {
