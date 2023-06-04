@@ -37,6 +37,7 @@ public class Image extends BaseEntity {
 
     private Image(Diary diary, String imageUrl, boolean isSelected) {
         this.diary = diary;
+        diary.getImageList().add(this);
         this.imageUrl = imageUrl;
         this.isSelected = isSelected;
     }

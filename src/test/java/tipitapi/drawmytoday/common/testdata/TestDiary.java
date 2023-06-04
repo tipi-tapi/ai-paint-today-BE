@@ -18,4 +18,12 @@ public class TestDiary {
         ReflectionTestUtils.setField(diary, "diaryId", diaryId);
         return diary;
     }
+
+    public static Diary createDiaryWithIdAndDate(Long diaryId, LocalDateTime diaryDate, User user,
+        Emotion emotion) {
+        Diary diary = createDiary(user, emotion);
+        ReflectionTestUtils.setField(diary, "diaryId", diaryId);
+        ReflectionTestUtils.setField(diary, "diaryDate", diaryDate);
+        return diary;
+    }
 }
