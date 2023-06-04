@@ -1,6 +1,5 @@
 package tipitapi.drawmytoday.oauth.controller;
 
-import static tipitapi.drawmytoday.common.exception.ErrorCode.INTERNAL_SERVER_ERROR;
 import static tipitapi.drawmytoday.common.exception.ErrorCode.JWT_REFRESH_TOKEN_NOT_FOUND;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,7 +12,6 @@ import java.io.IOException;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.security.jwt.JwtProperties;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
@@ -35,21 +32,17 @@ import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.service.AppleOAuthService;
 import tipitapi.drawmytoday.oauth.service.GoogleOAuthService;
-import tipitapi.drawmytoday.user.domain.SocialCode;
-import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.exception.UserNotFoundException;
-import tipitapi.drawmytoday.user.repository.UserRepository;
+import tipitapi.drawmytoday.oauth.service.OAuthService;
 
-@Slf4j
 @RestController
 @RequestMapping("/oauth2")
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final OAuthService oAuthService;
     private final GoogleOAuthService googleOAuthService;
     private final AppleOAuthService appleOAuthService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
 
 
     @Operation(summary = "구글 로그인", description = "프론트로부터 Authorization code를 받아 구글 로그인을 진행합니다.")
@@ -122,17 +115,8 @@ public class AuthController {
     @DeleteMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public void deleteAccount(@AuthUser JwtTokenInfo tokenInfo) {
-        User user = userRepository.findById(tokenInfo.getUserId()).orElseThrow(
-            () -> new UserNotFoundException()
-        );
+        oAuthService.deleteAccount(tokenInfo.getUserId());
 
-        if (user.getSocialCode() == SocialCode.GOOGLE) {
-            googleOAuthService.deleteAccount(user);
-        } else if (user.getSocialCode() == SocialCode.APPLE) {
-            appleOAuthService.deleteAccount(user);
-        } else {
-            throw new BusinessException(INTERNAL_SERVER_ERROR);
-        }
     }
 
     private String getRefreshToken(HttpServletRequest request) {

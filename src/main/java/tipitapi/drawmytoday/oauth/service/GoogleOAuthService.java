@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,7 +34,6 @@ import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.repository.UserRepository;
 
-@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -56,16 +54,10 @@ public class GoogleOAuthService {
 
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request) throws JsonProcessingException {
-        // Authorization Code로 Access Token 요청
         OAuthAccessToken accessToken = getAccessToken(request);
-        log.info("getAccessToken = {}", accessToken.getAccessToken());
-        log.info("getRefreshToken = {}", accessToken.getRefreshToken());
 
-        // Access Token으로 User Info 요청
         OAuthUserProfile oAuthUserProfile = getUserProfile(accessToken);
-        log.info("oAuthUserProfile = {}", oAuthUserProfile.getEmail());
 
-        // save user info to database
         Optional<User> findUser = userRepository.findByEmail(oAuthUserProfile.getEmail());
         User user = null;
         if (findUser.isPresent()) {
@@ -119,7 +111,6 @@ public class GoogleOAuthService {
     private OAuthAccessToken getAccessToken(HttpServletRequest request)
         throws JsonProcessingException {
         String authorizationCode = getAuthorizationCode(request);
-        log.info("authorizationCode: {}", authorizationCode);
 
         String tokenUri = properties.getTokenUrl();
 
