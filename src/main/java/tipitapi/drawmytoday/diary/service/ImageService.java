@@ -19,4 +19,8 @@ public class ImageService {
         return imageRepository.findByIsSelectedTrueAndDiary(diary)
             .orElseThrow(ImageNotFoundException::new);
     }
+
+    public Image createImage(Diary diary, String imagePath, boolean isSelected) {
+        return imageRepository.save(Image.create(diary, imagePath, isSelected));
+    }
 }

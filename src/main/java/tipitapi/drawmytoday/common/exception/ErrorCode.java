@@ -37,11 +37,18 @@ public enum ErrorCode {
     IMAGE_NOT_FOUND(404, "I001", "선택된 이미지를 찾을 수 없습니다."),
 
     // Emotion
+    EMOTION_NOT_FOUND(404, "E001", "감정을 찾을 수 없습니다."),
 
     // S3
-    S3_SERVICE_ERROR(500, "S3001", "AmazonServiceException 에러가 발생하였습니다."),
-    S3_SDK_ERROR(500, "S3002", "SdkClientException 에러가 발생하였습니다.");
+    S3_SERVICE_ERROR(500, "S3001", "S3Exception 에러가 발생하였습니다."),
+    S3_SDK_ERROR(500, "S3002", "SdkClientException 에러가 발생하였습니다."),
+    S3_FAILED(500, "S3003", "S3 처리에 실패하였습니다."),
 
+    // DALL-E
+    DALLE_REQUEST_FAIL(500, "DE001", "DALL-E 요청에 실패하였습니다."),
+
+    // Image InputStream
+    IMAGE_INPUT_STREAM_FAIL(500, "IIS001", "이미지 스트림을 가져오는데 실패하였습니다.");
 
     private final int status;
     private final String code;

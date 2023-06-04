@@ -1,0 +1,5 @@
+openai:
+    api:
+        key: ${OPENAI_API_KEY}
+    dalle:
+        url: ${DALLE_API_URL}

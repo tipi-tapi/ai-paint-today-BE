@@ -23,7 +23,6 @@ public class Prompt extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long promptId;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id", nullable = true)
     private Diary diary;
@@ -41,7 +40,16 @@ public class Prompt extends BaseEntity {
         this.isSuccess = isSuccess;
     }
 
+    private Prompt(String promptText, boolean isSuccess) {
+        this.promptText = promptText;
+        this.isSuccess = isSuccess;
+    }
+
     public static Prompt create(Diary diary, String promptText, boolean isSuccess) {
         return new Prompt(diary, promptText, isSuccess);
+    }
+
+    public static Prompt create(String promptText, boolean isSuccess) {
+        return new Prompt(promptText, isSuccess);
     }
 }
