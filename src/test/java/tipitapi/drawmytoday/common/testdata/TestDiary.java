@@ -26,4 +26,13 @@ public class TestDiary {
         ReflectionTestUtils.setField(diary, "diaryDate", diaryDate);
         return diary;
     }
+
+    public static Diary createDiaryWithIdAndCreatedAt(Long diaryId, LocalDateTime createdAt,
+        User user,
+        Emotion emotion) {
+        Diary diary = createDiary(user, emotion);
+        ReflectionTestUtils.setField(diary, "diaryId", diaryId);
+        ReflectionTestUtils.setField(diary, "createdAt", createdAt);
+        return diary;
+    }
 }
