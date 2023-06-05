@@ -1,6 +1,7 @@
 package tipitapi.drawmytoday.diary.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithIdAndCreatedAt;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithIdAndDate;
 import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotionWithId;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
@@ -173,9 +174,9 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                 userRepository.save(user);
                 emotionRepository.save(emotion);
                 diaryRepository.saveAll(Arrays.asList(
-                    createDiaryWithIdAndDate(diaryId1, LocalDateTime.now().minusDays(2), user,
+                    createDiaryWithIdAndCreatedAt(diaryId1, LocalDateTime.now().minusDays(2), user,
                         emotion),
-                    createDiaryWithIdAndDate(diaryId2, LocalDateTime.now().minusDays(1), user,
+                    createDiaryWithIdAndCreatedAt(diaryId2, LocalDateTime.now().minusDays(1), user,
                         emotion)
                 ));
 
