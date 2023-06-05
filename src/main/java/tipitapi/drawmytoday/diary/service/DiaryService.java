@@ -6,10 +6,12 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
@@ -45,6 +47,14 @@ public class DiaryService {
         List<Diary> getDiaryList = diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
             user.getUserId(), startMonth, endMonth);
         return convertDiariesToResponse(getDiaryList);
+    }
+
+    public GetLastCreationResponse getLastCreation(Long userId) {
+        validateUserService.validateUserById(userId);
+        return new GetLastCreationResponse(
+            diaryRepository.findFirstByUserUserIdOrderByCreatedAtDesc(userId)
+                .map(BaseEntity::getCreatedAt)
+                .orElse(null));
     }
 
     private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {

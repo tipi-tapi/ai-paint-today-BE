@@ -6,6 +6,7 @@ import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotionWith
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -138,4 +139,54 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("findFirstByUserUserIdOrderByCreatedAtDesc 메소드 테스트")
+    class findFirstByUserUserIdOrderByCreatedAtDescTest {
+
+        @Nested
+        @DisplayName("주어진 user의 Diary가 존재하지 않을 경우")
+        class if_diary_not_exist {
+
+            @Test
+            @DisplayName("null를 반환한다.")
+            void return_null() {
+                Long userId = 1L;
+                createUserWithId(userId);
+
+                assertThat(
+                    diaryRepository.findFirstByUserUserIdOrderByCreatedAtDesc(userId))
+                    .isNotPresent();
+            }
+        }
+
+        @Nested
+        @DisplayName("주어진 user의 Diary가 존재할 경우")
+        class if_diary_exist {
+
+            @Test
+            @DisplayName("마지막으로 생성한 Diary를 반환한다.")
+            void return_diary() {
+                Long userId = 1L, diaryId1 = 1L, diaryId2 = 2L;
+                User user = createUserWithId(userId);
+                Emotion emotion = createEmotionWithId(1L);
+                userRepository.save(user);
+                emotionRepository.save(emotion);
+                diaryRepository.saveAll(Arrays.asList(
+                    createDiaryWithIdAndDate(diaryId1, LocalDateTime.now().minusDays(2), user,
+                        emotion),
+                    createDiaryWithIdAndDate(diaryId2, LocalDateTime.now().minusDays(1), user,
+                        emotion)
+                ));
+
+                Optional<Diary> diary = diaryRepository.findFirstByUserUserIdOrderByCreatedAtDesc(
+                    userId);
+
+                assertThat(diary.isPresent()).isTrue();
+                assertThat(diary.get().getDiaryId()).isEqualTo(diaryId2);
+            }
+        }
+
+    }
+
 }
