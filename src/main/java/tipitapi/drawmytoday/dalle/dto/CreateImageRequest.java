@@ -20,6 +20,6 @@ public class CreateImageRequest {
     }
 
     public static CreateImageRequest withUrl(String prompt) {
-        return new CreateImageRequest(prompt, 1, "1024x1024", "url");
+        return new CreateImageRequest(prompt, 1, "512x512", "url");
     }
 }
