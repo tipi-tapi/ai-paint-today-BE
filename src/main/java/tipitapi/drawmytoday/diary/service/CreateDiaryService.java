@@ -67,7 +67,7 @@ public class CreateDiaryService {
     // TODO: 별도의 서비스로 분리, 로직 구현 필요
     private String createPromptText(Emotion emotion, String keyword) {
         return String.format(
-            "%s illustration in %s tones, painted in watercolor fairy tale style, with %s",
+            "%s , %s , canvas-textured, Oil Pastel, %s",
             emotion.getEmotionPrompt(), emotion.getColorPrompt(), keyword);
     }
 }
