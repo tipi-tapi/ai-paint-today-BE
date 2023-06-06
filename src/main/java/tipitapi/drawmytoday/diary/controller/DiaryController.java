@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
+import tipitapi.drawmytoday.diary.dto.UpdateDiaryRequest;
 import tipitapi.drawmytoday.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.diary.service.DiaryService;
 
@@ -139,5 +141,30 @@ public class DiaryController {
             createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes())
         ).asHttp(HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "일기 수정", description = "주어진 일기의 내용을 수정한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "성공적으로 일기 내용을 수정함"),
+        @ApiResponse(
+            responseCode = "403",
+            description = "D002 : 자신의 일기에만 접근할 수 있습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "D001 : 일기를 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateDiaryNotes(
+        @RequestBody @Valid UpdateDiaryRequest updateDiaryRequest,
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+    ) {
+        diaryService.updateDiaryNotes(tokenInfo.getUserId(), diaryId,
+            updateDiaryRequest.getNotes());
+        return ResponseEntity.noContent().build();
     }
 }

@@ -57,6 +57,16 @@ public class DiaryService {
                 .orElse(null));
     }
 
+    @Transactional
+    public void updateDiaryNotes(Long userId, Long diaryId, String notes) {
+        User user = validateUserService.validateUserById(userId);
+        Diary diary = diaryRepository.findById(diaryId)
+            .orElseThrow(DiaryNotFoundException::new);
+        ownedByUser(diary, user);
+
+        diary.setNotes(notes);
+    }
+
     private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {
         return getDiaryList.stream()
             .filter(diary -> {
