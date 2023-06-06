@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import javax.validation.Valid;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +27,7 @@ import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.diary.service.DiaryService;
@@ -87,7 +88,30 @@ public class DiaryController {
             diaryService.getMonthlyDiaries(tokenInfo.getUserId(), year, month)
         ).asHttp(HttpStatus.OK);
     }
-  
+
+    @Operation(summary = "마지막 일기 생성 시각 조회", description = "유저가 마지막으로 일기를 생성한 시각을 반환한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "마지막 일기 생성 시각 정보"),
+        @ApiResponse(
+            responseCode = "403",
+            description = "D002 : 자신의 일기에만 접근할 수 있습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "D001 : 일기를 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+    })
+    @GetMapping("/last-creation")
+    public ResponseEntity<SuccessResponse<GetLastCreationResponse>> getLastCreation(
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+    ) {
+        return SuccessResponse.of(
+            diaryService.getLastCreation(tokenInfo.getUserId())
+        ).asHttp(HttpStatus.OK);
+    }
+
     @Operation(summary = "일기 생성", description = "DALL-E API를 사용하여 이미지를 발급하여 일기를 생성한다.")
     @ApiResponses(value = {
         @ApiResponse(

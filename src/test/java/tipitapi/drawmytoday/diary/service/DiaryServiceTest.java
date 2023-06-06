@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithId;
+import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithIdAndCreatedAt;
 import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotion;
 import static tipitapi.drawmytoday.common.testdata.TestImage.createImage;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
@@ -26,6 +27,7 @@ import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
@@ -191,4 +193,65 @@ class DiaryServiceTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("getLastCreation 메소드 테스트")
+    class GetLastCreationTest {
+
+        @Nested
+        @DisplayName("userId에 해당하는 유저가 존재하지 않을 경우")
+        class if_user_not_exists {
+
+            @Test
+            @DisplayName("UserNotFoundException 예외를 발생시킨다.")
+            void it_throws_UserNotFoundException() {
+                given(validateUserService.validateUserById(1L)).willThrow(
+                    new UserNotFoundException());
+
+                assertThatThrownBy(() -> diaryService.getLastCreation(1L))
+                    .isInstanceOf(UserNotFoundException.class);
+            }
+        }
+
+        @Nested
+        @DisplayName("주어진 유저의 일기가 존재하지 않을 경우")
+        class if_user_doesnt_have_diary {
+
+            @Test
+            @DisplayName("lastCreation에 null을 반환한다.")
+            void it_returns_null() {
+                User user = createUserWithId(1L);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(diaryRepository.findFirstByUserUserIdOrderByCreatedAtDesc(any(Long.class)))
+                    .willReturn(Optional.empty());
+
+                GetLastCreationResponse response = diaryService.getLastCreation(1L);
+
+                assertThat(response.getLastCreation()).isNull();
+            }
+        }
+
+        @Nested
+        @DisplayName("주어진 유저의 일기가 존재할 경우")
+        class if_user_has_diary {
+
+            @Test
+            @DisplayName("마지막으로 일기를 생성한 날짜를 반환한다.")
+            void it_returns_last_creation() {
+                User user = createUserWithId(1L);
+                LocalDateTime lastCreation = LocalDateTime.now().minusDays(2);
+                Diary diary = createDiaryWithIdAndCreatedAt(1L, lastCreation, user,
+                    createEmotion());
+
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(diaryRepository.findFirstByUserUserIdOrderByCreatedAtDesc(any(Long.class)))
+                    .willReturn(Optional.of(diary));
+
+                GetLastCreationResponse response = diaryService.getLastCreation(1L);
+
+                assertThat(response.getLastCreation()).isEqualTo(lastCreation);
+            }
+        }
+    }
+
 }
