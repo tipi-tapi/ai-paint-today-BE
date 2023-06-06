@@ -254,4 +254,85 @@ class DiaryServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("updateDiaryNotes 메소드 테스트")
+    class UpdateDiaryNotesTest {
+
+        @Nested
+        @DisplayName("userId에 해당하는 유저가 존재하지 않을 경우")
+        class if_user_not_exists {
+
+            @Test
+            @DisplayName("UserNotFoundException 예외를 발생시킨다.")
+            void it_throws_UserNotFoundException() {
+                given(validateUserService.validateUserById(1L)).willThrow(
+                    new UserNotFoundException());
+
+                assertThatThrownBy(() -> diaryService.updateDiaryNotes(1L, 1L, "notes"))
+                    .isInstanceOf(UserNotFoundException.class);
+            }
+        }
+
+        @Nested
+        @DisplayName("diaryId에 해당하는 일기가 존재하지 않을 경우")
+        class if_diary_not_exists {
+
+            @Test
+            @DisplayName("DiaryNotFoundException 예외를 발생시킨다.")
+            void it_throws_DiaryNotFoundException() {
+                User user = createUserWithId(1L);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(diaryRepository.findById(any(Long.class)))
+                    .willReturn(Optional.empty());
+
+                assertThatThrownBy(() -> diaryService.updateDiaryNotes(1L, 1L, "notes"))
+                    .isInstanceOf(DiaryNotFoundException.class);
+            }
+        }
+
+        @Nested
+        @DisplayName("일기가 존재할 경우")
+        class if_diary_exists {
+
+            @Nested
+            @DisplayName("요청한 내용이 null일 경우")
+            class if_new_notes_is_null {
+
+                @Test
+                @DisplayName("일기의 내용을 제거해 null로 만든다.")
+                void it_removes_diary_notes() {
+                    User user = createUserWithId(1L);
+                    Diary diary = createDiaryWithId(1L, user, createEmotion());
+                    given(validateUserService.validateUserById(1L)).willReturn(user);
+                    given(diaryRepository.findById(any(Long.class)))
+                        .willReturn(Optional.of(diary));
+
+                    diaryService.updateDiaryNotes(1L, 1L, null);
+
+                    assertThat(diary.getNotes()).isNull();
+                }
+            }
+
+            @Nested
+            @DisplayName("요청한 내용이 null이 아닐 경우")
+            class if_new_notes_is_not_null {
+
+                @Test
+                @DisplayName("일기의 내용을 주어진 내용으로 수정한다.")
+                void it_updates_diary_notes() {
+                    User user = createUserWithId(1L);
+                    Diary diary = createDiaryWithId(1L, user, createEmotion());
+                    given(validateUserService.validateUserById(1L)).willReturn(user);
+                    given(diaryRepository.findById(any(Long.class)))
+                        .willReturn(Optional.of(diary));
+
+                    diaryService.updateDiaryNotes(1L, 1L, "notes");
+
+                    assertThat(diary.getNotes()).isEqualTo("notes");
+                }
+            }
+
+        }
+
+    }
 }
