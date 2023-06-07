@@ -15,4 +15,9 @@ public class TestEmotion {
         ReflectionTestUtils.setField(emotion, "emotionId", emotionId);
         return emotion;
     }
+
+    public static Emotion createEmotionInActive() {
+        return Emotion.create("SAD", "#45645", false, "example emotion prompt",
+            "example color prompt");
+    }
 }
