@@ -43,4 +43,19 @@ public class EmotionController {
             emotionService.getActiveEmotions(tokenInfo.getUserId())
         ).asHttp(HttpStatus.OK);
     }
+
+    @Operation(summary = "감정 등록", description = "주어진 감정 데이터 목록을 등록한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "성공적으로 감정을 등록함"),
+    })
+    @PostMapping()
+    public ResponseEntity<SuccessResponse<List<CreateEmotionResponse>>> createEmotions(
+        @RequestBody @Valid List<@Valid CreateEmotionRequest> createEmotionRequests
+    ) {
+        return SuccessResponse.of(
+            emotionService.createEmotions(createEmotionRequests)
+        ).asHttp(HttpStatus.CREATED);
+    }
 }

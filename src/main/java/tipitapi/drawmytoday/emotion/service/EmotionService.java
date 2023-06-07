@@ -25,4 +25,12 @@ public class EmotionService {
         return GetActiveEmotionsResponse.buildWithEmotions(
             emotionRepository.findAllActiveEmotions());
     }
+
+    public List<CreateEmotionResponse> createEmotions(
+        List<CreateEmotionRequest> createEmotionRequests) {
+        return emotionRepository.saveAll(
+            createEmotionRequests.stream().map(CreateEmotionRequest::toEmotionEntity).collect(
+                Collectors.toList())
+        ).stream().map(CreateEmotionResponse::of).collect(Collectors.toList());
+    }
 }
