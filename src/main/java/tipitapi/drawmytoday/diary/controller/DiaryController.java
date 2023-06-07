@@ -55,6 +55,10 @@ public class DiaryController {
             responseCode = "404",
             description = "D001 : 일기를 찾을 수 없습니다.\t\nI001 : 선택된 이미지를 찾을 수 없습니다.",
             content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "IIS001 : 이미지 스트림을 읽어오는데 실패했습니다.",
+            content = @Content(schema = @Schema(hidden = true)))
     })
     @GetMapping("/{id}")
     public ResponseEntity<SuccessResponse<GetDiaryResponse>> getDiary(

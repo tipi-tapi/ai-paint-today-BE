@@ -32,6 +32,10 @@ public class S3Service {
         }
     }
 
+    public String getFullUri(String uri) {
+        return "https://" + bucketName + ".s3.ap-northeast-2.amazonaws.com/" + uri;
+    }
+
     private PutObjectRequest buildPutObjectRequest(String filePath) {
         return PutObjectRequest.builder()
             .bucket(bucketName)

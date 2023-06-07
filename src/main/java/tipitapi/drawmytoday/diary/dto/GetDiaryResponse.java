@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 
 @Getter
@@ -22,8 +21,8 @@ public class GetDiaryResponse {
     @Schema(description = "일기 아이디", requiredMode = RequiredMode.REQUIRED)
     private final Long id;
 
-    @Schema(description = "이미지 URL", requiredMode = RequiredMode.REQUIRED)
-    private final String imageUrl;
+    @Schema(description = "이미지 바이트 배열(base64). 단, 실제로는 String으로 반환됨.", requiredMode = RequiredMode.REQUIRED)
+    private final byte[] imageBytes;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -43,8 +42,8 @@ public class GetDiaryResponse {
     @Schema(description = "일기 내용", requiredMode = RequiredMode.NOT_REQUIRED)
     private String notes;
 
-    public static GetDiaryResponse of(Diary diary, Image image, Emotion emotion) {
-        return new GetDiaryResponse(diary.getDiaryId(), image.getImageUrl(), diary.getDiaryDate(),
+    public static GetDiaryResponse of(Diary diary, byte[] imageBytes, Emotion emotion) {
+        return new GetDiaryResponse(diary.getDiaryId(), imageBytes, diary.getDiaryDate(),
             diary.getCreatedAt(), emotion.getName(), diary.getNotes());
     }
 }
