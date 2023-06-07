@@ -16,7 +16,6 @@ public class TestEmotion {
     }
 
     public static Emotion createEmotionInActive() {
-        return Emotion.create("SAD", "#45645", false, "example emotion prompt",
-            "example color prompt");
+        return Emotion.create("슬픔", "#0000FF", false, "sad", "blue");
     }
 }
