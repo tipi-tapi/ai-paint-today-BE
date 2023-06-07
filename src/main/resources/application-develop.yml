@@ -1,0 +1,17 @@
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/draw_my_today_db?serverTimezone=UTC&characterEncoding=UTF-8
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        open-in-view: false
+        hibernate:
+            ddl-auto: update
+
+    logging.level:
+        org.hibernate.SQL: debug
+
+# org.hibernate.type: trac
