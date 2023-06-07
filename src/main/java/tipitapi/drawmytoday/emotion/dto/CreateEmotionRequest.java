@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.emotion.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
@@ -10,6 +11,7 @@ import tipitapi.drawmytoday.emotion.domain.Emotion;
 @Getter
 @Schema(description = "감정 등록 Request")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateEmotionRequest {
 
     @NotBlank

@@ -2,11 +2,14 @@ package tipitapi.drawmytoday.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotion;
 import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotionInActive;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
+import tipitapi.drawmytoday.emotion.dto.CreateEmotionRequest;
+import tipitapi.drawmytoday.emotion.dto.CreateEmotionResponse;
 import tipitapi.drawmytoday.emotion.dto.GetActiveEmotionsResponse;
 import tipitapi.drawmytoday.emotion.repository.EmotionRepository;
 import tipitapi.drawmytoday.emotion.service.EmotionService;
@@ -74,6 +80,34 @@ public class EmotionServiceTest {
                     .isNotEqualTo(inActiveEmotion.getEmotionId());
             }
         }
+    }
 
+    @Nested
+    @DisplayName("createEmotions 메소드 테스트")
+    class CreateEmotionsTest {
+
+        @Test
+        @DisplayName("감정을 생성한다.")
+        void it_creates_emotions_and_returns_created_emotions()
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+            Emotion emotion = TestEmotion.createEmotion();
+            CreateEmotionRequest request = buildCreateEmotionRequest(emotion.getName(),
+                emotion.getEmotionPrompt(), emotion.getColor(), emotion.getColorPrompt());
+            given(emotionRepository.saveAll(anyList())).willReturn(List.of(emotion));
+
+            List<CreateEmotionResponse> response = emotionService.createEmotions(List.of(request));
+
+            assertThat(response.get(0).getId()).isEqualTo(emotion.getEmotionId());
+        }
+
+        private CreateEmotionRequest buildCreateEmotionRequest(String emotionName,
+            String emotionPrompt,
+            String colorHex, String colorPrompt)
+            throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+            Constructor<CreateEmotionRequest> constructor = CreateEmotionRequest.class.getDeclaredConstructor(
+                String.class, String.class, String.class, String.class);
+            constructor.setAccessible(true);
+            return constructor.newInstance(emotionName, emotionPrompt, colorHex, colorPrompt);
+        }
     }
 }

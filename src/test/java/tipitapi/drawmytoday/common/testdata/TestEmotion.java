@@ -6,8 +6,7 @@ import tipitapi.drawmytoday.emotion.domain.Emotion;
 public class TestEmotion {
 
     public static Emotion createEmotion() {
-        return Emotion.create("HAPPY", "#12312", true, "example emotion prompt",
-            "example color prompt");
+        return Emotion.create("행복", "#FF0000", true, "happy", "red");
     }
 
     public static Emotion createEmotionWithId(Long emotionId) {
