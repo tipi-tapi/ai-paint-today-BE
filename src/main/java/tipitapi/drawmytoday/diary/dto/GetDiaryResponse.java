@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 
 @Getter
@@ -43,8 +42,8 @@ public class GetDiaryResponse {
     @Schema(description = "일기 내용", requiredMode = RequiredMode.NOT_REQUIRED)
     private String notes;
 
-    public static GetDiaryResponse of(Diary diary, Image image, Emotion emotion) {
-        return new GetDiaryResponse(diary.getDiaryId(), image.getImageUrl(), diary.getDiaryDate(),
+    public static GetDiaryResponse of(Diary diary, String imageUrl, Emotion emotion) {
+        return new GetDiaryResponse(diary.getDiaryId(), imageUrl, diary.getDiaryDate(),
             diary.getCreatedAt(), emotion.getName(), diary.getNotes());
     }
 }
