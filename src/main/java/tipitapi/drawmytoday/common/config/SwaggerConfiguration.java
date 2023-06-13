@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.common.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,12 @@ import org.springframework.context.annotation.Configuration;
 @OpenAPIDefinition(
     info = @Info(title = "오늘 하루를 그려줘 API 문서",
         description = "프로그라피 8기 4팀 TipiTapi의 오늘 하루를 그려줘 프로젝트의 API 문서입니다.",
-        version = "v1"))
+        version = "v1"),
+    servers = {
+        @Server(url = "https://draw-my-today.devstory.co.kr", description = "운영 서버"),
+        @Server(url = "https://choihyeok.site", description = "개발 서버")
+    }
+)
 @Configuration
 @RequiredArgsConstructor
 public class SwaggerConfiguration {
