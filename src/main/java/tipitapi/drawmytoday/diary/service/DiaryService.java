@@ -16,7 +16,7 @@ import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.s3.service.S3Util;
+import tipitapi.drawmytoday.s3.service.S3PreSignedService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
 
@@ -28,7 +28,7 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final ImageService imageService;
     private final ValidateUserService validateUserService;
-    private final S3Util s3Util;
+    private final S3PreSignedService s3PreSignedService;
 
     public GetDiaryResponse getDiary(Long userId, Long diaryId) {
         User user = validateUserService.validateUserById(userId);
@@ -36,7 +36,9 @@ public class DiaryService {
         Diary diary = diaryRepository.findById(diaryId)
             .orElseThrow(DiaryNotFoundException::new);
         ownedByUser(diary, user);
-        String imageUrl = s3Util.getFullUri(imageService.getImage(diary).getImageUrl());
+
+        String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
+            imageService.getImage(diary).getImageUrl(), 30);
 
         return GetDiaryResponse.of(diary, imageUrl, diary.getEmotion());
     }
