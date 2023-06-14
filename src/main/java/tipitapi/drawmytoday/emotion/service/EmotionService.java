@@ -26,6 +26,7 @@ public class EmotionService {
             emotionRepository.findAllActiveEmotions());
     }
 
+    @Transactional
     public List<CreateEmotionResponse> createEmotions(
         List<CreateEmotionRequest> createEmotionRequests) {
         return emotionRepository.saveAll(
