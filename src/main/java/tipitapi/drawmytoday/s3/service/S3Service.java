@@ -1,6 +1,6 @@
 package tipitapi.drawmytoday.s3.service;
 
-import static software.amazon.awssdk.services.s3.model.ObjectCannedACL.PUBLIC_READ;
+import static software.amazon.awssdk.services.s3.model.ObjectCannedACL.PRIVATE;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +37,6 @@ public class S3Service {
             .bucket(bucketName)
             .key(filePath)
             .contentType("image/png")
-            .acl(PUBLIC_READ).build();
+            .acl(PRIVATE).build();
     }
 }
