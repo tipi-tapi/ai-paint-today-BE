@@ -8,8 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.exception.UserNotFoundException;
-import tipitapi.drawmytoday.user.repository.UserRepository;
+import tipitapi.drawmytoday.user.service.ValidateUserService;
 
 @Service
 @Transactional(readOnly = true)
@@ -18,12 +17,10 @@ public class OAuthService {
 
     private final GoogleOAuthService googleOAuthService;
     private final AppleOAuthService appleOAuthService;
-    private final UserRepository userRepository;
+    private final ValidateUserService validateUserService;
 
     public void deleteAccount(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-            () -> new UserNotFoundException()
-        );
+        User user = validateUserService.validateUserById(userId);
         if (user.getSocialCode() == SocialCode.GOOGLE) {
             googleOAuthService.deleteAccount(user);
         } else if (user.getSocialCode() == SocialCode.APPLE) {

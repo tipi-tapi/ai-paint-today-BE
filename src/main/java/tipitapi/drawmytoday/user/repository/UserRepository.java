@@ -6,5 +6,7 @@ import tipitapi.drawmytoday.user.domain.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    Optional<User> findByUserIdAndDeletedAtIsNull(Long userId);
+
     Optional<User> findByEmail(String email);
 }

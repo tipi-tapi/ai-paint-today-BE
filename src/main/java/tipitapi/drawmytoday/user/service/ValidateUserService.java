@@ -15,6 +15,7 @@ public class ValidateUserService {
     private final UserRepository userRepository;
 
     public User validateUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        return userRepository.findByUserIdAndDeletedAtIsNull(userId)
+            .orElseThrow(UserNotFoundException::new);
     }
 }
