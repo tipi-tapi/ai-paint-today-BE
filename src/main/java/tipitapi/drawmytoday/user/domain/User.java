@@ -34,25 +34,16 @@ public class User extends BaseEntityWithUpdate {
     private LocalDateTime lastDiaryDate;
 
     @Enumerated(EnumType.STRING)
-    private OAuthType oauthType;
-
-    @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
     private User(SocialCode socialCode) {
         this.socialCode = socialCode;
     }
 
+    @Builder
     private User(String email, SocialCode socialCode) {
         this.email = email;
         this.socialCode = socialCode;
-    }
-
-    @Builder
-    private User(String email, SocialCode socialCode, OAuthType oauthType) {
-        this.email = email;
-        this.socialCode = socialCode;
-        this.oauthType = oauthType;
         this.userRole = UserRole.USER;
     }
 
