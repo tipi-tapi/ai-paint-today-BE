@@ -106,6 +106,8 @@ public class AppleOAuthService {
         if (response.contains("error")) {
             throw new BusinessException(INTERNAL_SERVER_ERROR);
         }
+
+        user.deleteUser();
     }
 
     private OAuthAccessToken getRefreshToken(String authorizationCode)
