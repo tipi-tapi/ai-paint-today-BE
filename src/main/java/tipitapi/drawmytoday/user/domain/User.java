@@ -36,6 +36,8 @@ public class User extends BaseEntityWithUpdate {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    private LocalDateTime deletedAt;
+
     private User(SocialCode socialCode) {
         this.socialCode = socialCode;
     }
@@ -61,5 +63,9 @@ public class User extends BaseEntityWithUpdate {
 
     public void setLastDiaryDate(LocalDateTime date) {
         this.lastDiaryDate = date;
+    }
+
+    public void deleteUser() {
+        this.deletedAt = LocalDateTime.now();
     }
 }
