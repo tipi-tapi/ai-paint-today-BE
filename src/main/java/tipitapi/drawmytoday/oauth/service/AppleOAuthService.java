@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -29,12 +28,13 @@ import tipitapi.drawmytoday.oauth.dto.AppleIdToken;
 import tipitapi.drawmytoday.oauth.dto.OAuthAccessToken;
 import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
+import tipitapi.drawmytoday.oauth.exception.OAuthNotFoundException;
 import tipitapi.drawmytoday.oauth.properties.AppleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.exception.UserNotFoundException;
-import tipitapi.drawmytoday.user.repository.UserRepository;
+import tipitapi.drawmytoday.user.service.UserService;
+import tipitapi.drawmytoday.user.service.ValidateUserService;
 
 @Service
 @Transactional(readOnly = true)
@@ -42,15 +42,11 @@ import tipitapi.drawmytoday.user.repository.UserRepository;
 public class AppleOAuthService {
 
     private final AppleProperties properties;
-
     private final RestTemplate restTemplate;
-
     private final ObjectMapper objectMapper;
-
-    private final UserRepository userRepository;
-
+    private final ValidateUserService validateUserService;
+    private final UserService userService;
     private final AuthRepository authRepository;
-
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
@@ -62,17 +58,13 @@ public class AppleOAuthService {
 
         AppleIdToken appleIdToken = getAppleIdToken(requestAppleLogin.getIdToken());
 
-        Optional<User> findUser = userRepository.findByEmail(appleIdToken.getEmail());
-        User user = null;
-        if (findUser.isPresent()) {
-            user = findUser.get();
-            Auth auth = authRepository.findByUser(user).get();
+        User user = validateUserService.validateRegisteredUserByEmail(
+            appleIdToken.getEmail(), SocialCode.APPLE);
+        if (user != null) {
+            Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
             auth.setRefreshToken(oAuthAccessToken.getRefreshToken());
         } else {
-            user = userRepository.save(User.builder()
-                .email(appleIdToken.getEmail())
-                .socialCode(SocialCode.APPLE)
-                .build());
+            user = userService.registerUser(appleIdToken.getEmail(), SocialCode.APPLE);
             authRepository.save(new Auth(user, oAuthAccessToken.getRefreshToken()));
         }
 
@@ -86,7 +78,7 @@ public class AppleOAuthService {
 
     @Transactional
     public void deleteAccount(User user) {
-        Auth auth = authRepository.findByUser(user).orElseThrow(() -> new UserNotFoundException());
+        Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
         String refreshToken = auth.getRefreshToken();
 
         HttpHeaders headers = new HttpHeaders();

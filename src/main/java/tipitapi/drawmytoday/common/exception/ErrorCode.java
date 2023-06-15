@@ -28,6 +28,7 @@ public enum ErrorCode {
     // User
     USER_NOT_FOUND(404, "U001", "회원을 찾을 수 없습니다."),
     USER_ALREADY_EXISTS(409, "U002", "이미 존재하는 유저입니다."),
+    DUPLICATE_USER(400, "U003", "유저가 중복되었습니다."),
 
     // Diary
     DIARY_NOT_FOUND(404, "D001", "일기를 찾을 수 없습니다."),
@@ -48,7 +49,10 @@ public enum ErrorCode {
     DALLE_REQUEST_FAIL(500, "DE001", "DALL-E 요청에 실패하였습니다."),
 
     // Image InputStream
-    IMAGE_INPUT_STREAM_FAIL(500, "IIS001", "이미지 스트림을 가져오는데 실패하였습니다.");
+    IMAGE_INPUT_STREAM_FAIL(500, "IIS001", "이미지 스트림을 가져오는데 실패하였습니다."),
+
+    // OAuth
+    OAUTH_NOT_FOUND(404, "O001", "OAuth를 찾을 수 없습니다.");
 
     private final int status;
     private final String code;

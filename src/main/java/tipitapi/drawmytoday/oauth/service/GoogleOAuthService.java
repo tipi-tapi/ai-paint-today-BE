@@ -4,7 +4,6 @@ import static tipitapi.drawmytoday.common.exception.ErrorCode.INTERNAL_SERVER_ER
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -27,12 +26,13 @@ import tipitapi.drawmytoday.oauth.domain.Auth;
 import tipitapi.drawmytoday.oauth.dto.OAuthAccessToken;
 import tipitapi.drawmytoday.oauth.dto.OAuthUserProfile;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
+import tipitapi.drawmytoday.oauth.exception.OAuthNotFoundException;
 import tipitapi.drawmytoday.oauth.properties.GoogleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.exception.UserNotFoundException;
-import tipitapi.drawmytoday.user.repository.UserRepository;
+import tipitapi.drawmytoday.user.service.UserService;
+import tipitapi.drawmytoday.user.service.ValidateUserService;
 
 @Service
 @Transactional(readOnly = true)
@@ -40,15 +40,11 @@ import tipitapi.drawmytoday.user.repository.UserRepository;
 public class GoogleOAuthService {
 
     private final GoogleProperties properties;
-
     private final RestTemplate restTemplate;
-
     private final ObjectMapper objectMapper;
-
-    private final UserRepository userRepository;
-
+    private final UserService userService;
+    private final ValidateUserService validateUserService;
     private final AuthRepository authRepository;
-
     private final JwtTokenProvider jwtTokenProvider;
 
 
@@ -58,17 +54,13 @@ public class GoogleOAuthService {
 
         OAuthUserProfile oAuthUserProfile = getUserProfile(accessToken);
 
-        Optional<User> findUser = userRepository.findByEmail(oAuthUserProfile.getEmail());
-        User user = null;
-        if (findUser.isPresent()) {
-            user = findUser.get();
-            Auth auth = authRepository.findByUser(user).get();
+        User user = validateUserService.validateRegisteredUserByEmail(
+            oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
+        if (user != null) {
+            Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
             auth.setRefreshToken(accessToken.getRefreshToken());
         } else {
-            user = userRepository.save(User.builder()
-                .email(oAuthUserProfile.getEmail())
-                .socialCode(SocialCode.GOOGLE)
-                .build());
+            user = userService.registerUser(oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
             authRepository.save(new Auth(user, accessToken.getRefreshToken()));
         }
 
@@ -89,7 +81,7 @@ public class GoogleOAuthService {
      */
     @Transactional
     public void deleteAccount(User user) {
-        Auth auth = authRepository.findByUser(user).orElseThrow(() -> new UserNotFoundException());
+        Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
         String refreshToken = auth.getRefreshToken();
 
         HttpHeaders headers = new HttpHeaders();
