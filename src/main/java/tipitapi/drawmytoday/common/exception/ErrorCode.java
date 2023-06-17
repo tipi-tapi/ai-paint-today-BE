@@ -52,7 +52,7 @@ public enum ErrorCode {
     IMAGE_INPUT_STREAM_FAIL(500, "IIS001", "이미지 스트림을 가져오는데 실패하였습니다."),
 
     // OAuth
-    OAUTH_NOT_FOUND(404, "O001", "OAuth를 찾을 수 없습니다."),
+    OAUTH_NOT_FOUND(404, "O001", "유저의 refresh token을 찾을 수 없습니다."),
     OAUTH_SERVER_FAILED(500, "O002", "OAuth 서버와의 통신 중 에러가 발생하였습니다.");
 
 
