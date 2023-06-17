@@ -46,7 +46,6 @@ public class AuthController {
     private final AppleOAuthService appleOAuthService;
     private final JwtTokenProvider jwtTokenProvider;
 
-
     @Operation(summary = "구글 로그인", description = "프론트로부터 Authorization code를 받아 구글 로그인을 진행합니다.")
     @ApiResponses(value = {
         @ApiResponse(
@@ -54,7 +53,15 @@ public class AuthController {
             description = "구글 로그인 성공"),
         @ApiResponse(
             responseCode = "400",
-            description = "C001 : Authorization header 값이 Bearer 토큰이 아니거나 없습니다.",
+            description = "C001 : 토큰 형식이 Bearer 형식이 아닙니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "S007 : Authorization header에 토큰이 비었습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "O002 : 구글 OAuth 서버와의 통신에 실패했습니다.",
             content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping(value = "/google/login")
@@ -71,6 +78,14 @@ public class AuthController {
         @ApiResponse(
             responseCode = "400",
             description = "C001 : Authorization header 값이 Bearer 토큰이 아니거나 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "S007 : Authorization header에 토큰이 비었습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "O002 : 애플 OAuth 서버와의 통신에 실패했습니다.",
             content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping(value = "/apple/login")
@@ -80,14 +95,6 @@ public class AuthController {
         throws IOException {
         return appleOAuthService.login(request, requestAppleLogin);
     }
-
-    // @GetMapping("/logout")
-    // @ResponseStatus(HttpStatus.OK)
-    // public void logout() {
-    // 	log.info("logout");
-    // 	JwtCookieProvider.deleteCookieFromRequest(JwtProperties.ACCESS_TOKEN_HEADER,
-    // 		JwtProperties.REFRESH_TOKEN_HEADER);
-    // }
 
     @Operation(summary = "jwt access token 재발급",
         description = "프론트로부터 jwt refresh token을 받아 jwt access token을 재발급합니다.")
@@ -105,11 +112,8 @@ public class AuthController {
     @GetMapping("/refresh")
     public ResponseAccessToken getAccessToken(HttpServletRequest request) {
         String refreshToken = getRefreshToken(request);
-
         jwtTokenProvider.validRefreshToken(refreshToken);
-
         String accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
-
         return ResponseAccessToken.of(accessToken);
     }
 
@@ -137,17 +141,13 @@ public class AuthController {
 
     private String getRefreshToken(HttpServletRequest request) {
         String authorization = request.getHeader(JwtProperties.REFRESH_TOKEN_HEADER);
-
         if (Objects.isNull(authorization)) {
             throw new TokenNotFoundException(JWT_REFRESH_TOKEN_NOT_FOUND);
         }
-
         String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
-
         if (tokens.length != 2 || !"Bearer".equals(tokens[0])) {
             throw new InvalidTokenException();
         }
-
         return tokens[1];
     }
 

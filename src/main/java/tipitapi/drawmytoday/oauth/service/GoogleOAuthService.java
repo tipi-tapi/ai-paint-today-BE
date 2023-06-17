@@ -1,6 +1,6 @@
 package tipitapi.drawmytoday.oauth.service;
 
-import static tipitapi.drawmytoday.common.exception.ErrorCode.INTERNAL_SERVER_ERROR;
+import static tipitapi.drawmytoday.common.exception.ErrorCode.OAUTH_SERVER_FAILED;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -96,7 +96,7 @@ public class GoogleOAuthService {
 
         String response = restTemplate.postForObject(url, request, String.class);
         if (response.contains("error")) {
-            throw new BusinessException(INTERNAL_SERVER_ERROR);
+            throw new BusinessException(OAUTH_SERVER_FAILED);
         }
 
         user.deleteUser();
