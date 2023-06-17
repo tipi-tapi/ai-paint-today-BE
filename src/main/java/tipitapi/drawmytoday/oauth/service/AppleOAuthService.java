@@ -95,7 +95,7 @@ public class AppleOAuthService {
         String url = properties.getIosDeleteAccountUrl();
 
         String response = restTemplate.postForObject(url, request, String.class);
-        if (response.contains("error")) {
+        if (response != null) {
             throw new BusinessException(INTERNAL_SERVER_ERROR);
         }
 
@@ -109,7 +109,7 @@ public class AppleOAuthService {
 
         String clientId = properties.getIosClientId();
         String clientSecret = properties.getIosClientSecret();
-        String appleTokenUrl = "";
+        String appleTokenUrl = properties.getTokenUrl();
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");

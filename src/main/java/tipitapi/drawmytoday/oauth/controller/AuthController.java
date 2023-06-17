@@ -11,8 +11,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.io.IOException;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,7 +76,7 @@ public class AuthController {
     @PostMapping(value = "/apple/login")
     @ResponseStatus(HttpStatus.OK)
     public ResponseJwtToken appleLogin(HttpServletRequest request,
-        @RequestBody RequestAppleLogin requestAppleLogin)
+        @RequestBody @Valid RequestAppleLogin requestAppleLogin)
         throws IOException {
         return appleOAuthService.login(request, requestAppleLogin);
     }
@@ -111,12 +113,26 @@ public class AuthController {
         return ResponseAccessToken.of(accessToken);
     }
 
-    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 로직 미검증(검증되면 작성하겠습니다)")
+    @Operation(summary = "회원 탈퇴", description = "소셜로그인 탈퇴를 진행하고, 회원을 deleted 상태로 변경합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "소셜로그인 탈퇴 및 회원 삭제 성공"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "U001 : JwtToken의 userId에 해당하는 유저가 존재하지 않습니다.\t\n" +
+                "O001 : JwtToken의 userId에 해당하는 유저의 refreshtoken이 존재하지 않습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "C004 : 소셜서버와의 통신을 실패했습니다.",
+            content = @Content(schema = @Schema(hidden = true)))
+    })
     @DeleteMapping("/users")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteAccount(@AuthUser JwtTokenInfo tokenInfo) {
+    public ResponseEntity<Void> deleteAccount(@AuthUser JwtTokenInfo tokenInfo) {
         oAuthService.deleteAccount(tokenInfo.getUserId());
-
+        return ResponseEntity.noContent().build();
     }
 
     private String getRefreshToken(HttpServletRequest request) {

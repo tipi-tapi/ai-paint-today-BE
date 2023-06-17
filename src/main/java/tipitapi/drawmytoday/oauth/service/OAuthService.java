@@ -19,6 +19,7 @@ public class OAuthService {
     private final AppleOAuthService appleOAuthService;
     private final ValidateUserService validateUserService;
 
+    @Transactional
     public void deleteAccount(Long userId) {
         User user = validateUserService.validateUserById(userId);
         if (user.getSocialCode() == SocialCode.GOOGLE) {

@@ -73,7 +73,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (Objects.isNull(authorization)) {
             throw new TokenNotFoundException(ErrorCode.JWT_ACCESS_TOKEN_NOT_FOUND);
         }
-        log.info("authorization: {}", authorization);
         String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
 
         if (tokens.length != 2 || !"Bearer".equals(tokens[0])) {
