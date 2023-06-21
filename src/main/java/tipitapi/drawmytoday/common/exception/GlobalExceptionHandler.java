@@ -10,6 +10,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -26,6 +27,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Object> handleBusinessException(BusinessException e) {
+        log.warn("handleBusinessException", e);
         ErrorCode errorCode = e.getErrorCode();
         return handleExceptionInternal(errorCode);
     }
@@ -86,6 +88,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ImageInputStreamFailException e) {
         log.error("ImageInputStreamFailException", e);
         return handleExceptionInternal(ErrorCode.IMAGE_INPUT_STREAM_FAIL);
+    }
+
+    @ExceptionHandler(RestClientException.class)
+    public ResponseEntity<Object> handleRestClientException(RestClientException e) {
+        log.error("RestClientException", e);
+        return handleExceptionInternal(ErrorCode.OAUTH_SERVER_FAILED);
     }
 
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {

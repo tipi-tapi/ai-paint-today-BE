@@ -1,12 +1,11 @@
 package tipitapi.drawmytoday.oauth.service;
 
-import static tipitapi.drawmytoday.common.exception.ErrorCode.INTERNAL_SERVER_ERROR;
+import static tipitapi.drawmytoday.common.exception.ErrorCode.OAUTH_SERVER_FAILED;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,51 +26,41 @@ import tipitapi.drawmytoday.oauth.domain.Auth;
 import tipitapi.drawmytoday.oauth.dto.OAuthAccessToken;
 import tipitapi.drawmytoday.oauth.dto.OAuthUserProfile;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
+import tipitapi.drawmytoday.oauth.exception.OAuthNotFoundException;
 import tipitapi.drawmytoday.oauth.properties.GoogleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
-import tipitapi.drawmytoday.user.domain.OAuthType;
+import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.exception.UserNotFoundException;
-import tipitapi.drawmytoday.user.repository.UserRepository;
+import tipitapi.drawmytoday.user.service.UserService;
+import tipitapi.drawmytoday.user.service.ValidateUserService;
 
-@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class GoogleOAuthService {
 
     private final GoogleProperties properties;
-
     private final RestTemplate restTemplate;
-
     private final ObjectMapper objectMapper;
-
-    private final UserRepository userRepository;
-
+    private final UserService userService;
+    private final ValidateUserService validateUserService;
     private final AuthRepository authRepository;
-
     private final JwtTokenProvider jwtTokenProvider;
 
 
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request) throws JsonProcessingException {
-        // Authorization Code로 Access Token 요청
         OAuthAccessToken accessToken = getAccessToken(request);
 
-        // Access Token으로 User Info 요청
-        OAuthUserProfile OAuthUserProfile = getUserProfile(accessToken);
+        OAuthUserProfile oAuthUserProfile = getUserProfile(accessToken);
 
-        // save user info to database
-        User user = userRepository.findByEmail(OAuthUserProfile.getEmail())
-            .orElseGet(() -> {
-                return userRepository.save(User.builder()
-                    .email(OAuthUserProfile.getEmail())
-                    .oauthType(OAuthType.GOOGLE)
-                    .build());
-            });
-
-        // save refresh token to database
-        if (StringUtils.hasText(accessToken.getAccessToken())) {
+        User user = validateUserService.validateRegisteredUserByEmail(
+            oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
+        if (user != null) {
+            Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
+            auth.setRefreshToken(accessToken.getRefreshToken());
+        } else {
+            user = userService.registerUser(oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
             authRepository.save(new Auth(user, accessToken.getRefreshToken()));
         }
 
@@ -92,7 +81,7 @@ public class GoogleOAuthService {
      */
     @Transactional
     public void deleteAccount(User user) {
-        Auth auth = authRepository.findByUser(user).orElseThrow(() -> new UserNotFoundException());
+        Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
         String refreshToken = auth.getRefreshToken();
 
         HttpHeaders headers = new HttpHeaders();
@@ -106,9 +95,11 @@ public class GoogleOAuthService {
         String url = properties.getDeleteAccountUrl();
 
         String response = restTemplate.postForObject(url, request, String.class);
-        if (StringUtils.hasText(response)) {
-            throw new BusinessException(INTERNAL_SERVER_ERROR);
+        if (response.contains("error")) {
+            throw new BusinessException(OAUTH_SERVER_FAILED);
         }
+
+        user.deleteUser();
     }
 
     private OAuthAccessToken getAccessToken(HttpServletRequest request)

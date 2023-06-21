@@ -25,13 +25,20 @@ public class JwtAuthenticationEntryPoint extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
-            log.warn("exception info={}", e.getErrorCode(), e);
+            log.warn("security exception = {}", e.getErrorCode(), e);
             ErrorCode errorCode = e.getErrorCode();
-            response.setStatus(e.getErrorCode().getStatus());
-            ErrorResponse errorResponse = new ErrorResponse(errorCode.getCode(),
-                errorCode.getMessage(), null);
+
+            ErrorResponse errorResponse = makeErrorResponse(errorCode);
+            response.setStatus(errorCode.getStatus());
+            response.setCharacterEncoding("UTF-8");
             response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
         }
     }
 
+    private ErrorResponse makeErrorResponse(ErrorCode errorCode) {
+        return ErrorResponse.builder()
+            .code(errorCode.name())
+            .message(errorCode.getMessage())
+            .build();
+    }
 }

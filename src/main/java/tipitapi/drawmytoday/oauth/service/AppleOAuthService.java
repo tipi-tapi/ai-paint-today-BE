@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.oauth.service;
 
 import static tipitapi.drawmytoday.common.exception.ErrorCode.AUTH_CODE_NOT_FOUND;
-import static tipitapi.drawmytoday.common.exception.ErrorCode.INTERNAL_SERVER_ERROR;
+import static tipitapi.drawmytoday.common.exception.ErrorCode.OAUTH_SERVER_FAILED;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,12 +28,13 @@ import tipitapi.drawmytoday.oauth.dto.AppleIdToken;
 import tipitapi.drawmytoday.oauth.dto.OAuthAccessToken;
 import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
+import tipitapi.drawmytoday.oauth.exception.OAuthNotFoundException;
 import tipitapi.drawmytoday.oauth.properties.AppleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
-import tipitapi.drawmytoday.user.domain.OAuthType;
+import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.exception.UserNotFoundException;
-import tipitapi.drawmytoday.user.repository.UserRepository;
+import tipitapi.drawmytoday.user.service.UserService;
+import tipitapi.drawmytoday.user.service.ValidateUserService;
 
 @Service
 @Transactional(readOnly = true)
@@ -41,42 +42,32 @@ import tipitapi.drawmytoday.user.repository.UserRepository;
 public class AppleOAuthService {
 
     private final AppleProperties properties;
-
     private final RestTemplate restTemplate;
-
     private final ObjectMapper objectMapper;
-
-    private final UserRepository userRepository;
-
+    private final ValidateUserService validateUserService;
+    private final UserService userService;
     private final AuthRepository authRepository;
-
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request, RequestAppleLogin requestAppleLogin)
         throws IOException {
-        // authorization code 가져오기
         String authorizationCode = getAuthorizationCode(request);
 
-        // authorization code로 refresh token 가져오기
-        OAuthAccessToken OAuthAccessToken = getRefreshToken(authorizationCode);
+        OAuthAccessToken oAuthAccessToken = getRefreshToken(authorizationCode);
 
-        // appleIdToken 파싱
         AppleIdToken appleIdToken = getAppleIdToken(requestAppleLogin.getIdToken());
 
-        // save user info to database
-        User user = userRepository.findByEmail(appleIdToken.getEmail())
-            .orElseGet(() -> {
-                return userRepository.save(User.builder()
-                    .email(appleIdToken.getEmail())
-                    .oauthType(OAuthType.APPLE)
-                    .build());
-            });
+        User user = validateUserService.validateRegisteredUserByEmail(
+            appleIdToken.getEmail(), SocialCode.APPLE);
+        if (user != null) {
+            Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
+            auth.setRefreshToken(oAuthAccessToken.getRefreshToken());
+        } else {
+            user = userService.registerUser(appleIdToken.getEmail(), SocialCode.APPLE);
+            authRepository.save(new Auth(user, oAuthAccessToken.getRefreshToken()));
+        }
 
-        // save refresh token to database
-        authRepository.save(new Auth(user, OAuthAccessToken.getRefreshToken()));
-
-        // // create JWT token
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
             user.getUserRole());
         String jwtRefreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(),
@@ -87,7 +78,7 @@ public class AppleOAuthService {
 
     @Transactional
     public void deleteAccount(User user) {
-        Auth auth = authRepository.findByUser(user).orElseThrow(() -> new UserNotFoundException());
+        Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
         String refreshToken = auth.getRefreshToken();
 
         HttpHeaders headers = new HttpHeaders();
@@ -104,9 +95,11 @@ public class AppleOAuthService {
         String url = properties.getIosDeleteAccountUrl();
 
         String response = restTemplate.postForObject(url, request, String.class);
-        if (StringUtils.hasText(response)) {
-            throw new BusinessException(INTERNAL_SERVER_ERROR);
+        if (response != null) {
+            throw new BusinessException(OAUTH_SERVER_FAILED);
         }
+
+        user.deleteUser();
     }
 
     private OAuthAccessToken getRefreshToken(String authorizationCode)
@@ -116,7 +109,7 @@ public class AppleOAuthService {
 
         String clientId = properties.getIosClientId();
         String clientSecret = properties.getIosClientSecret();
-        String appleTokenUrl = "";
+        String appleTokenUrl = properties.getTokenUrl();
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
