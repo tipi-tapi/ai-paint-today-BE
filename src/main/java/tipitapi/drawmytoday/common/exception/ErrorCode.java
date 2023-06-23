@@ -40,6 +40,10 @@ public enum ErrorCode {
     // Emotion
     EMOTION_NOT_FOUND(404, "E001", "감정을 찾을 수 없습니다."),
 
+    // Prompt
+    PROMPT_NOT_FOUND(404, "P001", "프롬프트를 찾을 수 없습니다."),
+    PROMPT_NOT_UNIQUE(400, "P002", "한 일기에 여러 프롬프트가 존재합니다."),
+
     // S3
     S3_SERVICE_ERROR(500, "S3001", "S3Exception 에러가 발생하였습니다."),
     S3_SDK_ERROR(500, "S3002", "SdkClientException 에러가 발생하였습니다."),
