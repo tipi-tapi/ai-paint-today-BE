@@ -26,7 +26,7 @@ public class PromptService {
         return promptRepository.save(Prompt.create(prompt, isSuccess));
     }
 
-    @Transactional(noRollbackFor = PromptNotFoundException.class)
+    @Transactional(noRollbackFor = {PromptNotFoundException.class, BusinessException.class})
     public Prompt getOnePromptByDiaryId(Long diaryId) {
         List<Prompt> prompts = promptRepository.findAllByDiaryDiaryId(diaryId);
         if (prompts.isEmpty()) {
