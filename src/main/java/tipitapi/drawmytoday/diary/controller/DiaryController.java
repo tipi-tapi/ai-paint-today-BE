@@ -112,8 +112,13 @@ public class DiaryController {
             responseCode = "201",
             description = "성공적으로 생성된 일기 정보"),
         @ApiResponse(
+            responseCode = "400",
+            description = "U004 : 이미 그림일기를 그린 유저입니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
             responseCode = "404",
-            description = "E001 : 감정을 찾을 수 없습니다.",
+            description = "E001 : 감정을 찾을 수 없습니다. \t\n "
+                + "U001 : access token에 담긴 userId에 해당하는 유저를 찾을 수 없습니다.",
             content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(
             responseCode = "500",

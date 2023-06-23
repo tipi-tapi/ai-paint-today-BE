@@ -36,7 +36,7 @@ public class CreateDiaryService {
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
         String notes) throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
-        User user = validateUserService.validateUserById(userId);
+        User user = validateUserService.validateNotDrawDiaryUser(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         String prompt = createPromptText(emotion, keyword);
 
@@ -56,6 +56,8 @@ public class CreateDiaryService {
         } catch (DallERequestFailException | ImageInputStreamFailException e) {
             promptService.createPrompt(prompt, false);
             throw e;
+        } finally {
+            user.setLastDiaryDate(LocalDateTime.now());
         }
     }
 
