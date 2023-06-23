@@ -79,6 +79,15 @@ public class JwtTokenProvider {
         return createToken(userId, userRole, REFRESH_TOKEN_EXPIRE_TIME);
     }
 
+    public String expireToken(String jwtToken) {
+        Claims claims = parseClaims(jwtToken);
+        return Jwts.builder()
+            .setClaims(claims)
+            .setExpiration(new Date())
+            .signWith(key, SignatureAlgorithm.HS512)
+            .compact();
+    }
+
     public String createNewAccessTokenFromRefreshToken(String refreshToken) {
         Claims claims = parseClaims(refreshToken);
 

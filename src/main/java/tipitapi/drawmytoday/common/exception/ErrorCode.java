@@ -23,6 +23,7 @@ public enum ErrorCode {
     EXPIRED_JWT_ACCESS_TOKEN(400, "S005", "jwt access token이 만료되었습니다."),
     EXPIRED_JWT_REFRESH_TOKEN(400, "S006", "jwt refresh token이 만료되었습니다."),
     AUTH_CODE_NOT_FOUND(404, "S007", "authorization header가 비었습니다."),
+    JWT_TOKEN_NOT_FOUND(404, "S008", "jwt token이 없습니다."),
 
 
     // User

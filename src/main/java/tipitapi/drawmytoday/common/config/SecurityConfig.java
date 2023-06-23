@@ -27,7 +27,8 @@ public class SecurityConfig {
         "/oauth2/login",
         "/oauth2/google/login",
         "/oauth2/apple/login",
-        "/oauth2/refresh"
+        "/oauth2/refresh",
+        "/oauth2/expiredJwt"
     };
 
     @Bean

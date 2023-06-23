@@ -1,7 +1,5 @@
 package tipitapi.drawmytoday.oauth.controller;
 
-import static tipitapi.drawmytoday.common.exception.ErrorCode.JWT_REFRESH_TOKEN_NOT_FOUND;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,13 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.io.IOException;
-import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,11 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
-import tipitapi.drawmytoday.common.security.jwt.JwtProperties;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
-import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
-import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
+import tipitapi.drawmytoday.common.security.jwt.JwtType;
+import tipitapi.drawmytoday.common.utils.HeaderUtils;
 import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
@@ -111,7 +106,7 @@ public class AuthController {
     })
     @GetMapping("/refresh")
     public ResponseAccessToken getAccessToken(HttpServletRequest request) {
-        String refreshToken = getRefreshToken(request);
+        String refreshToken = HeaderUtils.getJwtToken(request, JwtType.REFRESH);
         jwtTokenProvider.validRefreshToken(refreshToken);
         String accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
         return ResponseAccessToken.of(accessToken);
@@ -139,16 +134,24 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    private String getRefreshToken(HttpServletRequest request) {
-        String authorization = request.getHeader(JwtProperties.REFRESH_TOKEN_HEADER);
-        if (Objects.isNull(authorization)) {
-            throw new TokenNotFoundException(JWT_REFRESH_TOKEN_NOT_FOUND);
-        }
-        String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
-        if (tokens.length != 2 || !"Bearer".equals(tokens[0])) {
-            throw new InvalidTokenException();
-        }
-        return tokens[1];
+    @Operation(summary = "토큰 만료(테스트)", description = "jwt token을 만료시킵니다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "jwt token 만료 성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "S002 : 유효하지 않은 토큰입니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "S008 : jwt token이 없습니다.",
+            content = @Content(schema = @Schema(hidden = true)))
+    })
+    @GetMapping("/expiredJwt")
+    public String getExpiredJwt(HttpServletRequest request) {
+        String jwtToken = HeaderUtils.getJwtToken(request, JwtType.BOTH);
+        return jwtTokenProvider.expireToken(jwtToken);
     }
 
 }
