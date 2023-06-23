@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
         version = "v1"),
     servers = {
         @Server(url = "https://draw-my-today.devstory.co.kr", description = "운영 서버"),
+        @Server(url = "https://choihyeok.site", description = "테스트 서버")
     }
 )
 @Configuration
