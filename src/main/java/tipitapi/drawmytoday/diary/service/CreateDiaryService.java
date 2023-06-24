@@ -52,12 +52,11 @@ public class CreateDiaryService {
             String imagePath = getImagePath(diary.getDiaryId(), 1);
             s3Service.uploadImage(dallEImage, imagePath);
             imageService.createImage(diary, imagePath, true);
+            user.setLastDiaryDate(LocalDateTime.now());
             return new CreateDiaryResponse(diary.getDiaryId());
         } catch (DallERequestFailException | ImageInputStreamFailException e) {
             promptService.createPrompt(prompt, false);
             throw e;
-        } finally {
-            user.setLastDiaryDate(LocalDateTime.now());
         }
     }
 
