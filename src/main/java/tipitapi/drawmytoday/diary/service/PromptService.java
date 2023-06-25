@@ -4,11 +4,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tipitapi.drawmytoday.common.exception.BusinessException;
-import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Prompt;
-import tipitapi.drawmytoday.diary.exception.PromptNotFoundException;
 import tipitapi.drawmytoday.diary.repository.PromptRepository;
 
 @Service
@@ -26,13 +23,10 @@ public class PromptService {
         return promptRepository.save(Prompt.create(prompt, isSuccess));
     }
 
-    @Transactional(noRollbackFor = {PromptNotFoundException.class, BusinessException.class})
     public Prompt getOnePromptByDiaryId(Long diaryId) {
         List<Prompt> prompts = promptRepository.findAllByDiaryDiaryId(diaryId);
         if (prompts.isEmpty()) {
-            throw new PromptNotFoundException();
-        } else if (prompts.size() > 1) {
-            throw new BusinessException(ErrorCode.PROMPT_NOT_UNIQUE);
+            prompts.add(Prompt.create("저장된 프롬프트가 없습니다.", true));
         }
         return prompts.get(0);
     }

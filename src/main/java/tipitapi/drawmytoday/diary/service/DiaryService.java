@@ -17,7 +17,6 @@ import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
-import tipitapi.drawmytoday.diary.exception.PromptNotFoundException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.s3.service.S3PreSignedService;
 import tipitapi.drawmytoday.user.domain.User;
@@ -45,12 +44,7 @@ public class DiaryService {
         String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
             imageService.getImage(diary).getImageUrl(), 30);
 
-        Prompt prompt = Prompt.create("프롬프트 조회를 실패했습니다.", false);
-        try {
-            prompt = promptService.getOnePromptByDiaryId(diaryId);
-        } catch (PromptNotFoundException e) {
-            log.info("프롬프트 조회를 실패했습니다.", e);
-        }
+        Prompt prompt = promptService.getOnePromptByDiaryId(diaryId);
 
         return GetDiaryResponse.of(diary, imageUrl, diary.getEmotion(), prompt);
     }
