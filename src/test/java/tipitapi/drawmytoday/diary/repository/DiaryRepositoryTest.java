@@ -55,9 +55,9 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("null을 반환한다.")
             void return_null() {
-                Long nonExistUserId = createUser().getUserId() + 1;
+                Long nonExistDiaryId = createDiary(createUser(), createEmotion()).getDiaryId() + 1;
 
-                Optional<Diary> foundDiary = diaryRepository.findById(nonExistUserId);
+                Optional<Diary> foundDiary = diaryRepository.findById(nonExistDiaryId);
 
                 assertThat(foundDiary).isEmpty();
             }
