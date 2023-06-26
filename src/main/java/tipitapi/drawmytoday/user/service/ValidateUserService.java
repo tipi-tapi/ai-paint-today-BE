@@ -1,8 +1,11 @@
 package tipitapi.drawmytoday.user.service;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.common.exception.BusinessException;
+import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
@@ -25,5 +28,14 @@ public class ValidateUserService {
             .filter(user -> user.getDeletedAt() == null && user.getSocialCode() == socialCode)
             .findFirst()
             .orElse(null);
+    }
+
+    public User validateUserWithDrawLimit(Long userId) {
+        User user = validateUserById(userId);
+        if (user.getLastDiaryDate().toLocalDate().equals(LocalDate.now())) {
+            throw new BusinessException(ErrorCode.USER_ALREADY_DRAW_DIARY);
+        } else {
+            return user;
+        }
     }
 }
