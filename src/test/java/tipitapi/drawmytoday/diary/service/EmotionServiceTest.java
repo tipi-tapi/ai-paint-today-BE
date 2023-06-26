@@ -55,7 +55,7 @@ public class EmotionServiceTest {
                 given(validateUserService.validateUserById(1L)).willThrow(
                     new UserNotFoundException());
 
-                assertThatThrownBy(() -> emotionService.getActiveEmotions(1L))
+                assertThatThrownBy(() -> emotionService.getActiveEmotions(1L, "ko"))
                     .isInstanceOf(UserNotFoundException.class);
             }
         }
@@ -73,11 +73,31 @@ public class EmotionServiceTest {
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(emotionRepository.findAllActiveEmotions()).willReturn(List.of(activeEmotion));
 
-                List<GetActiveEmotionsResponse> emotions = emotionService.getActiveEmotions(1L);
+                List<GetActiveEmotionsResponse> emotions =
+                    emotionService.getActiveEmotions(1L, "ko");
 
                 assertThat(emotions.get(0).getId()).isEqualTo(activeEmotion.getEmotionId());
                 assertThat(emotions).extracting(GetActiveEmotionsResponse::getId)
                     .isNotEqualTo(inActiveEmotion.getEmotionId());
+            }
+        }
+
+        @Nested
+        @DisplayName("영어로 반환하도록 요청할 경우")
+        class if_language_for_english {
+
+            @Test
+            @DisplayName("감정 값을 영어로 반환한다.")
+            void it_returns_emotion_as_english() {
+                User user = createUserWithId(1L);
+                Emotion activeEmotion = createEmotion();
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(emotionRepository.findAllActiveEmotions()).willReturn(List.of(activeEmotion));
+
+                List<GetActiveEmotionsResponse> emotions =
+                    emotionService.getActiveEmotions(1L, "en");
+
+                assertThat(emotions.get(0).getName()).isEqualTo(activeEmotion.getEmotionPrompt());
             }
         }
     }
