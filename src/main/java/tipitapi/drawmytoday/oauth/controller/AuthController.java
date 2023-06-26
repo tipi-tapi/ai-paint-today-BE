@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -134,7 +135,8 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "토큰 만료(테스트)", description = "jwt token을 만료시킵니다.")
+    @Operation(summary = "토큰 만료(테스트)", description = "jwt token을 만료시킵니다.",
+        security = @SecurityRequirement(name = "Bearer Authentication"))
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",

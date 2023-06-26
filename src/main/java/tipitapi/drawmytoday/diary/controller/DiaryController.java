@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ import tipitapi.drawmytoday.diary.service.DiaryService;
 @RestController
 @RequestMapping("/diary")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
 public class DiaryController {
 
     private final DiaryService diaryService;
