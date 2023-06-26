@@ -33,6 +33,7 @@ import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
+import tipitapi.drawmytoday.s3.service.S3PreSignedService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
@@ -46,6 +47,8 @@ class DiaryServiceTest {
     ImageService imageService;
     @Mock
     ValidateUserService validateUserService;
+    @Mock
+    S3PreSignedService s3PreSignedService;
     @Mock
     ValidateDiaryService validateDiaryService;
     @InjectMocks
@@ -69,6 +72,9 @@ class DiaryServiceTest {
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
                 given(imageService.getImage(diary)).willReturn(image);
+                given(
+                    s3PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
+                ).willReturn("https://test.com");
 
                 GetDiaryResponse getDiaryResponse = diaryService.getDiary(1L, 1L);
 
