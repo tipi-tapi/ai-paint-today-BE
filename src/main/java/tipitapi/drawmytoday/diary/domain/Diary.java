@@ -25,7 +25,6 @@ import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.User;
 
-
 @SQLDelete(sql = "UPDATE diary SET deleted_at = current_timestamp WHERE diary_id = ?")
 @Where(clause = "deleted_at is null")
 @Getter
