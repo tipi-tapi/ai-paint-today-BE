@@ -77,8 +77,8 @@ class DiaryServiceTest {
         }
 
         @Nested
-        @DisplayName("주어진 일기가 없을 경우")
-        class if_diary_not_exists_or_not_user_owned_diary {
+        @DisplayName("주어진 일기가 없거나 삭제되었을 경우")
+        class if_diary_not_exists_or_deleted {
 
             @Test
             @DisplayName("DiaryNotFoundException 예외를 발생시킨다.")
@@ -112,8 +112,8 @@ class DiaryServiceTest {
     }
 
     @Nested
-    @DisplayName("getDiaries 메소드 테스트")
-    class GetDiariesTest {
+    @DisplayName("getMonthlyDiaries 메소드 테스트")
+    class GetMonthlyDiariesTest {
 
         @Nested
         @DisplayName("userId에 해당하는 유저가 존재하지 않을 경우")
