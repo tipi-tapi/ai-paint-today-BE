@@ -42,8 +42,12 @@ public class GetDiaryResponse {
     @Schema(description = "일기 내용", requiredMode = RequiredMode.NOT_REQUIRED)
     private String notes;
 
-    public static GetDiaryResponse of(Diary diary, String imageUrl, Emotion emotion) {
+    @Schema(description = "프롬프트", requiredMode = RequiredMode.NOT_REQUIRED)
+    private String prompt;
+
+    public static GetDiaryResponse of(Diary diary, String imageUrl, Emotion emotion,
+        String promptText) {
         return new GetDiaryResponse(diary.getDiaryId(), imageUrl, diary.getDiaryDate(),
-            diary.getCreatedAt(), emotion.getName(), diary.getNotes());
+            diary.getCreatedAt(), emotion.getName(), diary.getNotes(), promptText);
     }
 }
