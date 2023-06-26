@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -157,6 +158,29 @@ public class DiaryController {
     ) {
         diaryService.updateDiaryNotes(tokenInfo.getUserId(), diaryId,
             updateDiaryRequest.getNotes());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "일기 삭제", description = "주어진 ID의 일기를 삭제(Soft Delete)한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "성공적으로 일기 내용을 삭제함"),
+        @ApiResponse(
+            responseCode = "403",
+            description = "D002 : 자신의 일기에만 접근할 수 있습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "D001 : 일기를 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDiary(
+        @AuthUser JwtTokenInfo tokenInfo,
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
+    ) {
+        diaryService.deleteDiary(tokenInfo.getUserId(), diaryId);
         return ResponseEntity.noContent().build();
     }
 }

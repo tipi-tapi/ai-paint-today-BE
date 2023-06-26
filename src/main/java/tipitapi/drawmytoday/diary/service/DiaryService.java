@@ -65,6 +65,14 @@ public class DiaryService {
         diary.setNotes(notes);
     }
 
+    @Transactional
+    public void deleteDiary(Long userId, Long diaryId) {
+        User user = validateUserService.validateUserById(userId);
+        Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
+
+        diaryRepository.delete(diary);
+    }
+
     private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {
         return getDiaryList.stream()
             .filter(diary -> {

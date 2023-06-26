@@ -337,4 +337,41 @@ class DiaryServiceTest {
         }
 
     }
+
+    @Nested
+    @DisplayName("deleteDiary 메소드 테스트")
+    class DeleteDiaryTest {
+
+        @Nested
+        @DisplayName("userId에 해당하는 유저가 존재하지 않을 경우")
+        class if_user_not_exists {
+
+            @Test
+            @DisplayName("UserNotFoundException 예외를 발생시킨다.")
+            void it_throws_UserNotFoundException() {
+                given(validateUserService.validateUserById(1L)).willThrow(
+                    new UserNotFoundException());
+
+                assertThatThrownBy(() -> diaryService.deleteDiary(1L, 1L))
+                    .isInstanceOf(UserNotFoundException.class);
+            }
+        }
+
+        @Nested
+        @DisplayName("diaryId에 해당하는 일기가 존재하지 않을 경우")
+        class if_diary_not_exists {
+
+            @Test
+            @DisplayName("DiaryNotFoundException 예외를 발생시킨다.")
+            void it_throws_DiaryNotFoundException() {
+                User user = createUserWithId(1L);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateDiaryService.validateDiaryById(1L, user))
+                    .willThrow(DiaryNotFoundException.class);
+
+                assertThatThrownBy(() -> diaryService.deleteDiary(1L, 1L))
+                    .isInstanceOf(DiaryNotFoundException.class);
+            }
+        }
+    }
 }
