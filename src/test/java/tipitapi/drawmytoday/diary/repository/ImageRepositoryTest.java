@@ -33,7 +33,7 @@ class ImageRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("이미지를 반환한다.")
             void return_image() {
-                Diary diary = createDiary(1L, createUser());
+                Diary diary = createDiaryWithId(1L, createUser());
                 Image image = createImage(1L, diary);
 
                 Optional<Image> foundImage = imageRepository.findByIsSelectedTrueAndDiary(diary);
@@ -50,7 +50,7 @@ class ImageRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("null을 반환한다.")
             void return_null() {
-                Diary diary = createDiary(1L, createUser());
+                Diary diary = createDiaryWithId(1L, createUser());
                 createImage(1L, diary).setSelected(false);
 
                 Optional<Image> foundImage = imageRepository.findByIsSelectedTrueAndDiary(diary);
@@ -67,8 +67,8 @@ class ImageRepositoryTest extends BaseRepositoryTest {
             @DisplayName("null을 반환한다.")
             void return_null() {
                 User user = createUser();
-                Diary diary = createDiary(1L, user);
-                Diary otherDiary = createDiary(2L, user);
+                Diary diary = createDiaryWithId(1L, user);
+                Diary otherDiary = createDiaryWithId(2L, user);
                 createImage(1L, diary);
 
                 Optional<Image> foundImage = imageRepository.findByIsSelectedTrueAndDiary(
