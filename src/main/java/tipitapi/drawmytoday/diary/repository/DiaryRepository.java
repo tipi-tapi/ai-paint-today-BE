@@ -14,6 +14,4 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
         LocalDateTime endMonth);
 
     Optional<Diary> findFirstByUserUserIdOrderByCreatedAtDesc(Long userId);
-
-    Optional<Diary> findFirstByDiaryId(Long diaryId);
 }

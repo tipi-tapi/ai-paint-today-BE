@@ -45,7 +45,7 @@ class ValidateDiaryServiceTest {
             @Test
             @DisplayName("DiaryNotFoundException 예외를 발생시킨다.")
             void it_throws_DiaryNotFoundException() {
-                given(diaryRepository.findFirstByDiaryId(any(Long.class)))
+                given(diaryRepository.findById(any(Long.class)))
                     .willReturn(Optional.empty());
 
                 assertThatThrownBy(() -> validateDiaryService.validateDiaryById(1L, createUser()))
@@ -64,7 +64,7 @@ class ValidateDiaryServiceTest {
                 User user = createUserWithId(1L);
                 Diary diary = TestDiary.createDiaryWithId(
                     1L, createUserWithId(2L), TestEmotion.createEmotion());
-                given(diaryRepository.findFirstByDiaryId(any(Long.class)))
+                given(diaryRepository.findById(any(Long.class)))
                     .willReturn(Optional.of(diary));
 
                 assertThatThrownBy(() -> validateDiaryService.validateDiaryById(1L, user))
@@ -79,7 +79,7 @@ class ValidateDiaryServiceTest {
             @Test
             @DisplayName("DiaryNotFoundException 예외를 발생시킨다.")
             void it_throws_DiaryNotFoundException() {
-                given(diaryRepository.findFirstByDiaryId(any(Long.class)))
+                given(diaryRepository.findById(any(Long.class)))
                     .willReturn(Optional.empty());
 
                 assertThatThrownBy(() -> validateDiaryService.validateDiaryById(1L, createUser()))
@@ -96,7 +96,7 @@ class ValidateDiaryServiceTest {
             void return_diary() {
                 User user = createUserWithId(1L);
                 Diary diary = createDiaryWithId(1L, user, createEmotion());
-                given(diaryRepository.findFirstByDiaryId(any(Long.class)))
+                given(diaryRepository.findById(any(Long.class)))
                     .willReturn(Optional.of(diary));
 
                 Diary validatedDiary = validateDiaryService.validateDiaryById(1L, user);

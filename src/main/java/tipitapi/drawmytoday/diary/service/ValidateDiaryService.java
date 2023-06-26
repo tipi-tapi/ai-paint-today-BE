@@ -17,7 +17,7 @@ public class ValidateDiaryService {
     private final DiaryRepository diaryRepository;
 
     public Diary validateDiaryById(Long diaryId, User user) {
-        Diary diary = diaryRepository.findFirstByDiaryId(diaryId)
+        Diary diary = diaryRepository.findById(diaryId)
             .orElseThrow(DiaryNotFoundException::new);
         ownedByUser(diary, user);
         return diary;
