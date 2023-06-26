@@ -1,13 +1,11 @@
 package tipitapi.drawmytoday.diary.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithIdAndCreatedAt;
-import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithIdAndDate;
-import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotionWithId;
+import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithCreatedAt;
+import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithDate;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +41,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             void return_diary() {
                 Diary diary = createDiary(createUser(), createEmotion());
 
-                Optional<Diary> foundDiary = diaryRepository.findById(1L);
+                Optional<Diary> foundDiary = diaryRepository.findById(diary.getDiaryId());
 
                 assertThat(foundDiary.isPresent()).isTrue();
                 assertThat(foundDiary.get().getDiaryId()).isEqualTo(diary.getDiaryId());
@@ -57,7 +55,9 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("null을 반환한다.")
             void return_null() {
-                Optional<Diary> foundDiary = diaryRepository.findById(1L);
+                Long nonExistUserId = createUser().getUserId() + 1;
+
+                Optional<Diary> foundDiary = diaryRepository.findById(nonExistUserId);
 
                 assertThat(foundDiary).isEmpty();
             }
@@ -78,14 +78,12 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("빈 리스트를 반환한다.")
             void return_empty_list() {
-                Long existUserId = 1L;
-                Long inputUserId = 2L;
-                createUserWithId(existUserId);
+                Long nonExistUserId = createUser().getUserId() + 1;
 
                 assertThat(
-                    diaryRepository.findAllByUserUserIdAndDiaryDateBetween(inputUserId, START_DATE,
-                        END_DATE))
-                    .isEmpty();
+                    diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
+                        nonExistUserId, START_DATE, END_DATE)
+                ).isEmpty();
             }
         }
 
@@ -97,18 +95,13 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             @DisplayName("빈 리스트를 반환한다.")
             void return_empty_list() {
                 LocalDateTime diaryDate = LocalDateTime.of(2023, 5, 1, 0, 0);
-                Long userId = 1L;
-                User user = createUserWithId(userId);
-                Emotion emotion = createEmotionWithId(1L);
-                Diary diary = createDiaryWithIdAndDate(1L, diaryDate, user, emotion);
-                userRepository.save(user);
-                emotionRepository.save(emotion);
-                diaryRepository.save(diary);
-                createImage(1L, diary);
+                User user = createUser();
+                Emotion emotion = createEmotion();
+                diaryRepository.save(createDiaryWithDate(diaryDate, user, emotion));
 
                 assertThat(
-                    diaryRepository.findAllByUserUserIdAndDiaryDateBetween(userId, START_DATE,
-                        END_DATE))
+                    diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
+                        user.getUserId(), START_DATE, END_DATE))
                     .isEmpty();
             }
         }
@@ -121,21 +114,39 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             @DisplayName("해당 월의 일기 리스트를 반환한다.")
             void return_diary_list() {
                 LocalDateTime diaryDate = LocalDateTime.of(2023, 6, 1, 0, 0);
-                Long userId = 1L;
-                User user = createUserWithId(userId);
-                Emotion emotion = createEmotionWithId(1L);
-                Diary diary1 = createDiaryWithIdAndDate(1L, diaryDate, user, emotion);
-                Diary diary2 = createDiaryWithIdAndDate(2L, diaryDate, user, emotion);
-                userRepository.save(user);
-                emotionRepository.save(emotion);
-                diaryRepository.save(diary1);
-                diaryRepository.save(diary2);
-                createImage(1L, diary1);
-                createImage(2L, diary2);
+                User user = createUser();
+                Emotion emotion = createEmotion();
+                diaryRepository.saveAll(
+                    List.of(createDiaryWithDate(diaryDate, user, emotion),
+                        createDiaryWithDate(diaryDate, user, emotion)));
 
                 List<Diary> diaryList = diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
-                    userId, START_DATE, END_DATE);
+                    user.getUserId(), START_DATE, END_DATE);
                 assertThat(diaryList.size()).isEqualTo(2);
+            }
+
+            @Nested
+            @DisplayName("삭제된 일기가 있을 경우")
+            class if_deleted_diary_exist {
+
+                @Test
+                @DisplayName("삭제된 일기는 포함하지 않은 일기 리스트를 반환한다.")
+                void return_diary_list_without_deleted() {
+                    LocalDateTime diaryDate = LocalDateTime.of(2023, 6, 1, 0, 0);
+                    User user = createUser();
+                    Emotion emotion = createEmotion();
+                    diaryRepository.save(
+                        createDiaryWithDate(diaryDate, user, emotion));
+                    Diary deletedDiary = diaryRepository.save(
+                        createDiaryWithDate(diaryDate, user, emotion));
+
+                    diaryRepository.delete(deletedDiary);
+
+                    List<Diary> diaryList = diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
+                        user.getUserId(), START_DATE, END_DATE);
+                    assertThat(diaryList.size()).isEqualTo(1);
+                    assertThat(diaryList).doesNotContain(deletedDiary);
+                }
             }
         }
     }
@@ -167,26 +178,43 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("마지막으로 생성한 Diary를 반환한다.")
             void return_diary() {
-                Long userId = 1L, diaryId1 = 1L, diaryId2 = 2L;
-                User user = createUserWithId(userId);
-                Emotion emotion = createEmotionWithId(1L);
-                userRepository.save(user);
-                emotionRepository.save(emotion);
-                diaryRepository.saveAll(Arrays.asList(
-                    createDiaryWithIdAndCreatedAt(diaryId1, LocalDateTime.now().minusDays(2), user,
-                        emotion),
-                    createDiaryWithIdAndCreatedAt(diaryId2, LocalDateTime.now().minusDays(1), user,
-                        emotion)
-                ));
+                User user = createUser();
+                Emotion emotion = createEmotion();
+                diaryRepository.save(
+                    createDiaryWithCreatedAt(LocalDateTime.now().minusDays(2), user, emotion));
+                Diary lastDiary = diaryRepository.save(
+                    createDiaryWithCreatedAt(LocalDateTime.now().minusDays(1), user,
+                        emotion));
 
                 Optional<Diary> diary = diaryRepository.findFirstByUserUserIdOrderByCreatedAtDesc(
-                    userId);
+                    user.getUserId());
 
                 assertThat(diary.isPresent()).isTrue();
-                assertThat(diary.get().getDiaryId()).isEqualTo(diaryId2);
+                assertThat(diary.get().getDiaryId()).isEqualTo(lastDiary.getDiaryId());
             }
         }
 
     }
 
+    @Nested
+    @DisplayName("delete 메소드 테스트")
+    class DeleteTest {
+
+        @Nested
+        @DisplayName("기존에 삭제 처리되지 않은 일기의 경우")
+        class if_diary_not_deleted {
+
+            @Test
+            @DisplayName("deletedAt에 값을 입력한다.")
+            void update_deleted_at() {
+                Diary diary = createDiary(createUser(), createEmotion());
+
+                diaryRepository.delete(diary);
+                diaryRepository.flush();
+
+                assertThat(diaryRepository.findById(1L)).isNotPresent();
+
+            }
+        }
+    }
 }
