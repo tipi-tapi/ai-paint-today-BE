@@ -113,7 +113,8 @@ public class AuthController {
         return ResponseAccessToken.of(accessToken);
     }
 
-    @Operation(summary = "회원 탈퇴", description = "소셜로그인 탈퇴를 진행하고, 회원을 deleted 상태로 변경합니다.")
+    @Operation(summary = "회원 탈퇴", description = "소셜로그인 탈퇴를 진행하고, 회원을 deleted 상태로 변경합니다.",
+        security = @SecurityRequirement(name = "Bearer Authentication"))
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "204",
