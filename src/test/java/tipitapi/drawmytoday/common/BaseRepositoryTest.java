@@ -35,9 +35,13 @@ public abstract class BaseRepositoryTest {
         return userRepository.save(TestUser.createUser());
     }
 
-    protected Diary createDiary(Long diaryId, User user) {
+    protected Diary createDiaryWithId(Long diaryId, User user) {
         Emotion emotion = emotionRepository.save(createEmotion());
         return diaryRepository.save(TestDiary.createDiaryWithId(diaryId, user, emotion));
+    }
+
+    protected Diary createDiary(User user, Emotion emotion) {
+        return diaryRepository.save(TestDiary.createDiary(user, emotion));
     }
 
     protected Image createImage(Long imageId, Diary diary) {

@@ -41,8 +41,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("일기를 반환한다.")
             void return_diary() {
-                User user = createUser();
-                Diary diary = createDiary(1L, user);
+                Diary diary = createDiary(createUser(), createEmotion());
 
                 Optional<Diary> foundDiary = diaryRepository.findById(1L);
 
