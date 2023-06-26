@@ -148,7 +148,7 @@ public class AuthController {
             description = "S008 : jwt token이 없습니다.",
             content = @Content(schema = @Schema(hidden = true)))
     })
-    @GetMapping("/expiredJwt")
+    @GetMapping("/expire")
     public String getExpiredJwt(HttpServletRequest request) {
         String jwtToken = HeaderUtils.getJwtToken(request, JwtType.BOTH);
         return jwtTokenProvider.expireToken(jwtToken);
