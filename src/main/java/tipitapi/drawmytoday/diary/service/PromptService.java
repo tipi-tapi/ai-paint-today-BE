@@ -1,6 +1,6 @@
 package tipitapi.drawmytoday.diary.service;
 
-import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +23,8 @@ public class PromptService {
         return promptRepository.save(Prompt.create(prompt, isSuccess));
     }
 
-    public Prompt getOnePromptByDiaryId(Long diaryId) {
-        List<Prompt> prompts = promptRepository.findAllByDiaryDiaryId(diaryId);
-        if (prompts.isEmpty()) {
-            prompts.add(Prompt.create("저장된 프롬프트가 없습니다.", true));
-        }
-        return prompts.get(0);
+    public Optional<Prompt> getOnePromptByDiaryId(Long diaryId) {
+        return promptRepository.findAllByDiaryDiaryId(diaryId)
+            .stream().findFirst();
     }
 }

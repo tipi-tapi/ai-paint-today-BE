@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.diary.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,9 +43,10 @@ public class DiaryService {
         String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
             imageService.getImage(diary).getImageUrl(), 30);
 
-        Prompt prompt = promptService.getOnePromptByDiaryId(diaryId);
+        Optional<Prompt> prompt = promptService.getOnePromptByDiaryId(diaryId);
+        String promptText = prompt.map(Prompt::getPromptText).orElse(null);
 
-        return GetDiaryResponse.of(diary, imageUrl, diary.getEmotion(), prompt);
+        return GetDiaryResponse.of(diary, imageUrl, diary.getEmotion(), promptText);
     }
 
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
