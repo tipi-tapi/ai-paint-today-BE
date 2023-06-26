@@ -84,8 +84,8 @@ public class DiaryController {
     })
     @GetMapping("/calendar/monthly")
     public ResponseEntity<SuccessResponse<List<GetMonthlyDiariesResponse>>> getMonthlyDiaries(
-        @Parameter(description = "조회할 연도", in = ParameterIn.PATH) @RequestParam("year") int year,
-        @Parameter(description = "조회할 달", in = ParameterIn.PATH) @RequestParam("month") int month
+        @Parameter(description = "조회할 연도", in = ParameterIn.QUERY) @RequestParam("year") int year,
+        @Parameter(description = "조회할 달", in = ParameterIn.QUERY) @RequestParam("month") int month
         , @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
