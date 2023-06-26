@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import tipitapi.drawmytoday.emotion.service.EmotionService;
 @RestController
 @RequestMapping("/emotions")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
 public class EmotionController {
 
     private final EmotionService emotionService;

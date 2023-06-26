@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ import tipitapi.drawmytoday.diary.service.DiaryService;
 @RestController
 @RequestMapping("/diary")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
 public class DiaryController {
 
     private final DiaryService diaryService;
@@ -83,8 +85,8 @@ public class DiaryController {
     })
     @GetMapping("/calendar/monthly")
     public ResponseEntity<SuccessResponse<List<GetMonthlyDiariesResponse>>> getMonthlyDiaries(
-        @Parameter(description = "조회할 연도", in = ParameterIn.PATH) @RequestParam("year") int year,
-        @Parameter(description = "조회할 달", in = ParameterIn.PATH) @RequestParam("month") int month
+        @Parameter(description = "조회할 연도", in = ParameterIn.QUERY) @RequestParam("year") int year,
+        @Parameter(description = "조회할 달", in = ParameterIn.QUERY) @RequestParam("month") int month
         , @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
