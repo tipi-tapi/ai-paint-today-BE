@@ -46,6 +46,8 @@ class DiaryServiceTest {
     ImageService imageService;
     @Mock
     ValidateUserService validateUserService;
+    @Mock
+    ValidateDiaryService validateDiaryService;
     @InjectMocks
     DiaryService diaryService;
 
@@ -65,8 +67,7 @@ class DiaryServiceTest {
                 Image image = createImage(diary);
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findById(1L)).willReturn(
-                    Optional.of(diary));
+                given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
                 given(imageService.getImage(diary)).willReturn(image);
 
                 GetDiaryResponse getDiaryResponse = diaryService.getDiary(1L, 1L);
@@ -82,8 +83,10 @@ class DiaryServiceTest {
             @Test
             @DisplayName("DiaryNotFoundException 예외를 발생시킨다.")
             void it_throws_DiaryNotFoundException() {
-                given(diaryRepository.findById(1L)).willReturn(Optional.empty());
-                given(validateUserService.validateUserById(1L)).willReturn(createUser());
+                User user = createUser();
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateDiaryService.validateDiaryById(1L, user)).willThrow(
+                    DiaryNotFoundException.class);
 
                 assertThatThrownBy(() -> diaryService.getDiary(1L, 1L))
                     .isInstanceOf(DiaryNotFoundException.class);
@@ -97,11 +100,10 @@ class DiaryServiceTest {
             @Test
             @DisplayName("NotOwnerOfDiaryException 예외를 발생시킨다.")
             void it_throws_NotOwnerOfDiaryException() {
-                createUserWithId(1L);
-                User otherUser = createUserWithId(2L);
-                Diary diary = createDiaryWithId(1L, otherUser, createEmotion());
-
-                given(diaryRepository.findById(1L)).willReturn(Optional.of(diary));
+                User user = createUserWithId(1L);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateDiaryService.validateDiaryById(1L, user))
+                    .willThrow(NotOwnerOfDiaryException.class);
 
                 assertThatThrownBy(() -> diaryService.getDiary(1L, 1L))
                     .isInstanceOf(NotOwnerOfDiaryException.class);
@@ -282,8 +284,8 @@ class DiaryServiceTest {
             void it_throws_DiaryNotFoundException() {
                 User user = createUserWithId(1L);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findById(any(Long.class)))
-                    .willReturn(Optional.empty());
+                given(validateDiaryService.validateDiaryById(1L, user))
+                    .willThrow(DiaryNotFoundException.class);
 
                 assertThatThrownBy(() -> diaryService.updateDiaryNotes(1L, 1L, "notes"))
                     .isInstanceOf(DiaryNotFoundException.class);
@@ -304,8 +306,8 @@ class DiaryServiceTest {
                     User user = createUserWithId(1L);
                     Diary diary = createDiaryWithId(1L, user, createEmotion());
                     given(validateUserService.validateUserById(1L)).willReturn(user);
-                    given(diaryRepository.findById(any(Long.class)))
-                        .willReturn(Optional.of(diary));
+                    given(validateDiaryService.validateDiaryById(1L, user))
+                        .willReturn(diary);
 
                     diaryService.updateDiaryNotes(1L, 1L, null);
 
@@ -323,8 +325,8 @@ class DiaryServiceTest {
                     User user = createUserWithId(1L);
                     Diary diary = createDiaryWithId(1L, user, createEmotion());
                     given(validateUserService.validateUserById(1L)).willReturn(user);
-                    given(diaryRepository.findById(any(Long.class)))
-                        .willReturn(Optional.of(diary));
+                    given(validateDiaryService.validateDiaryById(1L, user))
+                        .willReturn(diary);
 
                     diaryService.updateDiaryNotes(1L, 1L, "notes");
 
