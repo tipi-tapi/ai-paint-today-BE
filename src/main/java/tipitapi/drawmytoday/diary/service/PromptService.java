@@ -23,7 +23,7 @@ public class PromptService {
         return promptRepository.save(Prompt.create(prompt, isSuccess));
     }
 
-    public Optional<Prompt> getOnePromptByDiaryId(Long diaryId) {
+    public Optional<Prompt> getPromptByDiaryId(Long diaryId) {
         return promptRepository.findAllByDiaryDiaryId(diaryId)
             .stream().findFirst();
     }
