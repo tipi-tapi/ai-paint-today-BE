@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class EncryptorUtils {
 
     private static final String ALGORITHM = "AES";
-    private static final SecretKey secretKey = generateSecretKey();
+    private static final SecretKey SECRETKEY = generateSecretKey();
 
     private static SecretKey generateSecretKey() {
         KeyGenerator keyGenerator = null;
@@ -30,7 +30,7 @@ public class EncryptorUtils {
         byte[] encryptedBytes = null;
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            cipher.init(Cipher.ENCRYPT_MODE, SECRETKEY);
             encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
@@ -43,7 +43,7 @@ public class EncryptorUtils {
         byte[] decryptedBytes = null;
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            cipher.init(Cipher.DECRYPT_MODE, SECRETKEY);
             byte[] decodedBytes = Base64.getDecoder().decode(encryptedText);
             decryptedBytes = cipher.doFinal(decodedBytes);
         } catch (GeneralSecurityException e) {
