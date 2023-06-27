@@ -87,7 +87,12 @@ public class DiaryService {
                 }
                 return true;
             })
-            .map(GetMonthlyDiariesResponse::of)
+            .map(diary -> {
+                String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
+                    diary.getImageList().get(0).getImageUrl(), 30);
+                return GetMonthlyDiariesResponse.of(diary.getDiaryId(), imageUrl,
+                    diary.getDiaryDate());
+            })
             .collect(Collectors.toList());
     }
 }
