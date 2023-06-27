@@ -87,12 +87,12 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi serverOpenAPi() {
-        String[] paths = {"/server/**"};
+    public GroupedOpenApi healthOpenAPi() {
+        String[] paths = {"/health/**"};
 
         return GroupedOpenApi
             .builder()
-            .group("서버 API")
+            .group("Health Check API")
             .pathsToMatch(paths)
             .build();
     }
