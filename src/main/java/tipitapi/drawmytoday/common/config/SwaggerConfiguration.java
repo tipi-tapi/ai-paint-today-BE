@@ -76,12 +76,23 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi testOpenAPi() {
-        String[] paths = {"/test/**"};
+    public GroupedOpenApi devOpenAPi() {
+        String[] paths = {"/dev/**"};
 
         return GroupedOpenApi
             .builder()
-            .group("테스트 API")
+            .group("개발 환경 API")
+            .pathsToMatch(paths)
+            .build();
+    }
+
+    @Bean
+    public GroupedOpenApi serverOpenAPi() {
+        String[] paths = {"/server/**"};
+
+        return GroupedOpenApi
+            .builder()
+            .group("서버 API")
             .pathsToMatch(paths)
             .build();
     }
