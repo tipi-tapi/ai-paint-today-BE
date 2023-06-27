@@ -1,7 +1,6 @@
 package tipitapi.drawmytoday.common.security.jwt;
 
 import java.io.IOException;
-import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,14 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.filter.OncePerRequestFilter;
-import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.common.security.jwt.exception.ExpiredAccessTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
+import tipitapi.drawmytoday.common.utils.HeaderUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,11 +25,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final String[] permitAllEndpointList;
-
-    private static HttpServletRequest getRequest() {
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        return servletRequestAttributes.getRequest();
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -59,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @throws ExpiredAccessTokenException - 헤더에 토큰이 있지만 만료된 경우
      */
     private void authentication() {
-        String accessToken = getAccessToken();
+        String accessToken = HeaderUtils.getJwtToken(getRequest(), JwtType.ACCESS);
 
         jwtTokenProvider.validAccessToken(accessToken);
 
@@ -67,20 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private String getAccessToken() {
-        String authorization = getRequest().getHeader(JwtProperties.ACCESS_TOKEN_HEADER);
-
-        if (Objects.isNull(authorization)) {
-            throw new TokenNotFoundException(ErrorCode.JWT_ACCESS_TOKEN_NOT_FOUND);
-        }
-
-        String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
-
-        if (tokens.length != 2 || !"Bearer".equals(tokens[0])) {
-            throw new InvalidTokenException();
-        }
-
-        return tokens[1];
+    private HttpServletRequest getRequest() {
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        return servletRequestAttributes.getRequest();
     }
-
 }

@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.diary.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,14 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.diary.domain.Diary;
+import tipitapi.drawmytoday.diary.domain.Prompt;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
-import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
-import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.s3.service.S3Util;
+import tipitapi.drawmytoday.s3.service.S3PreSignedService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
 
@@ -25,20 +25,25 @@ import tipitapi.drawmytoday.user.service.ValidateUserService;
 @RequiredArgsConstructor
 public class DiaryService {
 
+    private final PromptService promptService;
     private final DiaryRepository diaryRepository;
     private final ImageService imageService;
     private final ValidateUserService validateUserService;
-    private final S3Util s3Util;
+    private final S3PreSignedService s3PreSignedService;
+    private final ValidateDiaryService validateDiaryService;
 
     public GetDiaryResponse getDiary(Long userId, Long diaryId) {
         User user = validateUserService.validateUserById(userId);
 
-        Diary diary = diaryRepository.findById(diaryId)
-            .orElseThrow(DiaryNotFoundException::new);
-        ownedByUser(diary, user);
-        String imageUrl = s3Util.getFullUri(imageService.getImage(diary).getImageUrl());
+        Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
 
-        return GetDiaryResponse.of(diary, imageUrl, diary.getEmotion());
+        String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
+            imageService.getImage(diary).getImageUrl(), 30);
+
+        Optional<Prompt> prompt = promptService.getPromptByDiaryId(diaryId);
+        String promptText = prompt.map(Prompt::getPromptText).orElse(null);
+
+        return GetDiaryResponse.of(diary, imageUrl, diary.getEmotion(), promptText);
     }
 
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
@@ -61,11 +66,17 @@ public class DiaryService {
     @Transactional
     public void updateDiaryNotes(Long userId, Long diaryId, String notes) {
         User user = validateUserService.validateUserById(userId);
-        Diary diary = diaryRepository.findById(diaryId)
-            .orElseThrow(DiaryNotFoundException::new);
-        ownedByUser(diary, user);
+        Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
 
         diary.setNotes(notes);
+    }
+
+    @Transactional
+    public void deleteDiary(Long userId, Long diaryId) {
+        User user = validateUserService.validateUserById(userId);
+        Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
+
+        diaryRepository.delete(diary);
     }
 
     private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {
@@ -78,11 +89,5 @@ public class DiaryService {
             })
             .map(GetMonthlyDiariesResponse::of)
             .collect(Collectors.toList());
-    }
-
-    private void ownedByUser(Diary diary, User user) {
-        if (diary.getUser() != user) {
-            throw new NotOwnerOfDiaryException();
-        }
     }
 }

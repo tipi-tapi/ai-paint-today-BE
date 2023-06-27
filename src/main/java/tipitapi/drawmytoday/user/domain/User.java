@@ -34,25 +34,18 @@ public class User extends BaseEntityWithUpdate {
     private LocalDateTime lastDiaryDate;
 
     @Enumerated(EnumType.STRING)
-    private OAuthType oauthType;
-
-    @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
+    private LocalDateTime deletedAt;
 
     private User(SocialCode socialCode) {
         this.socialCode = socialCode;
     }
 
+    @Builder
     private User(String email, SocialCode socialCode) {
         this.email = email;
         this.socialCode = socialCode;
-    }
-
-    @Builder
-    private User(String email, SocialCode socialCode, OAuthType oauthType) {
-        this.email = email;
-        this.socialCode = socialCode;
-        this.oauthType = oauthType;
         this.userRole = UserRole.USER;
     }
 
@@ -70,5 +63,9 @@ public class User extends BaseEntityWithUpdate {
 
     public void setLastDiaryDate(LocalDateTime date) {
         this.lastDiaryDate = date;
+    }
+
+    public void deleteUser() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

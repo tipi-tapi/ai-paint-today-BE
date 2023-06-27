@@ -1,13 +1,13 @@
 package tipitapi.drawmytoday.common.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.GroupedOpenApi;
-import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,9 +17,17 @@ import org.springframework.context.annotation.Configuration;
         version = "v1"),
     servers = {
         @Server(url = "https://draw-my-today.devstory.co.kr", description = "운영 서버"),
+        @Server(url = "https://choihyeok.site", description = "테스트 서버")
     }
 )
 @Configuration
+@SecurityScheme(
+    name = "Bearer Authentication",
+    type = SecuritySchemeType.HTTP,
+    in = SecuritySchemeIn.HEADER,
+    bearerFormat = "JWT",
+    scheme = "bearer"
+)
 @RequiredArgsConstructor
 public class SwaggerConfiguration {
 
@@ -31,7 +39,7 @@ public class SwaggerConfiguration {
             .builder()
             .group("유저 API")
             .pathsToMatch(paths)
-            .addOpenApiCustomiser(buildSecurityOpenApi()).build();
+            .build();
     }
 
     @Bean
@@ -42,7 +50,7 @@ public class SwaggerConfiguration {
             .builder()
             .group("일기 API")
             .pathsToMatch(paths)
-            .addOpenApiCustomiser(buildSecurityOpenApi()).build();
+            .build();
     }
 
     @Bean
@@ -53,7 +61,7 @@ public class SwaggerConfiguration {
             .builder()
             .group("감정 API")
             .pathsToMatch(paths)
-            .addOpenApiCustomiser(buildSecurityOpenApi()).build();
+            .build();
     }
 
     @Bean
@@ -64,17 +72,6 @@ public class SwaggerConfiguration {
             .builder()
             .group("OAuth2 API")
             .pathsToMatch(paths)
-            .addOpenApiCustomiser(buildSecurityOpenApi()).build();
-    }
-
-    public OpenApiCustomiser buildSecurityOpenApi() {
-        // jwt token 을 한번 설정하면 header 에 값을 넣어주는 코드
-        return OpenApi -> OpenApi.addSecurityItem(new SecurityRequirement().addList("jwt token"))
-            .getComponents().addSecuritySchemes("jwt token", new SecurityScheme()
-                .name("Authorization")
-                .type(SecurityScheme.Type.HTTP)
-                .in(SecurityScheme.In.HEADER)
-                .bearerFormat("JWT")
-                .scheme("bearer"));
+            .build();
     }
 }

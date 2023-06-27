@@ -20,12 +20,13 @@ public class EmotionService {
     private final ValidateUserService validateUserService;
 
 
-    public List<GetActiveEmotionsResponse> getActiveEmotions(Long userId) {
+    public List<GetActiveEmotionsResponse> getActiveEmotions(Long userId, String language) {
         validateUserService.validateUserById(userId);
         return GetActiveEmotionsResponse.buildWithEmotions(
-            emotionRepository.findAllActiveEmotions());
+            emotionRepository.findAllActiveEmotions(), language);
     }
 
+    @Transactional
     public List<CreateEmotionResponse> createEmotions(
         List<CreateEmotionRequest> createEmotionRequests) {
         return emotionRepository.saveAll(
