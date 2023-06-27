@@ -93,7 +93,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(RestClientException.class)
     public ResponseEntity<Object> handleRestClientException(RestClientException e) {
         log.error("RestClientException", e);
-        return handleExceptionInternal(ErrorCode.OAUTH_SERVER_FAILED);
+        return handleExceptionInternal(ErrorCode.REST_CLIENT_FAILED);
     }
 
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
