@@ -74,4 +74,26 @@ public class SwaggerConfiguration {
             .pathsToMatch(paths)
             .build();
     }
+
+    @Bean
+    public GroupedOpenApi devOpenAPi() {
+        String[] paths = {"/dev/**"};
+
+        return GroupedOpenApi
+            .builder()
+            .group("개발 환경 API")
+            .pathsToMatch(paths)
+            .build();
+    }
+
+    @Bean
+    public GroupedOpenApi healthOpenAPi() {
+        String[] paths = {"/health/**"};
+
+        return GroupedOpenApi
+            .builder()
+            .group("Health Check API")
+            .pathsToMatch(paths)
+            .build();
+    }
 }

@@ -135,26 +135,4 @@ public class AuthController {
         oAuthService.deleteAccount(tokenInfo.getUserId());
         return ResponseEntity.noContent().build();
     }
-
-    @Operation(summary = "토큰 만료(테스트)", description = "jwt token을 만료시킵니다.",
-        security = @SecurityRequirement(name = "Bearer Authentication"))
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "jwt token 만료 성공"),
-        @ApiResponse(
-            responseCode = "400",
-            description = "S002 : 유효하지 않은 토큰입니다.",
-            content = @Content(schema = @Schema(hidden = true))),
-        @ApiResponse(
-            responseCode = "404",
-            description = "S008 : jwt token이 없습니다.",
-            content = @Content(schema = @Schema(hidden = true)))
-    })
-    @GetMapping("/expire")
-    public String getExpiredJwt(HttpServletRequest request) {
-        String jwtToken = HeaderUtils.getJwtToken(request, JwtType.BOTH);
-        return jwtTokenProvider.expireToken(jwtToken);
-    }
-
 }
