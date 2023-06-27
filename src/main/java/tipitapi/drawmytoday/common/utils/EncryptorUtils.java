@@ -8,6 +8,8 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import lombok.NoArgsConstructor;
+import tipitapi.drawmytoday.common.exception.BusinessException;
+import tipitapi.drawmytoday.common.exception.ErrorCode;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class EncryptorUtils {
@@ -20,7 +22,7 @@ public class EncryptorUtils {
         try {
             keyGenerator = KeyGenerator.getInstance(ALGORITHM);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new BusinessException(ErrorCode.INVALID_ENCRYPT_KEY, e);
         }
         keyGenerator.init(128);
         return keyGenerator.generateKey();
@@ -33,7 +35,7 @@ public class EncryptorUtils {
             cipher.init(Cipher.ENCRYPT_MODE, SECRETKEY);
             encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
         } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
+            throw new BusinessException(ErrorCode.ENCRYPTION_ERROR, e);
         }
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
@@ -47,7 +49,7 @@ public class EncryptorUtils {
             byte[] decodedBytes = Base64.getDecoder().decode(encryptedText);
             decryptedBytes = cipher.doFinal(decodedBytes);
         } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
+            throw new BusinessException(ErrorCode.DECRYPTION_ERROR, e);
         }
         return new String(decryptedBytes, StandardCharsets.UTF_8);
     }
