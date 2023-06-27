@@ -32,7 +32,9 @@ public class ValidateUserService {
 
     public User validateUserWithDrawLimit(Long userId) {
         User user = validateUserById(userId);
-        if (user.getLastDiaryDate().toLocalDate().equals(LocalDate.now())) {
+        if (user.getLastDiaryDate() == null) {
+            return user;
+        } else if (user.getLastDiaryDate().toLocalDate().equals(LocalDate.now())) {
             throw new BusinessException(ErrorCode.USER_ALREADY_DRAW_DIARY);
         } else {
             return user;
