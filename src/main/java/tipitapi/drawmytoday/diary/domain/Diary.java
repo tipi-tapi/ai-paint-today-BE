@@ -47,7 +47,7 @@ public class Diary extends BaseEntityWithUpdate {
     @Column(nullable = false)
     private LocalDateTime diaryDate;
 
-    @Column(length = 6010)
+    @Column(length = 8013)
     private String notes;
 
     @NotNull
