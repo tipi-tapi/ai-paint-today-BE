@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.test.controller;
+package tipitapi.drawmytoday.dev.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,9 +16,9 @@ import tipitapi.drawmytoday.common.security.jwt.JwtType;
 import tipitapi.drawmytoday.common.utils.HeaderUtils;
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/dev")
 @RequiredArgsConstructor
-public class TestController {
+public class DevelopController {
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -42,12 +41,5 @@ public class TestController {
     public String getExpiredJwt(HttpServletRequest request) {
         String jwtToken = HeaderUtils.getJwtToken(request, JwtType.BOTH);
         return jwtTokenProvider.expireToken(jwtToken);
-    }
-
-    @Operation(summary = "서버 생존 여부 체크용", description = "서버가 살아있는지 체크합니다.")
-    @ApiResponse(responseCode = "204", description = "서버 생존")
-    @GetMapping("/server")
-    public ResponseEntity<Void> verifyServerAlive() {
-        return ResponseEntity.noContent().build();
     }
 }
