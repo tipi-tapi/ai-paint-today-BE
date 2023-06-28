@@ -20,7 +20,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
-import tipitapi.drawmytoday.common.utils.EncryptorUtils;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.User;
 
@@ -73,7 +72,7 @@ public class Diary extends BaseEntityWithUpdate {
         this.user = user;
         this.emotion = emotion;
         this.diaryDate = diaryDate;
-        this.notes = EncryptorUtils.encrypt(notes);
+        this.notes = notes;
         this.isAi = isAi;
         this.title = title;
         this.weather = weather;
@@ -82,10 +81,10 @@ public class Diary extends BaseEntityWithUpdate {
     }
 
     public String getNotes() {
-        return EncryptorUtils.decrypt(notes);
+        return notes;
     }
 
     public void setNotes(String notes) {
-        this.notes = EncryptorUtils.encrypt(notes);
+        this.notes = notes;
     }
 }
