@@ -5,21 +5,23 @@ import java.security.GeneralSecurityException;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 
-public class EncryptorUtils {
+@Component
+public class Encryptor {
 
-    private static final String ALGORITHM = "AES";
-    private static final SecretKeySpec SECRET_KEY;
+    private final String ALGORITHM = "AES";
+    private final SecretKeySpec SECRET_KEY;
 
-    static {
-        String keyString = "ThisIsEncryptorSecretKey";
-        SECRET_KEY = new SecretKeySpec(
-            keyString.getBytes(StandardCharsets.UTF_8), ALGORITHM);
+    public Encryptor(@Value("${encryptor.secret.key}") String stringKey) {
+        this.SECRET_KEY = new SecretKeySpec(
+            stringKey.getBytes(StandardCharsets.UTF_8), ALGORITHM);
     }
 
-    public static String encrypt(String plainText) {
+    public String encrypt(String plainText) {
         byte[] encryptedBytes = null;
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -31,7 +33,7 @@ public class EncryptorUtils {
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
-    public static String decrypt(String encryptedText) {
+    public String decrypt(String encryptedText) {
         byte[] decryptedBytes = null;
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
