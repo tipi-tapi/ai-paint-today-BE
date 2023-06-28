@@ -86,10 +86,6 @@ public class Diary extends BaseEntityWithUpdate {
         this.imageList = new ArrayList<>();
     }
 
-    public String getNotes() {
-        return notes;
-    }
-
     public void setNotes(String notes) {
         this.notes = notes;
     }
