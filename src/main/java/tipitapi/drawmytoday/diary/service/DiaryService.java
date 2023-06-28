@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
+import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
@@ -29,6 +30,7 @@ public class DiaryService {
     private final ImageService imageService;
     private final ValidateUserService validateUserService;
     private final S3PreSignedService s3PreSignedService;
+    private final Encryptor encryptor;
 
     public GetDiaryResponse getDiary(Long userId, Long diaryId) {
         User user = validateUserService.validateUserById(userId);
@@ -36,6 +38,7 @@ public class DiaryService {
         Diary diary = diaryRepository.findById(diaryId)
             .orElseThrow(DiaryNotFoundException::new);
         ownedByUser(diary, user);
+        diary.setNotes(encryptor.decrypt(diary.getNotes()));
 
         String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
             imageService.getImage(diary).getImageUrl(), 30);
@@ -67,7 +70,7 @@ public class DiaryService {
             .orElseThrow(DiaryNotFoundException::new);
         ownedByUser(diary, user);
 
-        diary.setNotes(notes);
+        diary.setNotes(encryptor.encrypt(notes));
     }
 
     private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {
