@@ -5,6 +5,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.dalle.service.DallEService;
@@ -29,6 +30,7 @@ public class CreateDiaryService {
     private final S3Service s3Service;
     private final DallEService dallEService;
     private final PromptService promptService;
+    private final Encryptor encryptor;
 
     @Transactional(
         noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
@@ -39,13 +41,14 @@ public class CreateDiaryService {
         User user = validateUserService.validateUserWithDrawLimit(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         String prompt = createPromptText(emotion, keyword);
+        String encryptedNotes = encryptor.encrypt(notes);
 
         try {
             byte[] dallEImage = dallEService.getImageAsUrl(prompt);
 
             Diary diary = diaryRepository.save(
                 Diary.builder().user(user).emotion(emotion).diaryDate(LocalDateTime.now())
-                    .notes(notes)
+                    .notes(encryptedNotes)
                     .isAi(true).build());
             promptService.createPrompt(diary, prompt, true);
 

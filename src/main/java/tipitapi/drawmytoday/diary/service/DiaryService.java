@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
+import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Prompt;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
@@ -30,13 +31,16 @@ public class DiaryService {
     private final ImageService imageService;
     private final ValidateUserService validateUserService;
     private final S3PreSignedService s3PreSignedService;
+    private final Encryptor encryptor;
     private final ValidateDiaryService validateDiaryService;
 
     public GetDiaryResponse getDiary(Long userId, Long diaryId) {
         User user = validateUserService.validateUserById(userId);
 
-        Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
 
+        Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
+        diary.setNotes(encryptor.decrypt(diary.getNotes()));
+  
         String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
             imageService.getImage(diary).getImageUrl(), 30);
 
@@ -68,7 +72,7 @@ public class DiaryService {
         User user = validateUserService.validateUserById(userId);
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
 
-        diary.setNotes(notes);
+        diary.setNotes(encryptor.encrypt(notes));
     }
 
     @Transactional

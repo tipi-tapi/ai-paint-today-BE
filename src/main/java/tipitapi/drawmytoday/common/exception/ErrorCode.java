@@ -14,6 +14,8 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "C004", "서버 오류"),
     INVALID_TYPE_VALUE(400, "C005", "잘못된 타입의 값입니다."),
     HANDLE_ACCESS_DENIED(403, "C006", "접근이 거부됐습니다."),
+    ENCRYPTION_ERROR(500, "C007", "암호화에 실패했습니다."),
+    DECRYPTION_ERROR(500, "C008", "복호화에 실패했습니다."),
 
     // Security
     AUTHORITY_NOT_FOUND(404, "S001", "유저 권한이 없습니다."),
