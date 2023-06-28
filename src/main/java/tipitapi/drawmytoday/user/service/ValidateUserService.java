@@ -19,13 +19,13 @@ public class ValidateUserService {
     private final UserRepository userRepository;
 
     public User validateUserById(Long userId) {
-        return userRepository.findByUserIdAndDeletedAtIsNull(userId)
+        return userRepository.findByUserId(userId)
             .orElseThrow(UserNotFoundException::new);
     }
 
     public User validateRegisteredUserByEmail(String email, SocialCode socialCode) {
         return userRepository.findAllByEmail(email).stream()
-            .filter(user -> user.getDeletedAt() == null && user.getSocialCode() == socialCode)
+            .filter(user -> user.getSocialCode() == socialCode)
             .findFirst()
             .orElse(null);
     }
