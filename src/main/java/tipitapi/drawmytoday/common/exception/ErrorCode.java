@@ -26,12 +26,14 @@ public enum ErrorCode {
     EXPIRED_JWT_ACCESS_TOKEN(400, "S005", "jwt access token이 만료되었습니다."),
     EXPIRED_JWT_REFRESH_TOKEN(400, "S006", "jwt refresh token이 만료되었습니다."),
     AUTH_CODE_NOT_FOUND(404, "S007", "authorization header가 비었습니다."),
+    JWT_TOKEN_NOT_FOUND(404, "S008", "jwt token이 없습니다."),
 
 
     // User
     USER_NOT_FOUND(404, "U001", "회원을 찾을 수 없습니다."),
     USER_ALREADY_EXISTS(409, "U002", "이미 존재하는 유저입니다."),
     DUPLICATE_USER(400, "U003", "유저가 중복되었습니다."),
+    USER_ALREADY_DRAW_DIARY(400, "U004", "이미 그림일기를 그린 유저입니다."),
 
     // Diary
     DIARY_NOT_FOUND(404, "D001", "일기를 찾을 수 없습니다."),
@@ -56,7 +58,10 @@ public enum ErrorCode {
 
     // OAuth
     OAUTH_NOT_FOUND(404, "O001", "유저의 refresh token을 찾을 수 없습니다."),
-    OAUTH_SERVER_FAILED(500, "O002", "OAuth 서버와의 통신 중 에러가 발생하였습니다.");
+    OAUTH_SERVER_FAILED(500, "O002", "OAuth 서버와의 통신 중 에러가 발생하였습니다."),
+
+    // REST
+    REST_CLIENT_FAILED(500, "R001", "외부로의 REST 통신에 실패하였습니다.");
 
 
     private final int status;

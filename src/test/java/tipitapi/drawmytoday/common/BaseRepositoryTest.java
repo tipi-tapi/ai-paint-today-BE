@@ -1,12 +1,11 @@
 package tipitapi.drawmytoday.common;
 
-import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotion;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
+import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestImage;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.diary.domain.Diary;
@@ -35,13 +34,21 @@ public abstract class BaseRepositoryTest {
         return userRepository.save(TestUser.createUser());
     }
 
-    protected Diary createDiary(Long diaryId, User user) {
+    protected Diary createDiaryWithId(Long diaryId, User user) {
         Emotion emotion = emotionRepository.save(createEmotion());
         return diaryRepository.save(TestDiary.createDiaryWithId(diaryId, user, emotion));
     }
 
+    protected Diary createDiary(User user, Emotion emotion) {
+        return diaryRepository.save(TestDiary.createDiary(user, emotion));
+    }
+
     protected Image createImage(Long imageId, Diary diary) {
         return imageRepository.save(TestImage.createImageWithId(imageId, diary));
+    }
+
+    protected Emotion createEmotion() {
+        return emotionRepository.save(TestEmotion.createEmotion());
     }
 
 }

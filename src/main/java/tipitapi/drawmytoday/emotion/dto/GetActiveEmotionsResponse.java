@@ -26,10 +26,20 @@ public class GetActiveEmotionsResponse {
         return new GetActiveEmotionsResponse(id, name, color);
     }
 
-    public static List<GetActiveEmotionsResponse> buildWithEmotions(List<Emotion> emotions) {
+    public static List<GetActiveEmotionsResponse> buildWithEmotions(List<Emotion> emotions,
+        String language) {
         return emotions.stream()
-            .map(e -> GetActiveEmotionsResponse.of(e.getEmotionId(), e.getName(), e.getColor()))
+            .map(e -> GetActiveEmotionsResponse.of(
+                e.getEmotionId(), getEmotionName(language, e), e.getColor()))
             .collect(
                 Collectors.toList());
+    }
+
+    private static String getEmotionName(String language, Emotion emotion) {
+        if (language.equals("ko")) {
+            return emotion.getName();
+        } else {
+            return emotion.getEmotionPrompt();
+        }
     }
 }

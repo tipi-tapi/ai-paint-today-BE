@@ -38,7 +38,7 @@ public class CreateDiaryService {
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
         String notes) throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
-        User user = validateUserService.validateUserById(userId);
+        User user = validateUserService.validateUserWithDrawLimit(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         String prompt = createPromptText(emotion, keyword);
         String encryptedNotes = encryptor.encrypt(notes);
@@ -55,6 +55,7 @@ public class CreateDiaryService {
             String imagePath = getImagePath(diary.getDiaryId(), 1);
             s3Service.uploadImage(dallEImage, imagePath);
             imageService.createImage(diary, imagePath, true);
+            user.setLastDiaryDate(LocalDateTime.now());
             return new CreateDiaryResponse(diary.getDiaryId());
         } catch (DallERequestFailException | ImageInputStreamFailException e) {
             promptService.createPrompt(prompt, false);

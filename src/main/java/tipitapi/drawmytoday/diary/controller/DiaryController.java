@@ -7,11 +7,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +39,7 @@ import tipitapi.drawmytoday.diary.service.DiaryService;
 @RestController
 @RequestMapping("/diary")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
 public class DiaryController {
 
     private final DiaryService diaryService;
@@ -82,8 +85,8 @@ public class DiaryController {
     })
     @GetMapping("/calendar/monthly")
     public ResponseEntity<SuccessResponse<List<GetMonthlyDiariesResponse>>> getMonthlyDiaries(
-        @Parameter(description = "조회할 연도", in = ParameterIn.PATH) @RequestParam("year") int year,
-        @Parameter(description = "조회할 달", in = ParameterIn.PATH) @RequestParam("month") int month
+        @Parameter(description = "조회할 연도", in = ParameterIn.QUERY) @RequestParam("year") int year,
+        @Parameter(description = "조회할 달", in = ParameterIn.QUERY) @RequestParam("month") int month
         , @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
@@ -111,6 +114,10 @@ public class DiaryController {
         @ApiResponse(
             responseCode = "201",
             description = "성공적으로 생성된 일기 정보"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "U004 : 이미 그림일기를 그린 유저입니다.",
+            content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(
             responseCode = "404",
             description = "E001 : 감정을 찾을 수 없습니다.",
@@ -157,6 +164,29 @@ public class DiaryController {
     ) {
         diaryService.updateDiaryNotes(tokenInfo.getUserId(), diaryId,
             updateDiaryRequest.getNotes());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "일기 삭제", description = "주어진 ID의 일기를 삭제(Soft Delete)한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "성공적으로 일기 내용을 삭제함"),
+        @ApiResponse(
+            responseCode = "403",
+            description = "D002 : 자신의 일기에만 접근할 수 있습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "D001 : 일기를 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDiary(
+        @AuthUser JwtTokenInfo tokenInfo,
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
+    ) {
+        diaryService.deleteDiary(tokenInfo.getUserId(), diaryId);
         return ResponseEntity.noContent().build();
     }
 }

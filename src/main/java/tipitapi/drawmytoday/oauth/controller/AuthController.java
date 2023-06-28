@@ -1,21 +1,18 @@
 package tipitapi.drawmytoday.oauth.controller;
 
-import static tipitapi.drawmytoday.common.exception.ErrorCode.JWT_REFRESH_TOKEN_NOT_FOUND;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.io.IOException;
-import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,11 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
-import tipitapi.drawmytoday.common.security.jwt.JwtProperties;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
-import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
-import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
+import tipitapi.drawmytoday.common.security.jwt.JwtType;
+import tipitapi.drawmytoday.common.utils.HeaderUtils;
 import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.oauth.dto.ResponseAccessToken;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
@@ -111,13 +107,14 @@ public class AuthController {
     })
     @GetMapping("/refresh")
     public ResponseAccessToken getAccessToken(HttpServletRequest request) {
-        String refreshToken = getRefreshToken(request);
+        String refreshToken = HeaderUtils.getJwtToken(request, JwtType.REFRESH);
         jwtTokenProvider.validRefreshToken(refreshToken);
         String accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
         return ResponseAccessToken.of(accessToken);
     }
 
-    @Operation(summary = "회원 탈퇴", description = "소셜로그인 탈퇴를 진행하고, 회원을 deleted 상태로 변경합니다.")
+    @Operation(summary = "회원 탈퇴", description = "소셜로그인 탈퇴를 진행하고, 회원을 deleted 상태로 변경합니다.",
+        security = @SecurityRequirement(name = "Bearer Authentication"))
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "204",
@@ -138,17 +135,4 @@ public class AuthController {
         oAuthService.deleteAccount(tokenInfo.getUserId());
         return ResponseEntity.noContent().build();
     }
-
-    private String getRefreshToken(HttpServletRequest request) {
-        String authorization = request.getHeader(JwtProperties.REFRESH_TOKEN_HEADER);
-        if (Objects.isNull(authorization)) {
-            throw new TokenNotFoundException(JWT_REFRESH_TOKEN_NOT_FOUND);
-        }
-        String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
-        if (tokens.length != 2 || !"Bearer".equals(tokens[0])) {
-            throw new InvalidTokenException();
-        }
-        return tokens[1];
-    }
-
 }

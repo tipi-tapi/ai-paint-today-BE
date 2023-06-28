@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import tipitapi.drawmytoday.diary.domain.Diary;
 
 @Getter
 @Schema(description = "월별 일기 목록 Response")
@@ -29,9 +28,8 @@ public class GetMonthlyDiariesResponse {
     @Schema(description = "일기 날짜", requiredMode = RequiredMode.REQUIRED)
     private final LocalDateTime date;
 
-    public static GetMonthlyDiariesResponse of(Diary diary) {
-        return new GetMonthlyDiariesResponse(diary.getDiaryId(),
-            diary.getImageList().get(0).getImageUrl(),
-            diary.getDiaryDate());
+    public static GetMonthlyDiariesResponse of(Long diaryId, String imageUrl,
+        LocalDateTime diaryDate) {
+        return new GetMonthlyDiariesResponse(diaryId, imageUrl, diaryDate);
     }
 }

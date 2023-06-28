@@ -33,6 +33,7 @@ import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
+import tipitapi.drawmytoday.s3.service.S3PreSignedService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
@@ -46,6 +47,10 @@ class DiaryServiceTest {
     ImageService imageService;
     @Mock
     ValidateUserService validateUserService;
+    @Mock
+    S3PreSignedService s3PreSignedService;
+    @Mock
+    ValidateDiaryService validateDiaryService;
     @InjectMocks
     DiaryService diaryService;
 
@@ -65,9 +70,11 @@ class DiaryServiceTest {
                 Image image = createImage(diary);
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findById(1L)).willReturn(
-                    Optional.of(diary));
+                given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
                 given(imageService.getImage(diary)).willReturn(image);
+                given(
+                    s3PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
+                ).willReturn("https://test.com");
 
                 GetDiaryResponse getDiaryResponse = diaryService.getDiary(1L, 1L);
 
@@ -76,14 +83,16 @@ class DiaryServiceTest {
         }
 
         @Nested
-        @DisplayName("주어진 일기가 없을 경우")
-        class if_diary_not_exists_or_not_user_owned_diary {
+        @DisplayName("주어진 일기가 없거나 삭제되었을 경우")
+        class if_diary_not_exists_or_deleted {
 
             @Test
             @DisplayName("DiaryNotFoundException 예외를 발생시킨다.")
             void it_throws_DiaryNotFoundException() {
-                given(diaryRepository.findById(1L)).willReturn(Optional.empty());
-                given(validateUserService.validateUserById(1L)).willReturn(createUser());
+                User user = createUser();
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateDiaryService.validateDiaryById(1L, user)).willThrow(
+                    DiaryNotFoundException.class);
 
                 assertThatThrownBy(() -> diaryService.getDiary(1L, 1L))
                     .isInstanceOf(DiaryNotFoundException.class);
@@ -97,11 +106,10 @@ class DiaryServiceTest {
             @Test
             @DisplayName("NotOwnerOfDiaryException 예외를 발생시킨다.")
             void it_throws_NotOwnerOfDiaryException() {
-                createUserWithId(1L);
-                User otherUser = createUserWithId(2L);
-                Diary diary = createDiaryWithId(1L, otherUser, createEmotion());
-
-                given(diaryRepository.findById(1L)).willReturn(Optional.of(diary));
+                User user = createUserWithId(1L);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateDiaryService.validateDiaryById(1L, user))
+                    .willThrow(NotOwnerOfDiaryException.class);
 
                 assertThatThrownBy(() -> diaryService.getDiary(1L, 1L))
                     .isInstanceOf(NotOwnerOfDiaryException.class);
@@ -110,8 +118,8 @@ class DiaryServiceTest {
     }
 
     @Nested
-    @DisplayName("getDiaries 메소드 테스트")
-    class GetDiariesTest {
+    @DisplayName("getMonthlyDiaries 메소드 테스트")
+    class GetMonthlyDiariesTest {
 
         @Nested
         @DisplayName("userId에 해당하는 유저가 존재하지 않을 경우")
@@ -282,8 +290,8 @@ class DiaryServiceTest {
             void it_throws_DiaryNotFoundException() {
                 User user = createUserWithId(1L);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findById(any(Long.class)))
-                    .willReturn(Optional.empty());
+                given(validateDiaryService.validateDiaryById(1L, user))
+                    .willThrow(DiaryNotFoundException.class);
 
                 assertThatThrownBy(() -> diaryService.updateDiaryNotes(1L, 1L, "notes"))
                     .isInstanceOf(DiaryNotFoundException.class);
@@ -304,8 +312,8 @@ class DiaryServiceTest {
                     User user = createUserWithId(1L);
                     Diary diary = createDiaryWithId(1L, user, createEmotion());
                     given(validateUserService.validateUserById(1L)).willReturn(user);
-                    given(diaryRepository.findById(any(Long.class)))
-                        .willReturn(Optional.of(diary));
+                    given(validateDiaryService.validateDiaryById(1L, user))
+                        .willReturn(diary);
 
                     diaryService.updateDiaryNotes(1L, 1L, null);
 
@@ -323,8 +331,8 @@ class DiaryServiceTest {
                     User user = createUserWithId(1L);
                     Diary diary = createDiaryWithId(1L, user, createEmotion());
                     given(validateUserService.validateUserById(1L)).willReturn(user);
-                    given(diaryRepository.findById(any(Long.class)))
-                        .willReturn(Optional.of(diary));
+                    given(validateDiaryService.validateDiaryById(1L, user))
+                        .willReturn(diary);
 
                     diaryService.updateDiaryNotes(1L, 1L, "notes");
 
@@ -334,5 +342,42 @@ class DiaryServiceTest {
 
         }
 
+    }
+
+    @Nested
+    @DisplayName("deleteDiary 메소드 테스트")
+    class DeleteDiaryTest {
+
+        @Nested
+        @DisplayName("userId에 해당하는 유저가 존재하지 않을 경우")
+        class if_user_not_exists {
+
+            @Test
+            @DisplayName("UserNotFoundException 예외를 발생시킨다.")
+            void it_throws_UserNotFoundException() {
+                given(validateUserService.validateUserById(1L)).willThrow(
+                    new UserNotFoundException());
+
+                assertThatThrownBy(() -> diaryService.deleteDiary(1L, 1L))
+                    .isInstanceOf(UserNotFoundException.class);
+            }
+        }
+
+        @Nested
+        @DisplayName("diaryId에 해당하는 일기가 존재하지 않을 경우")
+        class if_diary_not_exists {
+
+            @Test
+            @DisplayName("DiaryNotFoundException 예외를 발생시킨다.")
+            void it_throws_DiaryNotFoundException() {
+                User user = createUserWithId(1L);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateDiaryService.validateDiaryById(1L, user))
+                    .willThrow(DiaryNotFoundException.class);
+
+                assertThatThrownBy(() -> diaryService.deleteDiary(1L, 1L))
+                    .isInstanceOf(DiaryNotFoundException.class);
+            }
+        }
     }
 }

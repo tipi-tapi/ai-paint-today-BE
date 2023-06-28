@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.diary.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,5 +21,10 @@ public class PromptService {
 
     public Prompt createPrompt(String prompt, boolean isSuccess) {
         return promptRepository.save(Prompt.create(prompt, isSuccess));
+    }
+
+    public Optional<Prompt> getPromptByDiaryId(Long diaryId) {
+        return promptRepository.findAllByDiaryDiaryId(diaryId)
+            .stream().findFirst();
     }
 }

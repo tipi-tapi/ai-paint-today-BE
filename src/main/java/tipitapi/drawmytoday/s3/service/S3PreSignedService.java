@@ -4,7 +4,9 @@ import static java.time.Duration.ofMinutes;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -18,8 +20,17 @@ public class S3PreSignedService {
 
     private final String bucketName;
 
-    public S3PreSignedService(@Value("${cloud.aws.s3.bucket}") String bucketName) {
-        this.s3Presigner = S3Presigner.create();
+    public S3PreSignedService(
+        @Value("${cloud.aws.credentials.access-key}") String accessKey,
+        @Value("${cloud.aws.credentials.secret-key}") String secretKey,
+        @Value("${cloud.aws.region.static}") String region,
+        @Value("${cloud.aws.s3.bucket}") String bucketName) {
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+        this.s3Presigner = S3Presigner
+            .builder()
+            .credentialsProvider(() -> credentials)
+            .region(Region.of(region))
+            .build();
         this.bucketName = bucketName;
     }
 
