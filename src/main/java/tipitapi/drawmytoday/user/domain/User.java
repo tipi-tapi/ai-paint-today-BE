@@ -13,11 +13,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE user SET deleted_at = current_timestamp WHERE diary_id = ?")
+@Where(clause = "deleted_at is null")
 public class User extends BaseEntityWithUpdate {
 
     @Id
