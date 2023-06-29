@@ -7,6 +7,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 
@@ -22,6 +23,9 @@ public class Encryptor {
     }
 
     public String encrypt(String plainText) {
+        if (!StringUtils.hasText(plainText)) {
+            return null;
+        }
         byte[] encryptedBytes = null;
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -34,6 +38,9 @@ public class Encryptor {
     }
 
     public String decrypt(String encryptedText) {
+        if (!StringUtils.hasText(encryptedText)) {
+            return null;
+        }
         byte[] decryptedBytes = null;
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
