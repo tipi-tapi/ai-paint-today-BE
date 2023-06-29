@@ -30,6 +30,7 @@ public class CreateDiaryService {
     private final S3Service s3Service;
     private final DallEService dallEService;
     private final PromptService promptService;
+    private final PromptTextService promptTextService;
     private final Encryptor encryptor;
 
     @Transactional(
@@ -40,7 +41,7 @@ public class CreateDiaryService {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
         User user = validateUserService.validateUserWithDrawLimit(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
-        String prompt = createPromptText(emotion, keyword);
+        String prompt = promptTextService.createPromptText(emotion, keyword);
         String encryptedNotes = encryptor.encrypt(notes);
 
         try {
@@ -68,10 +69,4 @@ public class CreateDiaryService {
             new Date().getTime(), index);
     }
 
-    // TODO: 별도의 서비스로 분리, 로직 구현 필요
-    private String createPromptText(Emotion emotion, String keyword) {
-        return String.format(
-            "%s , %s , canvas-textured, Oil Pastel, %s",
-            emotion.getEmotionPrompt(), emotion.getColorPrompt(), keyword);
-    }
 }
