@@ -18,8 +18,8 @@ jobs:
         steps:
             -   name: checkout
                 uses: actions/checkout@v3
-                
-            -   name: appliication.yml setting
+
+            -   name: application.yml setting
                 uses: microsoft/variable-substitution@v1
                 with:
                     files: ${{ env.APPLICATION_PATH }}
