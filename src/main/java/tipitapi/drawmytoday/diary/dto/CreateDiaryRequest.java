@@ -19,7 +19,7 @@ public class CreateDiaryRequest {
 
     @NotBlank
     @Size(max = 100)
-    @Schema(description = "일기 키워드")
+    @Schema(description = "일기 키워드", nullable = true)
     private String keyword;
 
     @Size(max = 6010)
