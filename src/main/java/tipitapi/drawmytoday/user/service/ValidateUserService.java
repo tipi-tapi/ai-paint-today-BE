@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.ad.service.UseAdRewardService;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.user.domain.SocialCode;
@@ -17,6 +18,7 @@ import tipitapi.drawmytoday.user.repository.UserRepository;
 public class ValidateUserService {
 
     private final UserRepository userRepository;
+    private final UseAdRewardService useAdRewardService;
 
     public User validateUserById(Long userId) {
         return userRepository.findByUserId(userId)
@@ -35,6 +37,9 @@ public class ValidateUserService {
         if (user.getLastDiaryDate() == null) {
             return user;
         } else if (user.getLastDiaryDate().toLocalDate().equals(LocalDate.now())) {
+            if (useAdRewardService.useReward(user)) {
+                return user;
+            }
             throw new BusinessException(ErrorCode.USER_ALREADY_DRAW_DIARY);
         } else {
             return user;
