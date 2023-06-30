@@ -86,12 +86,11 @@ public class UserRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("두 유저를 반환한다.")
             void return_two_user_list() {
-                User googleUser = User.createWithEmail(email, SocialCode.GOOGLE);
-                User appleUser = User.createWithEmail(email, SocialCode.APPLE);
-                User otherUser = User.createWithEmail(otherEmail, SocialCode.GOOGLE);
-                userRepository.save(googleUser);
-                userRepository.save(appleUser);
-                userRepository.save(otherUser);
+                User googleUser = userRepository.save(
+                    User.createWithEmail(email, SocialCode.GOOGLE));
+                User appleUser = userRepository.save(User.createWithEmail(email, SocialCode.APPLE));
+                User otherUser = userRepository.save(
+                    User.createWithEmail(otherEmail, SocialCode.GOOGLE));
 
                 List<User> findUserList = userRepository.findAllByEmail(email);
 
@@ -128,7 +127,7 @@ public class UserRepositoryTest extends BaseRepositoryTest {
             void return_empty_list() {
                 User otherUser = User.createWithEmail(otherEmail, SocialCode.GOOGLE);
                 userRepository.save(otherUser);
-                
+
                 List<User> findUserList = userRepository.findAllByEmail(email);
 
                 assertThat(findUserList).isEmpty();
