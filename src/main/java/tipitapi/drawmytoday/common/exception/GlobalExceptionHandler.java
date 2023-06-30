@@ -113,7 +113,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ErrorResponse makeErrorResponse(ErrorCode errorCode) {
         return ErrorResponse.builder()
-            .code(errorCode.name())
+            .code(errorCode.getCode())
             .message(errorCode.getMessage())
             .build();
     }
