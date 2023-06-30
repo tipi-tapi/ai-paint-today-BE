@@ -37,7 +37,7 @@ public class JwtAuthenticationEntryPoint extends OncePerRequestFilter {
 
     private ErrorResponse makeErrorResponse(ErrorCode errorCode) {
         return ErrorResponse.builder()
-            .code(errorCode.name())
+            .code(errorCode.getCode())
             .message(errorCode.getMessage())
             .build();
     }
