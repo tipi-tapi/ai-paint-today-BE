@@ -20,14 +20,16 @@ public class PromptTextService {
         StringBuilder sb = new StringBuilder();
         for (String prompt : prompts) {
             if (StringUtils.hasText(prompt)) {
+                if (sb.length() != 0) {
+                    sb.append(", ");
+                }
                 sb.append(prompt);
-                sb.append(", ");
             }
         }
         if (sb.length() == 0) {
             return "";
         }
-        return sb.substring(0, sb.length() - 2);
+        return sb.toString();
     }
 
 }
