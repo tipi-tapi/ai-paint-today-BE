@@ -17,6 +17,7 @@ public class AdRewardService {
     private final AdRewardRepository adRewardRepository;
     private final ValidateUserService validateUserService;
 
+    @Transactional
     public void createAdReward(Long userId, AdType adType) {
         User user = validateUserService.validateUserById(userId);
         AdReward adReward = AdReward.builder().user(user).adType(adType).build();
