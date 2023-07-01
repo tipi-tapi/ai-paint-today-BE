@@ -15,13 +15,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
+import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.user.domain.User;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class AdReward extends BaseEntityWithUpdate {
+public class AdReward extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
