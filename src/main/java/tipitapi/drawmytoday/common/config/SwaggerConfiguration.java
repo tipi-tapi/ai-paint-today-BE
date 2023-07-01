@@ -96,4 +96,15 @@ public class SwaggerConfiguration {
             .pathsToMatch(paths)
             .build();
     }
+
+    @Bean
+    public GroupedOpenApi adOpenAPi() {
+        String[] paths = {"/ad/**"};
+
+        return GroupedOpenApi
+            .builder()
+            .group("광고 API")
+            .pathsToMatch(paths)
+            .build();
+    }
 }
