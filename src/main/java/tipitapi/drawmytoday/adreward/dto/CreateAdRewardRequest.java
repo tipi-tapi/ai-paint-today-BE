@@ -1,10 +1,10 @@
-package tipitapi.drawmytoday.ad.dto;
+package tipitapi.drawmytoday.adreward.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import tipitapi.drawmytoday.ad.domain.AdType;
+import tipitapi.drawmytoday.adreward.domain.AdType;
 
 @Getter
 @Schema(description = "광고 기록 생성 Request")

@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.ad.domain;
+package tipitapi.drawmytoday.adreward.domain;
 
 import java.time.LocalDateTime;
 import javax.persistence.Entity;

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tipitapi.drawmytoday.ad.service.UseAdRewardService;
+import tipitapi.drawmytoday.adreward.service.UseAdRewardService;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.user.domain.SocialCode;

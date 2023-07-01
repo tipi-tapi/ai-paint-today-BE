@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.ad.controller;
+package tipitapi.drawmytoday.adreward.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tipitapi.drawmytoday.ad.dto.CreateAdRewardRequest;
-import tipitapi.drawmytoday.ad.service.AdRewardService;
+import tipitapi.drawmytoday.adreward.dto.CreateAdRewardRequest;
+import tipitapi.drawmytoday.adreward.service.AdRewardService;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
 

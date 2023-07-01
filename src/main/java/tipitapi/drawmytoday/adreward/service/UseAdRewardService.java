@@ -1,12 +1,12 @@
-package tipitapi.drawmytoday.ad.service;
+package tipitapi.drawmytoday.adreward.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tipitapi.drawmytoday.ad.domain.AdReward;
-import tipitapi.drawmytoday.ad.repository.AdRewardRepository;
+import tipitapi.drawmytoday.adreward.domain.AdReward;
+import tipitapi.drawmytoday.adreward.repository.AdRewardRepository;
 import tipitapi.drawmytoday.user.domain.User;
 
 @Service

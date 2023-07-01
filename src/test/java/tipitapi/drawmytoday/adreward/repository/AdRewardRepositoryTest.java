@@ -12,9 +12,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
-import tipitapi.drawmytoday.ad.domain.AdReward;
-import tipitapi.drawmytoday.ad.domain.AdType;
-import tipitapi.drawmytoday.ad.repository.AdRewardRepository;
+import tipitapi.drawmytoday.adreward.domain.AdReward;
+import tipitapi.drawmytoday.adreward.domain.AdType;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.user.domain.User;
 
