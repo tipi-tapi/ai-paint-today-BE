@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.ad.service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,13 +19,13 @@ public class UseAdRewardService {
     public boolean useReward(User user) {
         LocalDateTime endDate = LocalDateTime.now();
         LocalDateTime startDate = endDate.minusWeeks(1);
-        Optional<AdReward> adReward = adRewardRepository.findValidAdReward(user.getUserId(),
+        List<AdReward> adReward = adRewardRepository.findValidAdReward(user.getUserId(),
             startDate, endDate);
-        if (adReward.isPresent()) {
-            adReward.get().useReward();
-            return true;
+        if (adReward.isEmpty()) {
+            return false;
         }
-        return false;
+        adReward.get(0).useReward();
+        return true;
     }
 
 }
