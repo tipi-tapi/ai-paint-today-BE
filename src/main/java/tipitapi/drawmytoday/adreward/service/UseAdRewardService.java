@@ -16,6 +16,7 @@ public class UseAdRewardService {
 
     private final AdRewardRepository adRewardRepository;
 
+    @Transactional
     public boolean useReward(User user) {
         LocalDateTime endDate = LocalDateTime.now();
         LocalDateTime startDate = endDate.minusWeeks(1);
