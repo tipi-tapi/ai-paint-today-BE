@@ -2,8 +2,6 @@ package tipitapi.drawmytoday.adreward.domain;
 
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,7 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
@@ -32,16 +29,11 @@ public class AdReward extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Enumerated(EnumType.STRING)
-    private AdType adType;
-
 
     private LocalDateTime usedAt;
 
-    @Builder
-    public AdReward(User user, AdType adType) {
+    public AdReward(User user) {
         this.user = user;
-        this.adType = adType;
     }
 
     public void useReward() {

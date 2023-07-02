@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tipitapi.drawmytoday.adreward.domain.AdType;
 import tipitapi.drawmytoday.adreward.repository.AdRewardRepository;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
@@ -40,7 +39,7 @@ class AdRewardServiceTest {
                 given(validateUserService.validateUserById(anyLong())).willThrow(
                     new UserNotFoundException());
 
-                assertThatThrownBy(() -> adRewardService.createAdReward(1L, AdType.VIDEO))
+                assertThatThrownBy(() -> adRewardService.createAdReward(1L))
                     .isInstanceOf(UserNotFoundException.class);
             }
         }

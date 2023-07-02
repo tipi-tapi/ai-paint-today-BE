@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.adreward.domain.AdReward;
-import tipitapi.drawmytoday.adreward.domain.AdType;
 import tipitapi.drawmytoday.adreward.repository.AdRewardRepository;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
@@ -18,9 +17,9 @@ public class AdRewardService {
     private final ValidateUserService validateUserService;
 
     @Transactional
-    public void createAdReward(Long userId, AdType adType) {
+    public void createAdReward(Long userId) {
         User user = validateUserService.validateUserById(userId);
-        AdReward adReward = AdReward.builder().user(user).adType(adType).build();
+        AdReward adReward = new AdReward(user);
         adRewardRepository.save(adReward);
     }
 }

@@ -5,14 +5,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tipitapi.drawmytoday.adreward.dto.CreateAdRewardRequest;
 import tipitapi.drawmytoday.adreward.service.AdRewardService;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
@@ -33,10 +30,9 @@ public class AdRewardController {
     })
     @PostMapping()
     public ResponseEntity<Void> createDiary(
-        @RequestBody @Valid CreateAdRewardRequest createAdRewardRequest,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
-        adRewardService.createAdReward(tokenInfo.getUserId(), createAdRewardRequest.getAdType());
+        adRewardService.createAdReward(tokenInfo.getUserId());
         return ResponseEntity.noContent().build();
     }
 }

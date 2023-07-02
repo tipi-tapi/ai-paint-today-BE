@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.adreward.domain.AdReward;
-import tipitapi.drawmytoday.adreward.domain.AdType;
 import tipitapi.drawmytoday.adreward.repository.AdRewardRepository;
 import tipitapi.drawmytoday.user.domain.User;
 
@@ -56,7 +55,7 @@ class UseAdRewardServiceTest {
             @DisplayName("true를 반환한다.")
             void return_true() {
                 User user = createUserWithId(1L);
-                AdReward adReward = new AdReward(user, AdType.VIDEO);
+                AdReward adReward = new AdReward(user);
                 given(adRewardRepository.findValidAdReward(anyLong(), any(), any()))
                     .willReturn(List.of(adReward));
 

@@ -13,7 +13,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 import tipitapi.drawmytoday.adreward.domain.AdReward;
-import tipitapi.drawmytoday.adreward.domain.AdType;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.user.domain.User;
 
@@ -52,7 +51,7 @@ public class AdRewardRepositoryTest extends BaseRepositoryTest {
             @DisplayName("null을 반환한다.")
             void return_null() {
                 User user = createUser();
-                AdReward adReward = new AdReward(user, AdType.VIDEO);
+                AdReward adReward = new AdReward(user);
                 adReward.useReward();
                 adRewardRepository.save(adReward);
 
