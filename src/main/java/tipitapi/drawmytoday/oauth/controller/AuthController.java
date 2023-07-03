@@ -11,14 +11,12 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
@@ -61,7 +59,6 @@ public class AuthController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping(value = "/google/login")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseJwtToken googleLogin(HttpServletRequest request) throws JsonProcessingException {
         return googleOAuthService.login(request);
     }
@@ -85,7 +82,6 @@ public class AuthController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping(value = "/apple/login")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseJwtToken appleLogin(HttpServletRequest request,
         @RequestBody @Valid RequestAppleLogin requestAppleLogin)
         throws IOException {
@@ -130,7 +126,6 @@ public class AuthController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @DeleteMapping("/users")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> deleteAccount(@AuthUser JwtTokenInfo tokenInfo) {
         oAuthService.deleteAccount(tokenInfo.getUserId());
         return ResponseEntity.noContent().build();
