@@ -5,6 +5,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.dalle.service.DallEService;
@@ -29,6 +30,8 @@ public class CreateDiaryService {
     private final S3Service s3Service;
     private final DallEService dallEService;
     private final PromptService promptService;
+    private final PromptTextService promptTextService;
+    private final Encryptor encryptor;
 
     @Transactional(
         noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
@@ -36,16 +39,18 @@ public class CreateDiaryService {
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
         String notes) throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
-        User user = validateUserService.validateUserWithDrawLimit(userId);
+        // TODO: 광고 추가시 일기 생성 제한 로직으로 변경 필요
+        User user = validateUserService.validateUserById(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
-        String prompt = createPromptText(emotion, keyword);
+        String prompt = promptTextService.createPromptText(emotion, keyword);
+        String encryptedNotes = encryptor.encrypt(notes);
 
         try {
             byte[] dallEImage = dallEService.getImageAsUrl(prompt);
 
             Diary diary = diaryRepository.save(
                 Diary.builder().user(user).emotion(emotion).diaryDate(LocalDateTime.now())
-                    .notes(notes)
+                    .notes(encryptedNotes)
                     .isAi(true).build());
             promptService.createPrompt(diary, prompt, true);
 
@@ -65,10 +70,4 @@ public class CreateDiaryService {
             new Date().getTime(), index);
     }
 
-    // TODO: 별도의 서비스로 분리, 로직 구현 필요
-    private String createPromptText(Emotion emotion, String keyword) {
-        return String.format(
-            "%s , %s , canvas-textured, Oil Pastel, %s",
-            emotion.getEmotionPrompt(), emotion.getColorPrompt(), keyword);
-    }
 }

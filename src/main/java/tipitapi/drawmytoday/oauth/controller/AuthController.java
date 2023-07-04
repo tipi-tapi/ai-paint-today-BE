@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
+import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.security.jwt.JwtType;
@@ -61,9 +61,11 @@ public class AuthController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping(value = "/google/login")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseJwtToken googleLogin(HttpServletRequest request) throws JsonProcessingException {
-        return googleOAuthService.login(request);
+    public ResponseEntity<SuccessResponse<ResponseJwtToken>> googleLogin(HttpServletRequest request)
+        throws JsonProcessingException {
+        return SuccessResponse.of(
+            googleOAuthService.login(request)
+        ).asHttp(HttpStatus.OK);
     }
 
     @Operation(summary = "애플 로그인", description = "프론트로부터 Authorization code, idToken을 받아 애플 로그인을 진행합니다.")
@@ -85,11 +87,11 @@ public class AuthController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping(value = "/apple/login")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseJwtToken appleLogin(HttpServletRequest request,
-        @RequestBody @Valid RequestAppleLogin requestAppleLogin)
-        throws IOException {
-        return appleOAuthService.login(request, requestAppleLogin);
+    public ResponseEntity<SuccessResponse<ResponseJwtToken>> appleLogin(HttpServletRequest request,
+        @RequestBody @Valid RequestAppleLogin requestAppleLogin) throws IOException {
+        return SuccessResponse.of(
+            appleOAuthService.login(request, requestAppleLogin)
+        ).asHttp(HttpStatus.OK);
     }
 
     @Operation(summary = "jwt access token 재발급",
@@ -106,11 +108,14 @@ public class AuthController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @GetMapping("/refresh")
-    public ResponseAccessToken getAccessToken(HttpServletRequest request) {
+    public ResponseEntity<SuccessResponse<ResponseAccessToken>> getAccessToken(
+        HttpServletRequest request) {
         String refreshToken = HeaderUtils.getJwtToken(request, JwtType.REFRESH);
         jwtTokenProvider.validRefreshToken(refreshToken);
         String accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
-        return ResponseAccessToken.of(accessToken);
+        return SuccessResponse.of(
+            ResponseAccessToken.of(accessToken)
+        ).asHttp(HttpStatus.OK);
     }
 
     @Operation(summary = "회원 탈퇴", description = "소셜로그인 탈퇴를 진행하고, 회원을 deleted 상태로 변경합니다.",
@@ -130,31 +135,8 @@ public class AuthController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @DeleteMapping("/users")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> deleteAccount(@AuthUser JwtTokenInfo tokenInfo) {
         oAuthService.deleteAccount(tokenInfo.getUserId());
         return ResponseEntity.noContent().build();
     }
-
-    @Operation(summary = "토큰 만료(테스트)", description = "jwt token을 만료시킵니다.",
-        security = @SecurityRequirement(name = "Bearer Authentication"))
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "jwt token 만료 성공"),
-        @ApiResponse(
-            responseCode = "400",
-            description = "S002 : 유효하지 않은 토큰입니다.",
-            content = @Content(schema = @Schema(hidden = true))),
-        @ApiResponse(
-            responseCode = "404",
-            description = "S008 : jwt token이 없습니다.",
-            content = @Content(schema = @Schema(hidden = true)))
-    })
-    @GetMapping("/expire")
-    public String getExpiredJwt(HttpServletRequest request) {
-        String jwtToken = HeaderUtils.getJwtToken(request, JwtType.BOTH);
-        return jwtTokenProvider.expireToken(jwtToken);
-    }
-
 }

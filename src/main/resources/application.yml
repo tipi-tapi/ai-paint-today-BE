@@ -2,3 +2,6 @@ spring:
     profiles:
         active: ${profile}
         include: oauth, aws, openai
+encryptor:
+    secret:
+        key: ${ENCRYPTOR_SECRET_KEY}

@@ -13,11 +13,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "deleted_at is null")
 public class User extends BaseEntityWithUpdate {
 
     @Id

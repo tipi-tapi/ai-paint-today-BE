@@ -5,6 +5,7 @@ on:
         branches: [ "main" ]
 
 env:
+    APPLICATION_PATH: ./src/main/resources/application.yml
     PROD_PATH: ./src/main/resources/application-prod.yml
     OAUTH_PATH: ./src/main/resources/application-oauth.yml
     AWS_PATH: ./src/main/resources/application-aws.yml
@@ -17,6 +18,13 @@ jobs:
         steps:
             -   name: checkout
                 uses: actions/checkout@v3
+
+            -   name: application.yml setting
+                uses: microsoft/variable-substitution@v1
+                with:
+                    files: ${{ env.APPLICATION_PATH }}
+                env:
+                    encryptor.secret.key: ${{ secrets.ENCRYPTOR_SECRET_KEY }}
 
             -   name: application-prod.yml setting
                 uses: microsoft/variable-substitution@v1
