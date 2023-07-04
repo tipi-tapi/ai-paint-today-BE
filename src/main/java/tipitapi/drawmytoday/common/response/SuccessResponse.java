@@ -1,6 +1,7 @@
 package tipitapi.drawmytoday.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class SuccessResponse<T> {
     @Schema(description = "성공 여부. 항상 true 이다.", defaultValue = "true")
     private final boolean status = true;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonInclude(Include.NON_NULL)
     private T data;
 
     public static <T> SuccessResponse<T> of(T data) {
