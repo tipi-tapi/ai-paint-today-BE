@@ -34,7 +34,7 @@ public class SuccessResponseTest {
             String json = objectMapper.writeValueAsString(successResponse);
 
             // then
-            assertThat(json).contains('"' + "data" + '"' + ":" + '"' + "data" + '"');
+            assertThat(json).contains("\"data\":\"data\"");
         }
 
         @Test
@@ -47,7 +47,7 @@ public class SuccessResponseTest {
             String json = objectMapper.writeValueAsString(successResponse);
 
             // then
-            assertThat(json).contains('"' + "data" + '"' + ":[]");
+            assertThat(json).contains("\"data\":[]");
         }
 
         @Test
@@ -60,7 +60,7 @@ public class SuccessResponseTest {
             String json = objectMapper.writeValueAsString(successResponse);
 
             // then
-            assertThat(json).doesNotContain('"' + "data" + '"' + ":");
+            assertThat(json).doesNotContain("\"data\":");
         }
     }
 
