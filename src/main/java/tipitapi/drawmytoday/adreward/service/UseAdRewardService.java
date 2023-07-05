@@ -1,31 +1,25 @@
 package tipitapi.drawmytoday.adreward.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.adreward.domain.AdReward;
-import tipitapi.drawmytoday.adreward.repository.AdRewardRepository;
-import tipitapi.drawmytoday.user.domain.User;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UseAdRewardService {
 
-    private final AdRewardRepository adRewardRepository;
+    private final ValidateAdRewardService validateAdRewardService;
 
     @Transactional
-    public boolean useReward(User user) {
-        LocalDateTime endDate = LocalDateTime.now();
-        LocalDateTime startDate = endDate.minusHours(1);
-        List<AdReward> adReward = adRewardRepository.findValidAdReward(user.getUserId(),
-            startDate, endDate);
+    public boolean useReward(Long userId) {
+        Optional<AdReward> adReward = validateAdRewardService.findValidAdReward(userId);
         if (adReward.isEmpty()) {
             return false;
         }
-        adReward.get(0).useReward();
+        adReward.get().useReward();
         return true;
     }
 
