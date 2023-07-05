@@ -3,6 +3,8 @@ package tipitapi.drawmytoday.diary.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithId;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithIdAndCreatedAt;
@@ -24,6 +26,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.common.exception.BusinessException;
+import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
@@ -51,6 +54,10 @@ class DiaryServiceTest {
     S3PreSignedService s3PreSignedService;
     @Mock
     ValidateDiaryService validateDiaryService;
+    @Mock
+    Encryptor encryptor;
+    @Mock
+    PromptService promptService;
     @InjectMocks
     DiaryService diaryService;
 
@@ -75,6 +82,8 @@ class DiaryServiceTest {
                 given(
                     s3PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");
+                given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
+                given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
 
                 GetDiaryResponse getDiaryResponse = diaryService.getDiary(1L, 1L);
 
@@ -314,6 +323,7 @@ class DiaryServiceTest {
                     given(validateUserService.validateUserById(1L)).willReturn(user);
                     given(validateDiaryService.validateDiaryById(1L, user))
                         .willReturn(diary);
+                    given(encryptor.encrypt(null)).willReturn(null);
 
                     diaryService.updateDiaryNotes(1L, 1L, null);
 
@@ -333,10 +343,11 @@ class DiaryServiceTest {
                     given(validateUserService.validateUserById(1L)).willReturn(user);
                     given(validateDiaryService.validateDiaryById(1L, user))
                         .willReturn(diary);
+                    given(encryptor.encrypt(anyString())).willReturn("encrypted notes");
 
                     diaryService.updateDiaryNotes(1L, 1L, "notes");
 
-                    assertThat(diary.getNotes()).isEqualTo("notes");
+                    assertThat(diary.getNotes()).isEqualTo("encrypted notes");
                 }
             }
 
