@@ -134,11 +134,13 @@ public class DiaryController {
     @PostMapping()
     public ResponseEntity<SuccessResponse<CreateDiaryResponse>> createDiary(
         @RequestBody @Valid CreateDiaryRequest createDiaryRequest,
-        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo,
+        @Parameter(description = "테스트 여부", in = ParameterIn.QUERY)
+        @RequestParam(value = "test", required = false, defaultValue = "false") boolean test
     ) throws DallERequestFailException, ImageInputStreamFailException {
         return SuccessResponse.of(
             createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
-                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes())
+                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(), test)
         ).asHttp(HttpStatus.CREATED);
     }
 
