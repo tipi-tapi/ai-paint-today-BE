@@ -19,7 +19,7 @@ public class UseAdRewardService {
     @Transactional
     public boolean useReward(User user) {
         LocalDateTime endDate = LocalDateTime.now();
-        LocalDateTime startDate = endDate.minusWeeks(1);
+        LocalDateTime startDate = endDate.minusHours(1);
         List<AdReward> adReward = adRewardRepository.findValidAdReward(user.getUserId(),
             startDate, endDate);
         if (adReward.isEmpty()) {
