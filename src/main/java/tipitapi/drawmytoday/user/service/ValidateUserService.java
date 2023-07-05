@@ -1,6 +1,5 @@
 package tipitapi.drawmytoday.user.service;
 
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,15 +33,13 @@ public class ValidateUserService {
 
     public User validateUserWithDrawLimit(Long userId) {
         User user = validateUserById(userId);
-        if (user.getLastDiaryDate() == null) {
+        if (user.checkDrawLimit()) {
             return user;
-        } else if (user.getLastDiaryDate().toLocalDate().equals(LocalDate.now())) {
-            if (useAdRewardService.useReward(user)) {
+        } else {
+            if (useAdRewardService.useReward(userId)) {
                 return user;
             }
             throw new BusinessException(ErrorCode.USER_ALREADY_DRAW_DIARY);
-        } else {
-            return user;
         }
     }
 }
