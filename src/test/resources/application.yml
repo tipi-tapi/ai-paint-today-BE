@@ -3,7 +3,7 @@ spring:
         include: oauth, aws, openai
     datasource:
         driver-class-name: org.h2.Driver
-        url: jdbc:h2:mem:draw_my_today_db;MODE=MySQL;DB_CLOSE_DELAY=-1
+        url: jdbc:h2:mem:draw_my_today_db;MODE=MySQL;
 
     jpa:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
