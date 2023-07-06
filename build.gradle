@@ -41,7 +41,7 @@ dependencies {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+//    useJUnitPlatform()
 }
 jar {
     enabled = false
