@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.user.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -69,5 +70,10 @@ public class User extends BaseEntityWithUpdate {
 
     public void deleteUser() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public boolean checkDrawLimit() {
+        return this.getLastDiaryDate() == null
+            || !this.getLastDiaryDate().toLocalDate().equals(LocalDate.now());
     }
 }
