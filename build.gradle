@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'org.springframework.boot' version '2.7.11'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
@@ -42,7 +43,53 @@ dependencies {
 
 tasks.named('test') {
 //    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.enabled true
+        xml.enabled true
+        csv.enabled false
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it,
+                exclude: [
+                    'tipitapi/drawmytoday/common/**'
+                ])
+        }))
+    }
+
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+
+    violationRules {
+        rule {
+            element = 'CLASS'
+
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.00
+            }
+
+            excludes = [
+                'tipitapi/drawmytoday/common/**'
+            ]
+        }
+    }
+}
+
 jar {
     enabled = false
 }
