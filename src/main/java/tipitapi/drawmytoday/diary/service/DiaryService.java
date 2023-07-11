@@ -7,11 +7,14 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.adreward.domain.AdReward;
+import tipitapi.drawmytoday.adreward.service.ValidateAdRewardService;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Prompt;
+import tipitapi.drawmytoday.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
@@ -33,14 +36,14 @@ public class DiaryService {
     private final S3PreSignedService s3PreSignedService;
     private final Encryptor encryptor;
     private final ValidateDiaryService validateDiaryService;
+    private final ValidateAdRewardService validateAdRewardService;
 
     public GetDiaryResponse getDiary(Long userId, Long diaryId) {
         User user = validateUserService.validateUserById(userId);
 
-
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         diary.setNotes(encryptor.decrypt(diary.getNotes()));
-  
+
         String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
             imageService.getImage(diary).getImageUrl(), 30);
 
@@ -81,6 +84,26 @@ public class DiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
 
         diaryRepository.delete(diary);
+    }
+
+    public GetDiaryLimitResponse getDrawLimit(Long userId) {
+        User user = validateUserService.validateUserById(userId);
+
+        boolean available = false;
+        LocalDateTime lastDiaryDate = user.getLastDiaryDate();
+        LocalDateTime rewardCreatedAt = null;
+
+        if (user.checkDrawLimit()) {
+            available = true;
+        } else {
+            Optional<AdReward> adReward = validateAdRewardService.findValidAdReward(userId);
+            if (adReward.isPresent()) {
+                available = true;
+                rewardCreatedAt = adReward.get().getCreatedAt();
+            }
+        }
+
+        return GetDiaryLimitResponse.of(available, lastDiaryDate, rewardCreatedAt);
     }
 
     private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {

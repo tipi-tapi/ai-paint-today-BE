@@ -1,10 +1,13 @@
 package tipitapi.drawmytoday.adreward.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,33 +17,34 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.adreward.domain.AdReward;
+import tipitapi.drawmytoday.adreward.repository.AdRewardRepository;
 import tipitapi.drawmytoday.user.domain.User;
 
 @ExtendWith(MockitoExtension.class)
-class UseAdRewardServiceTest {
+class ValidateAdRewardServiceTest {
 
     @Mock
-    ValidateAdRewardService validateAdRewardService;
+    AdRewardRepository adRewardRepository;
     @InjectMocks
-    UseAdRewardService useAdRewardService;
+    ValidateAdRewardService validateAdRewardService;
 
     @Nested
-    @DisplayName("useReward 메소드 테스트")
-    class UseRewardTest {
+    @DisplayName("findValidAdReward 메소드 테스트")
+    class FindValidateAdRewardTest {
 
         @Nested
         @DisplayName("유효한 광고리워드가 존재하지 않을 경우")
         class If_no_valid_ad_reward_exists {
 
             @Test
-            @DisplayName("false를 반환한다.")
-            void return_false() {
-                given(validateAdRewardService.findValidAdReward(anyLong()))
-                    .willReturn(Optional.empty());
+            @DisplayName("null를 반환한다.")
+            void return_null() {
+                given(adRewardRepository.findValidAdReward(anyLong(), any(), any()))
+                    .willReturn(new ArrayList<>());
 
-                boolean used = useAdRewardService.useReward(1L);
+                Optional<AdReward> adReward = validateAdRewardService.findValidAdReward(1L);
 
-                assertThat(used).isFalse();
+                assertThat(adReward).isEmpty();
             }
         }
 
@@ -50,15 +54,16 @@ class UseAdRewardServiceTest {
 
             @Test
             @DisplayName("true를 반환한다.")
-            void return_true() {
+            void return_adreward() {
                 User user = createUserWithId(1L);
                 AdReward adReward = new AdReward(user);
-                given(validateAdRewardService.findValidAdReward(anyLong()))
-                    .willReturn(Optional.of(adReward));
+                given(adRewardRepository.findValidAdReward(anyLong(), any(), any()))
+                    .willReturn(List.of(adReward));
 
-                boolean used = useAdRewardService.useReward(1L);
+                Optional<AdReward> result = validateAdRewardService.findValidAdReward(1L);
 
-                assertThat(used).isTrue();
+                assertThat(result).isPresent();
+                assertThat(result.get().getAdRewardId()).isEqualTo(adReward.getAdRewardId());
             }
         }
     }

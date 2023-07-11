@@ -29,6 +29,7 @@ import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
@@ -134,11 +135,13 @@ public class DiaryController {
     @PostMapping()
     public ResponseEntity<SuccessResponse<CreateDiaryResponse>> createDiary(
         @RequestBody @Valid CreateDiaryRequest createDiaryRequest,
-        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo,
+        @Parameter(description = "테스트 여부", in = ParameterIn.QUERY)
+        @RequestParam(value = "test", required = false, defaultValue = "false") boolean test
     ) throws DallERequestFailException, ImageInputStreamFailException {
         return SuccessResponse.of(
             createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
-                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes())
+                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(), test)
         ).asHttp(HttpStatus.CREATED);
     }
 
@@ -188,5 +191,20 @@ public class DiaryController {
     ) {
         diaryService.deleteDiary(tokenInfo.getUserId(), diaryId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "일기 생성 가능 여부 조회", description = "유저가 금일 일기를 생성할 수 있는지 여부를 반환한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "일기 생성 가능 정보"),
+    })
+    @GetMapping("/limit")
+    public ResponseEntity<SuccessResponse<GetDiaryLimitResponse>> getDrawLimit(
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+    ) {
+        return SuccessResponse.of(
+            diaryService.getDrawLimit(tokenInfo.getUserId())
+        ).asHttp(HttpStatus.OK);
     }
 }

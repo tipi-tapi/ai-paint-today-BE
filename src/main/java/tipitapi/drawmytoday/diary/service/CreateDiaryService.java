@@ -32,18 +32,24 @@ public class CreateDiaryService {
     private final PromptService promptService;
     private final PromptTextService promptTextService;
     private final Encryptor encryptor;
+    private final String DUMMY_IMAGE_PATH = "test/dummy.png";
 
     @Transactional(
         noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
             ImageInputStreamFailException.class})
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
-        String notes) throws DallERequestFailException, ImageInputStreamFailException {
+        String notes, boolean test)
+        throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
         // TODO: 광고 추가시 일기 생성 제한 로직으로 변경 필요
         User user = validateUserService.validateUserById(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         String prompt = promptTextService.createPromptText(emotion, keyword);
         String encryptedNotes = encryptor.encrypt(notes);
+
+        if (test) {
+            return createDummyDiary(user, emotion, prompt, encryptedNotes);
+        }
 
         try {
             byte[] dallEImage = dallEService.getImageAsUrl(prompt);
@@ -70,4 +76,14 @@ public class CreateDiaryService {
             new Date().getTime(), index);
     }
 
+    private CreateDiaryResponse createDummyDiary(User user, Emotion emotion, String prompt,
+        String notes) {
+        Diary diary = diaryRepository.save(
+            Diary.builder().user(user).emotion(emotion).diaryDate(LocalDateTime.now())
+                .notes(notes).isAi(true).build());
+        promptService.createPrompt(diary, prompt, true);
+        imageService.createImage(diary, DUMMY_IMAGE_PATH, true);
+        user.setLastDiaryDate(LocalDateTime.now());
+        return new CreateDiaryResponse(diary.getDiaryId());
+    }
 }
