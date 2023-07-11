@@ -19,16 +19,28 @@ import tipitapi.drawmytoday.user.domain.User;
 
 @Import({ControllerTestConfig.class})
 @MockBean(JpaMetamodelMappingContext.class)
-@WithCustomUser
 public abstract class ControllerTestSetup {
 
-    protected static final long USER_ID = 1L;
+    protected static final long REQUEST_USER_ID = 1L;
     protected MockMvc mockMvc;
+    protected MockMvc noSecurityMockMvc;
+
+    // "yyyy-MM-dd'T'HH:mm:ss.SSS" 형식으로 변환
+    protected static String parseLocalDateTime(LocalDateTime input) {
+        String inputString = input.toString();
+        if (inputString.length() <= 23) {
+            return inputString;
+        }
+        return inputString.substring(0, 23);
+    }
 
     @BeforeEach
     void setUp(WebApplicationContext context) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
             .apply(SecurityMockMvcConfigurers.springSecurity())
+            .alwaysDo(MockMvcResultHandlers.print())
+            .build();
+        this.noSecurityMockMvc = MockMvcBuilders.webAppContextSetup(context)
             .alwaysDo(MockMvcResultHandlers.print())
             .build();
     }
@@ -38,7 +50,7 @@ public abstract class ControllerTestSetup {
             .email("email")
             .socialCode(socialCode)
             .build();
-        ReflectionTestUtils.setField(user, "userId", USER_ID);
+        ReflectionTestUtils.setField(user, "userId", REQUEST_USER_ID);
         return user;
     }
 
@@ -53,6 +65,7 @@ public abstract class ControllerTestSetup {
             .weather("weather")
             .build();
         ReflectionTestUtils.setField(diary, "diaryId", 1L);
+        ReflectionTestUtils.setField(diary, "createdAt", LocalDateTime.now());
         return diary;
     }
 
