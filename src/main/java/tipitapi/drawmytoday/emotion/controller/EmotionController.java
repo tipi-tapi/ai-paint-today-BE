@@ -11,8 +11,6 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -72,14 +70,8 @@ public class EmotionController {
     })
     @PostMapping()
     public ResponseEntity<SuccessResponse<List<CreateEmotionResponse>>> createEmotions(
-        @RequestBody @Valid List<CreateEmotionRequest> createEmotionRequests,
-        BindingResult bindingResult
+        @RequestBody @Valid List<CreateEmotionRequest> createEmotionRequests
     ) {
-        if (bindingResult.hasErrors()) {
-            ObjectError objectError = bindingResult.getAllErrors().get(0);
-            throw new IllegalArgumentException(objectError.getDefaultMessage());
-        }
-
         return SuccessResponse.of(
             emotionService.createEmotions(createEmotionRequests)
         ).asHttp(HttpStatus.CREATED);
