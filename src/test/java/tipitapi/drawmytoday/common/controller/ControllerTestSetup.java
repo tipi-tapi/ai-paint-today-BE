@@ -11,13 +11,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import tipitapi.drawmytoday.common.validator.CustomCollectionValidator;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.ReviewType;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 
-@Import({ControllerTestConfig.class})
+@Import({ControllerTestConfig.class, CustomCollectionValidator.class})
 @MockBean(JpaMetamodelMappingContext.class)
 public abstract class ControllerTestSetup {
 
