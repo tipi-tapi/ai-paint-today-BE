@@ -120,7 +120,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ErrorResponse makeErrorResponse(ErrorCode errorCode, String message) {
         return ErrorResponse.builder()
-            .code(errorCode.name())
+            .code(errorCode.getCode())
             .message(message)
             .build();
     }
@@ -133,7 +133,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .collect(Collectors.toList());
 
         return ErrorResponse.builder()
-            .code(errorCode.name())
+            .code(errorCode.getCode())
             .message(errorCode.getMessage())
             .errors(validationErrorList)
             .build();

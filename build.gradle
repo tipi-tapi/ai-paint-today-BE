@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'org.springframework.boot' version '2.7.11'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
@@ -21,6 +22,7 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation platform('software.amazon.awssdk:bom:2.20.26')
@@ -42,7 +44,53 @@ dependencies {
 
 tasks.named('test') {
 //    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.enabled true
+        xml.enabled false
+        csv.enabled false
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it,
+                exclude: [
+                    'tipitapi/drawmytoday/common/**'
+                ])
+        }))
+    }
+
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+
+    violationRules {
+        rule {
+            element = 'CLASS'
+
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.00
+            }
+
+            excludes = [
+                'tipitapi/drawmytoday/common/**'
+            ]
+        }
+    }
+}
+
 jar {
     enabled = false
 }
