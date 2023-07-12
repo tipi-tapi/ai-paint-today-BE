@@ -234,6 +234,75 @@ class EmotionControllerTest extends ControllerTestSetup {
                 result.andExpect(status().isBadRequest());
                 verify(emotionService, never()).createEmotions(anyList());
             }
+
+            @ParameterizedTest
+            @ArgumentsSource(BlankStringArgumentsProvider.class)
+            @DisplayName("emotionPrompt가 비어있으면 400 예외를 반환한다.")
+            void emotion_prompt_is_blank_than_throw_400_exception(String emotionPrompt)
+                throws Exception {
+                //given
+                Map<String, Object> content = new HashMap<>();
+                content.put("emotionName", emotionName);
+                content.put("emotionPrompt", emotionPrompt);
+                content.put("colorHex", colorHex);
+                content.put("colorPrompt", colorPrompt);
+
+                //when
+                ResultActions result = mockMvc.perform(post(BASE_URL)
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(List.of(content))));
+
+                //then
+                result.andExpect(status().isBadRequest());
+                verify(emotionService, never()).createEmotions(anyList());
+            }
+
+            @ParameterizedTest
+            @ArgumentsSource(BlankStringArgumentsProvider.class)
+            @DisplayName("colorHex가 비어있으면 400 예외를 반환한다.")
+            void color_hex_is_blank_than_throw_400_exception(String colorHex)
+                throws Exception {
+                //given
+                Map<String, Object> content = new HashMap<>();
+                content.put("emotionName", emotionName);
+                content.put("emotionPrompt", emotionPrompt);
+                content.put("colorHex", colorHex);
+                content.put("colorPrompt", colorPrompt);
+
+                //when
+                ResultActions result = mockMvc.perform(post(BASE_URL)
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(List.of(content))));
+
+                //then
+                result.andExpect(status().isBadRequest());
+                verify(emotionService, never()).createEmotions(anyList());
+            }
+
+            @ParameterizedTest
+            @ArgumentsSource(BlankStringArgumentsProvider.class)
+            @DisplayName("colorPrompt가 비어있으면 400 예외를 반환한다.")
+            void color_prompt_is_blank_than_throw_400_exception(String colorPrompt)
+                throws Exception {
+                //given
+                Map<String, Object> content = new HashMap<>();
+                content.put("emotionName", emotionName);
+                content.put("emotionPrompt", emotionPrompt);
+                content.put("colorHex", colorHex);
+                content.put("colorPrompt", colorPrompt);
+
+                //when
+                ResultActions result = mockMvc.perform(post(BASE_URL)
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(List.of(content))));
+
+                //then
+                result.andExpect(status().isBadRequest());
+                verify(emotionService, never()).createEmotions(anyList());
+            }
         }
     }
 }
