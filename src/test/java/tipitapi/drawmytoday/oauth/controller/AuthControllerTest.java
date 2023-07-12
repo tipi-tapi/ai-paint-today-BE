@@ -2,6 +2,9 @@ package tipitapi.drawmytoday.oauth.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
+import tipitapi.drawmytoday.common.controller.WithCustomUser;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
@@ -120,6 +124,48 @@ class AuthControllerTest extends ControllerTestSetup {
                 //then
                 result.andExpect(status().isBadRequest());
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("getAccessToken 메서드는")
+    class GetAccessTokenTest {
+
+        @Test
+        @DisplayName("정상 흐름이면 access token을 발급한다.")
+        void return_access_token() throws Exception {
+            //given
+            String jwtAccessToken = "jwtAccessToken";
+            given(jwtTokenProvider.createNewAccessTokenFromRefreshToken(any(String.class)))
+                .willReturn(jwtAccessToken);
+
+            //when
+            ResultActions result = noSecurityMockMvc.perform(get(BASIC_URL + "/refresh")
+                .header("Authorization", "Bearer " + "refreshToken"));
+
+            //then
+            result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.accessToken").value(jwtAccessToken));
+            verify(jwtTokenProvider).validRefreshToken(any(String.class));
+        }
+    }
+
+    @Nested
+    @WithCustomUser
+    @DisplayName("deleteAccount 메서드는")
+    class DeleteAccountTest {
+
+        @Test
+        @DisplayName("정상 흐름이면 계정을 삭제하고 204를 반환한다.")
+        void delete_account() throws Exception {
+            //given
+            //when
+            ResultActions result = mockMvc.perform(delete(BASIC_URL + "/users")
+                .with(SecurityMockMvcRequestPostProcessors.csrf()));
+
+            //then
+            result.andExpect(status().isNoContent());
+            verify(oAuthService).deleteAccount(any(Long.class));
         }
     }
 }
