@@ -18,7 +18,7 @@ import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 
-@Import({ControllerTestConfig.class, CustomCollectionValidator.class})
+@Import({CustomCollectionValidator.class})
 @MockBean(JpaMetamodelMappingContext.class)
 public abstract class ControllerTestSetup {
 
