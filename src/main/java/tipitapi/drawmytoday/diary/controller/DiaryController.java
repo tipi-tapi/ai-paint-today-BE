@@ -141,7 +141,8 @@ public class DiaryController {
     ) throws DallERequestFailException, ImageInputStreamFailException {
         return SuccessResponse.of(
             createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
-                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(), test)
+                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
+                createDiaryRequest.getCreateDiaryDate(), test)
         ).asHttp(HttpStatus.CREATED);
     }
 
