@@ -76,4 +76,8 @@ public class User extends BaseEntityWithUpdate {
         return this.getLastDiaryDate() == null
             || !this.getLastDiaryDate().toLocalDate().equals(LocalDate.now());
     }
+
+    public boolean isAdmin() {
+        return this.userRole == UserRole.ADMIN;
+    }
 }
