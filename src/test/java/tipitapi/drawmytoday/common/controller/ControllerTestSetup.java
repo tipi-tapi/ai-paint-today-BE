@@ -6,13 +6,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import tipitapi.drawmytoday.common.validator.CustomCollectionValidator;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
 
 @Import({CustomCollectionValidator.class})
 @MockBean(JpaMetamodelMappingContext.class)
@@ -40,12 +38,6 @@ public abstract class ControllerTestSetup {
         this.noSecurityMockMvc = MockMvcBuilders.webAppContextSetup(context)
             .alwaysDo(MockMvcResultHandlers.print())
             .build();
-    }
-
-    protected Emotion getEmotion() {
-        Emotion emotion = Emotion.create("파랑", "blue", true, "blue", "blue");
-        ReflectionTestUtils.setField(emotion, "emotionId", 1L);
-        return emotion;
     }
 
 }
