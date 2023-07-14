@@ -1,7 +1,6 @@
 package tipitapi.drawmytoday.diary.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -17,7 +16,6 @@ public class CreateDiaryRequest {
     @Schema(description = "감정 ID")
     private Long emotionId;
 
-    @NotBlank
     @Size(max = 100)
     @Schema(description = "일기 키워드", nullable = true)
     private String keyword;
