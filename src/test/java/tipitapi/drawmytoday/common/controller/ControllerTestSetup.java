@@ -12,11 +12,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import tipitapi.drawmytoday.common.validator.CustomCollectionValidator;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.domain.ReviewType;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.user.domain.SocialCode;
-import tipitapi.drawmytoday.user.domain.User;
 
 @Import({CustomCollectionValidator.class})
 @MockBean(JpaMetamodelMappingContext.class)
@@ -44,30 +40,6 @@ public abstract class ControllerTestSetup {
         this.noSecurityMockMvc = MockMvcBuilders.webAppContextSetup(context)
             .alwaysDo(MockMvcResultHandlers.print())
             .build();
-    }
-
-    protected User getUser(SocialCode socialCode) {
-        User user = User.builder()
-            .email("email")
-            .socialCode(socialCode)
-            .build();
-        ReflectionTestUtils.setField(user, "userId", REQUEST_USER_ID);
-        return user;
-    }
-
-    protected Diary getDiary(User user, Emotion emotion) {
-        Diary diary = Diary.builder()
-            .user(user)
-            .emotion(emotion)
-            .diaryDate(LocalDateTime.now())
-            .notes("notes")
-            .isAi(true)
-            .review(ReviewType.GOOD)
-            .weather("weather")
-            .build();
-        ReflectionTestUtils.setField(diary, "diaryId", 1L);
-        ReflectionTestUtils.setField(diary, "createdAt", LocalDateTime.now());
-        return diary;
     }
 
     protected Emotion getEmotion() {

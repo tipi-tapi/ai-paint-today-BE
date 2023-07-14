@@ -29,6 +29,9 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
+import tipitapi.drawmytoday.common.testdata.TestDiary;
+import tipitapi.drawmytoday.common.testdata.TestEmotion;
+import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryLimitResponse;
@@ -38,7 +41,6 @@ import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.diary.service.DiaryService;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 
 @WebMvcTest(DiaryController.class)
@@ -68,9 +70,10 @@ class DiaryControllerTest extends ControllerTestSetup {
             void exist_than_return_diary() throws Exception {
                 // given
                 long diaryId = 1L;
-                User user = getUser(SocialCode.GOOGLE);
-                Emotion emotion = getEmotion();
-                Diary diary = getDiary(user, emotion);
+                User user = TestUser.createUser();
+                Emotion emotion = TestEmotion.createEmotion();
+                Diary diary = TestDiary.createDiaryWithIdAndCreatedAt(
+                    diaryId, LocalDateTime.now(), user, emotion);
                 String imageUrl = "imageUrl";
                 String promptText = "promptText";
                 GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl, emotion,

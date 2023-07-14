@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ class EmotionControllerTest extends ControllerTestSetup {
                 //given
                 String language = "ko";
                 List<GetActiveEmotionsResponse> emotionResponses = GetActiveEmotionsResponse.buildWithEmotions(
-                    List.of(getEmotion(), getEmotion()), language);
+                    List.of(createEmotion(), createEmotion()), language);
                 given(emotionService.getActiveEmotions(any(Long.class), any(String.class)))
                     .willReturn(emotionResponses);
 
@@ -99,7 +100,7 @@ class EmotionControllerTest extends ControllerTestSetup {
                 //given
                 String language = "en";
                 List<GetActiveEmotionsResponse> emotionResponses = GetActiveEmotionsResponse.buildWithEmotions(
-                    List.of(getEmotion(), getEmotion()), language);
+                    List.of(createEmotion(), createEmotion()), language);
                 given(emotionService.getActiveEmotions(any(Long.class), any(String.class)))
                     .willReturn(emotionResponses);
 
@@ -125,7 +126,7 @@ class EmotionControllerTest extends ControllerTestSetup {
                 //given
                 String language = "hello";
                 List<GetActiveEmotionsResponse> emotionResponses = GetActiveEmotionsResponse.buildWithEmotions(
-                    List.of(getEmotion(), getEmotion()), "ko");
+                    List.of(createEmotion(), createEmotion()), "ko");
                 given(emotionService.getActiveEmotions(any(Long.class), any(String.class)))
                     .willReturn(emotionResponses);
 
@@ -150,7 +151,7 @@ class EmotionControllerTest extends ControllerTestSetup {
             void not_query_parameter_than_return_korean_emotion() throws Exception {
                 //given
                 List<GetActiveEmotionsResponse> emotionResponses = GetActiveEmotionsResponse.buildWithEmotions(
-                    List.of(getEmotion(), getEmotion()), "ko");
+                    List.of(createEmotion(), createEmotion()), "ko");
                 given(emotionService.getActiveEmotions(any(Long.class), any(String.class)))
                     .willReturn(emotionResponses);
 
@@ -190,7 +191,7 @@ class EmotionControllerTest extends ControllerTestSetup {
             content.put("colorHex", colorHex);
             content.put("colorPrompt", colorPrompt);
             List<CreateEmotionResponse> createEmotionResponses = Stream.of(
-                    getEmotion(), getEmotion())
+                    createEmotion(), createEmotion())
                 .map(CreateEmotionResponse::of)
                 .collect(Collectors.toList());
             given(emotionService.createEmotions(anyList())).willReturn(createEmotionResponses);
