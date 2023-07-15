@@ -35,7 +35,7 @@ public class AdminController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "일기 목록"),
+            description = "일기 목록. Pagination에 대한 세부 항목은 노션의 pageable 필드 설명 문서를 참고해주세요."),
         @ApiResponse(
             responseCode = "403",
             description = "D002 : 접근할 권한이 없습니다.",
