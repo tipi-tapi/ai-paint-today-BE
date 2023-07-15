@@ -45,7 +45,7 @@ class AdminServiceTest {
 
         @Nested
         @DisplayName("관리자가 아닌 유저가 호출하면")
-        class IfUserIsNotAdmin {
+        class if_user_is_not_admin {
 
             @Test
             @DisplayName("UserAccessDeniedException 예외가 발생한다.")
@@ -63,7 +63,7 @@ class AdminServiceTest {
 
         @Nested
         @DisplayName("관리자인 유저가 호출하면")
-        class IfUserIsAdmin {
+        class is_user_is_admin {
 
             @Test
             @DisplayName("페이지네이션이 적용된 일기 목록을 반환한다.")
