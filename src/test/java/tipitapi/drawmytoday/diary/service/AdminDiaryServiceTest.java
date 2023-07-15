@@ -43,11 +43,11 @@ class AdminDiaryServiceTest {
             diaries.add(createDiaryForMonitorQueryResponse(1L,
                 "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/1.png",
                 "joyful , pink , canvas-textured, Oil Pastel, a crowded subway",
-                "2023-06-16T15:00:00.000+00:00"));
+                "2023-06-16 15:00:00.0"));
             diaries.add(createDiaryForMonitorQueryResponse(2L,
                 "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/2.png",
                 "angry , purple , canvas-textured, Oil Pastel, school",
-                "2023-06-17T15:00:00.000+00:00"));
+                "2023-06-17 15:00:00.0"));
             given(
                 diaryRepository.getAllDiariesForMonitorAsPage(any(Pageable.class)))
                 .willReturn(new PageImpl<>(diaries));
