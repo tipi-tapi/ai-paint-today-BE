@@ -7,6 +7,8 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.common.exception.BusinessException;
+import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
@@ -46,6 +48,7 @@ public class CreateDiaryService {
         // TODO: 광고 추가시 일기 생성 제한 로직으로 변경 필요
         User user = validateUserService.validateUserById(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
+        validateCreateDiaryDate(createDiaryDate);
         String prompt = promptTextService.createPromptText(emotion, keyword);
         String encryptedNotes = encryptor.encrypt(notes);
 
@@ -71,6 +74,12 @@ public class CreateDiaryService {
         } catch (DallERequestFailException | ImageInputStreamFailException e) {
             promptService.createPrompt(prompt, false);
             throw e;
+        }
+    }
+
+    private void validateCreateDiaryDate(LocalDate createDiaryDate) {
+        if (createDiaryDate.isAfter(LocalDate.now())) {
+            throw new BusinessException(ErrorCode.INVALID_CREATE_DIARY_DATE);
         }
     }
 
