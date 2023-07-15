@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.common.testdata;
 import org.springframework.test.util.ReflectionTestUtils;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.user.domain.UserRole;
 
 public class TestUser {
 
@@ -13,6 +14,12 @@ public class TestUser {
     public static User createUserWithId(Long userId) {
         User user = createUser();
         ReflectionTestUtils.setField(user, "userId", userId);
+        return user;
+    }
+
+    public static User createAdminUserWithId(Long userId) {
+        User user = createUserWithId(userId);
+        ReflectionTestUtils.setField(user, "userRole", UserRole.ADMIN);
         return user;
     }
 }
