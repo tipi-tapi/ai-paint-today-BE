@@ -35,5 +35,5 @@ public class CreateDiaryRequest {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @Schema(description = "일기 날짜")
-    private LocalDate createDiaryDate;
+    private LocalDate diaryDate;
 }

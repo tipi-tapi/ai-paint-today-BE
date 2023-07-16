@@ -142,7 +142,7 @@ public class DiaryController {
         return SuccessResponse.of(
             createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getCreateDiaryDate(), test)
+                createDiaryRequest.getDiaryDate(), test)
         ).asHttp(HttpStatus.CREATED);
     }
 

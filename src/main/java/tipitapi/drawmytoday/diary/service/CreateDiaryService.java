@@ -42,18 +42,18 @@ public class CreateDiaryService {
         noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
             ImageInputStreamFailException.class})
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
-        String notes, LocalDate createDiaryDate, boolean test)
+        String notes, LocalDate diaryDate, boolean test)
         throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
         // TODO: 광고 추가시 일기 생성 제한 로직으로 변경 필요
         User user = validateUserService.validateUserById(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
-        validateCreateDiaryDate(createDiaryDate);
+        validateCreateDiaryDate(diaryDate);
         String prompt = promptTextService.createPromptText(emotion, keyword);
         String encryptedNotes = encryptor.encrypt(notes);
 
         if (test) {
-            return createDummyDiary(user, emotion, prompt, encryptedNotes, createDiaryDate);
+            return createDummyDiary(user, emotion, prompt, encryptedNotes, diaryDate);
         }
 
         try {
@@ -61,7 +61,7 @@ public class CreateDiaryService {
 
             Diary diary = diaryRepository.save(
                 Diary.builder().user(user).emotion(emotion)
-                    .diaryDate(createDiaryDate.atTime(LocalTime.now()))
+                    .diaryDate(diaryDate.atTime(LocalTime.now()))
                     .notes(encryptedNotes)
                     .isAi(true).build());
             promptService.createPrompt(diary, prompt, true);
@@ -89,10 +89,10 @@ public class CreateDiaryService {
     }
 
     private CreateDiaryResponse createDummyDiary(User user, Emotion emotion, String prompt,
-        String notes, LocalDate createDiaryDate) {
+        String notes, LocalDate diaryDate) {
         Diary diary = diaryRepository.save(
             Diary.builder().user(user).emotion(emotion)
-                .diaryDate(createDiaryDate.atTime(LocalTime.now()))
+                .diaryDate(diaryDate.atTime(LocalTime.now()))
                 .notes(notes).isAi(true).build());
         promptService.createPrompt(diary, prompt, true);
         imageService.createImage(diary, DUMMY_IMAGE_PATH, true);
