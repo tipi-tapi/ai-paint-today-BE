@@ -15,9 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.test.context.jdbc.Sql;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.diary.domain.Diary;
+import tipitapi.drawmytoday.diary.dto.DiaryForMonitorQueryResponse;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.User;
 
@@ -210,6 +216,33 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
 
                 assertThat(diaryRepository.findById(1L)).isNotPresent();
 
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("getAllDiariesForMonitorAsPage 메소드 테스트")
+    class GetAllDiariesForMonitorAsPageTest {
+
+        @Nested
+        @DisplayName("삭제된 일기가 있을 경우")
+        class if_deleted_diary_exist {
+
+            @Test
+            @DisplayName("삭제된 일기를 포함한 일기 리스트를 반환한다.")
+            @Sql("GetAllDiariesForMonitorAsPageTest.sql")
+            void return_diary_list_includes_deleted() {
+                int page = 0;
+                int size = 5;
+                Direction direction = Direction.DESC;
+                Page<DiaryForMonitorQueryResponse> response = diaryRepository.getAllDiariesForMonitorAsPage(
+                    PageRequest.of(page, size, Sort.by(direction, "created_at", "diary_id")));
+
+                assertThat(response.getTotalElements()).isEqualTo(10);
+                assertThat(response.getContent().size()).isEqualTo(5);
+                assertThat(response.getTotalPages()).isEqualTo(2);
+                assertThat(response.getSort().isSorted()).isTrue();
+                assertThat(response.getContent().get(0).getId()).isEqualTo(10L);
             }
         }
     }

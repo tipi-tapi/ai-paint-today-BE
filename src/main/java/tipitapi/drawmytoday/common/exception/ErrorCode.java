@@ -33,6 +33,7 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(409, "U002", "이미 존재하는 유저입니다."),
     DUPLICATE_USER(400, "U003", "유저가 중복되었습니다."),
     USER_ALREADY_DRAW_DIARY(400, "U004", "이미 그림일기를 그린 유저입니다."),
+    USER_ACCESS_DENIED(403, "U005", "접근할 수 있는 권한이 없습니다."),
 
     // Diary
     DIARY_NOT_FOUND(404, "D001", "일기를 찾을 수 없습니다."),

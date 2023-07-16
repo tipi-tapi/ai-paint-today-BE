@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.user.domain;
 
 public enum UserRole {
-    GUEST("ROLE_GUEST"),
+    ADMIN("ROLE_ADMIN"),
     USER("ROLE_USER");
 
     private final String key;

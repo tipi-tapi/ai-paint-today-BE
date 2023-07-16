@@ -8,6 +8,7 @@ import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.user.exception.UserAccessDeniedException;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.repository.UserRepository;
 
@@ -40,6 +41,15 @@ public class ValidateUserService {
                 return user;
             }
             throw new BusinessException(ErrorCode.USER_ALREADY_DRAW_DIARY);
+        }
+    }
+
+    public User validateAdminUserById(Long userId) {
+        User user = validateUserById(userId);
+        if (user.isAdmin()) {
+            return user;
+        } else {
+            throw new UserAccessDeniedException();
         }
     }
 }
