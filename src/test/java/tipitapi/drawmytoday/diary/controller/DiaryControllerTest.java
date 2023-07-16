@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,6 +160,7 @@ class DiaryControllerTest extends ControllerTestSetup {
 
         private final String keyword = "keyword";
         private final String notes = "notes";
+        private final LocalDate createDiaryDate = LocalDate.now();
         private final Long emotionId = 1L;
 
         @Nested
@@ -182,7 +184,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), anyBoolean());
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
+                    anyBoolean());
             }
 
             @Test
@@ -204,7 +207,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), anyBoolean());
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
+                    anyBoolean());
             }
 
             @Test
@@ -226,7 +230,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), anyBoolean());
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
+                    anyBoolean());
             }
         }
 
@@ -240,7 +245,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 Long diaryId = 1L;
                 given(createDiaryService.createDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, false))
+                    REQUEST_USER_ID, emotionId, keyword, notes, createDiaryDate, false))
                     .willReturn(new CreateDiaryResponse(diaryId));
 
                 // when
@@ -248,6 +253,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 requestMap.put("emotionId", emotionId);
                 requestMap.put("keyword", keyword);
                 requestMap.put("notes", notes);
+                requestMap.put("createDiaryDate", createDiaryDate);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
 
                 ResultActions result = mockMvc.perform(post(BASIC_URL)
@@ -265,7 +271,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 Long testDiaryId = 1L;
                 given(createDiaryService.createDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, true))
+                    REQUEST_USER_ID, emotionId, keyword, notes, createDiaryDate, true))
                     .willReturn(new CreateDiaryResponse(testDiaryId));
 
                 // when
@@ -273,6 +279,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 requestMap.put("emotionId", emotionId);
                 requestMap.put("keyword", keyword);
                 requestMap.put("notes", notes);
+                requestMap.put("createDiaryDate", createDiaryDate);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
 
                 ResultActions result = mockMvc.perform(post(BASIC_URL)
