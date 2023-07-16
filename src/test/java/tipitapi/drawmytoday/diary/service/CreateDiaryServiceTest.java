@@ -69,7 +69,7 @@ class CreateDiaryServiceTest {
         private final String KEYWORD = "키워드";
         private final String NOTES = "노트";
         private final LocalDate CREATE_DIARY_DATE = LocalDate.now();
-        private final boolean TEST = false;
+        private final boolean NON_TEST = false;
 
         @Nested
         @DisplayName("파라미터로 받은 createDiaryDate가")
@@ -84,7 +84,7 @@ class CreateDiaryServiceTest {
                 //when
                 //then
                 assertThatThrownBy(() -> createDiaryService.createDiary(
-                    USER_ID, EMOTION_ID, KEYWORD, NOTES, afterCreateDiaryDate, TEST))
+                    USER_ID, EMOTION_ID, KEYWORD, NOTES, afterCreateDiaryDate, NON_TEST))
                     .isInstanceOf(BusinessException.class);
             }
         }
@@ -184,7 +184,7 @@ class CreateDiaryServiceTest {
                 //when
                 //then
                 assertThatThrownBy(() -> createDiaryService.createDiary(
-                    USER_ID, EMOTION_ID, KEYWORD, NOTES, CREATE_DIARY_DATE, TEST))
+                    USER_ID, EMOTION_ID, KEYWORD, NOTES, CREATE_DIARY_DATE, NON_TEST))
                     .isInstanceOf(exceptionClass);
                 assertThat(user.getLastDiaryDate().isEqual(lastDateTime)).isTrue();
                 verify(promptService).createPrompt(eq(prompt), eq(false));
