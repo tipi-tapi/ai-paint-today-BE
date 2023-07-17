@@ -194,7 +194,7 @@ public class DiaryController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "일기 생성 가능 여부 조회", description = "유저가 금일 일기를 생성할 수 있는지 여부를 반환한다.")
+    @Operation(summary = "일기 생성 가능 여부 조회", description = "유저가 일기를 생성할 수 있는지 여부를 반환한다.")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",

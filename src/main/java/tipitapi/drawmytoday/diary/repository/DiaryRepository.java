@@ -24,7 +24,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
             "SELECT d.diary_id AS id, i.image_url AS imageUrl, p.prompt_text AS prompt, d.created_at AS createdAt FROM diary AS d "
                 + "LEFT JOIN image AS i ON d.diary_id = i.diary_id "
                 + "LEFT JOIN prompt AS p ON d.diary_id = p.diary_id",
-        countQuery = "SELECT COUNT(*) FROM Diary",
+        countQuery = "SELECT COUNT(*) FROM diary",
         nativeQuery = true
     )
     Page<DiaryForMonitorQueryResponse> getAllDiariesForMonitorAsPage(Pageable pageable);
