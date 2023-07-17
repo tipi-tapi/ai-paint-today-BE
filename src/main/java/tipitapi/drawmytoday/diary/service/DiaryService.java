@@ -68,10 +68,13 @@ public class DiaryService {
         int day) {
         User user = validateUserService.validateUserById(userId);
         Date date = DateUtils.getDate(year, month, day);
-        return diaryRepository.findByUserIdAndDiaryDate(user.getUserId(), date)
-            .stream().findFirst()
-            .map(diary -> GetDiaryExistByDateResponse.ofExist(diary.getDiaryId()))
-            .orElseGet(GetDiaryExistByDateResponse::ofNotExist);
+        List<Diary> diaries = diaryRepository.findByUserIdAndDiaryDate(
+            user.getUserId(), date);
+        if (diaries.isEmpty()) {
+            return GetDiaryExistByDateResponse.ofNotExist();
+        } else {
+            return GetDiaryExistByDateResponse.ofExist(diaries.get(0).getDiaryId());
+        }
     }
 
     public GetLastCreationResponse getLastCreation(Long userId) {
