@@ -14,6 +14,8 @@ import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +34,7 @@ import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
+import tipitapi.drawmytoday.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
@@ -213,6 +216,130 @@ class DiaryServiceTest {
 
                 assertThat(getDiaryResponses).hasSize(1);
                 assertThat(getDiaryResponses.get(0).getId()).isEqualTo(diary.getDiaryId());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("getDiaryExistByDate 메소드 테스트")
+    class GetDiaryExistByDateTest {
+
+        @Nested
+        @DisplayName("userId에 해당하는 유저가 존재하지 않을 경우")
+        class if_user_not_exists {
+
+            @Test
+            @DisplayName("UserNotFoundException 예외를 발생시킨다.")
+            void it_throws_UserNotFoundException() {
+                given(validateUserService.validateUserById(1L)).willThrow(
+                    new UserNotFoundException());
+
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, 1))
+                    .isInstanceOf(UserNotFoundException.class);
+            }
+        }
+
+        @Nested
+        @DisplayName("month 값이")
+        class if_month_value {
+
+            @ParameterizedTest
+            @DisplayName("1보다 작을 경우 BusinessException 예외를 발생시킨다.")
+            @ValueSource(ints = {0, -1})
+            void less_1_then_throws_BusinessException(int value) {
+                User user = createUser();
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, value, 1))
+                    .isInstanceOf(BusinessException.class);
+            }
+
+            @ParameterizedTest
+            @DisplayName("12보다 클 경우 BusinessException 예외를 발생시킨다.")
+            @ValueSource(ints = {13, 14, 999})
+            void more_12_then_throws_BusinessException(int value) {
+                User user = createUser();
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, value, 1))
+                    .isInstanceOf(BusinessException.class);
+            }
+        }
+
+        @Nested
+        @DisplayName("day 값이")
+        class if_day_value {
+
+            @ParameterizedTest
+            @DisplayName("1보다 작을 경우 BusinessException 예외를 발생시킨다.")
+            @ValueSource(ints = {0, -1})
+            void less_1_then_throws_BusinessException(int value) {
+                User user = createUser();
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, value))
+                    .isInstanceOf(BusinessException.class);
+            }
+
+            @ParameterizedTest
+            @DisplayName("31 보다 클 경우 BusinessException 예외를 발생시킨다.")
+            @ValueSource(ints = {32, 100})
+            void more_12_then_throws_BusinessException(int value) {
+                User user = createUser();
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, value))
+                    .isInstanceOf(BusinessException.class);
+            }
+
+            @Test
+            @DisplayName("30일이 최대인 달에 31일이 입력될 경우 BusinessException 예외를 발생시킨다.")
+            void exceeds_maximum_day_30_then_throws_BusinessException() {
+                User user = createUser();
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, 31))
+                    .isInstanceOf(BusinessException.class);
+            }
+        }
+
+        @Nested
+        @DisplayName("해당 날짜의 일기가 존재하지 않는 경우")
+        class if_diary_not_exists {
+
+            @Test
+            @DisplayName("false를 반환한다.")
+            void it_returns_false() {
+                User user = createUserWithId(1L);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(diaryRepository.findByUserIdAndDiaryDate(anyLong(), any(Date.class)))
+                    .willReturn(new ArrayList<>());
+
+                GetDiaryExistByDateResponse response = diaryService.getDiaryExistByDate(
+                    1L, 2023, 6, 1);
+
+                assertThat(response.isExist()).isFalse();
+            }
+        }
+
+        @Nested
+        @DisplayName("해당 날짜의 일기가 존재하는 경우")
+        class if_diary_exists {
+
+            @Test
+            @DisplayName("true를 반환한다.")
+            void it_returns_true() {
+                User user = createUserWithId(1L);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                Diary diary = createDiaryWithId(1L, user, createEmotion());
+                given(diaryRepository.findByUserIdAndDiaryDate(anyLong(), any(Date.class)))
+                    .willReturn(List.of(diary));
+
+                GetDiaryExistByDateResponse response = diaryService.getDiaryExistByDate(
+                    1L, 2023, 6, 1);
+
+                assertThat(response.isExist()).isTrue();
+                assertThat(response.getDiaryId()).isEqualTo(1L);
             }
         }
     }
