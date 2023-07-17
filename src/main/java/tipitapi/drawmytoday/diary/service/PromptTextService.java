@@ -1,13 +1,18 @@
 package tipitapi.drawmytoday.diary.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 
 @Service
+@Transactional(readOnly = true)
 public class PromptTextService {
 
     public String createPromptText(Emotion emotion, String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            keyword = "emotional";
+        }
         return promptTextBuilder(
             emotion.getEmotionPrompt(),
             emotion.getColorPrompt(),
