@@ -5,6 +5,7 @@ import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithCrea
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithDate;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -243,6 +244,74 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                 assertThat(response.getTotalPages()).isEqualTo(2);
                 assertThat(response.getSort().isSorted()).isTrue();
                 assertThat(response.getContent().get(0).getId()).isEqualTo(10L);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("findByUserIdAndDiaryDate")
+    class FindByUserIdAndDiaryDateTest {
+
+        private final LocalDateTime DIARY_DATE_TIME = LocalDateTime.of(2021, 1, 1, 0, 0);
+        private final Date DIARY_DATE = Date.valueOf(DIARY_DATE_TIME.toLocalDate());
+
+        @Nested
+        @DisplayName("해당 날짜에 일기가 없을 경우")
+        class if_diary_not_exist_at_date {
+
+            @Test
+            @DisplayName("빈 리스트를 반환한다.")
+            void return_empty_list() {
+                assertThat(
+                    diaryRepository.findByUserIdAndDiaryDate(createUser().getUserId(), DIARY_DATE))
+                    .isEmpty();
+            }
+        }
+
+        @Nested
+        @DisplayName("해당 날짜에 일기가 있을 경우")
+        class if_diary_exist_at_date {
+
+            @Nested
+            @DisplayName("여러개의 일기가 있을 경우")
+            class if_diary_exist_more_than_one {
+
+                @Test
+                @DisplayName("최신순으로 해당 날짜의 일기 리스트를 반환한다.")
+                void return_diaries_order_by_newest() {
+                    User user = createUser();
+                    Emotion emotion = createEmotion();
+                    Diary prevDiary = diaryRepository.save(
+                        createDiaryWithDate(DIARY_DATE_TIME, user, emotion));
+                    Diary lastDiary = diaryRepository.save(
+                        createDiaryWithDate(DIARY_DATE_TIME, user, emotion));
+
+                    List<Diary> diaries = diaryRepository.findByUserIdAndDiaryDate(user.getUserId(),
+                        DIARY_DATE);
+
+                    assertThat(diaries.size()).isEqualTo(2);
+                    assertThat(diaries.get(0).getDiaryId()).isEqualTo(lastDiary.getDiaryId());
+                    assertThat(diaries.get(1).getDiaryId()).isEqualTo(prevDiary.getDiaryId());
+                }
+            }
+
+            @Nested
+            @DisplayName("한개의 일기만 있을 경우")
+            class if_diary_exist_only_one {
+
+                @Test
+                @DisplayName("해당 날짜의 일기를 반환한다.")
+                void return_diary() {
+                    User user = createUser();
+                    LocalDateTime diaryDate = LocalDateTime.of(2021, 1, 1, 0, 0);
+                    Diary diary = diaryRepository.save(
+                        createDiaryWithDate(diaryDate, user, createEmotion()));
+
+                    List<Diary> diaryList = diaryRepository.findByUserIdAndDiaryDate(
+                        user.getUserId(), DIARY_DATE);
+                    assertThat(diaryList.size()).isEqualTo(1);
+                    assertThat(diaryList.get(0).getDiaryId()).isEqualTo(diary.getDiaryId());
+                }
             }
         }
     }

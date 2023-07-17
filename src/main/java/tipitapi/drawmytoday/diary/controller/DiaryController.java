@@ -29,6 +29,7 @@ import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
@@ -92,6 +93,33 @@ public class DiaryController {
     ) {
         return SuccessResponse.of(
             diaryService.getMonthlyDiaries(tokenInfo.getUserId(), year, month)
+        ).asHttp(HttpStatus.OK);
+    }
+
+    @Operation(summary = "특정 날짜 일기 존재 여부 조회", description = "특정 날짜에 일기가 존재하는지 조회하여 반환한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "존재 여부와, 존재할 경우 일기 ID를 반환한다."),
+        @ApiResponse(
+            responseCode = "400",
+            description = "C001 : month 값이 1~12 사이의 정수가 아닙니다.\n"
+                + "C001 : day 값이 1~31 사이의 정수가 아닙니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "U001: 해당 토큰의 유저를 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+    })
+    @GetMapping("/calendar/date")
+    public ResponseEntity<SuccessResponse<GetDiaryExistByDateResponse>> getDiaryExistByDate(
+        @Parameter(description = "조회할 연도", in = ParameterIn.QUERY) @RequestParam("year") int year,
+        @Parameter(description = "조회할 달", in = ParameterIn.QUERY) @RequestParam("month") int month,
+        @Parameter(description = "조회할 일", in = ParameterIn.QUERY) @RequestParam("day") int day,
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+    ) {
+        return SuccessResponse.of(
+            diaryService.getDiaryExistByDate(tokenInfo.getUserId(), year, month, day)
         ).asHttp(HttpStatus.OK);
     }
 

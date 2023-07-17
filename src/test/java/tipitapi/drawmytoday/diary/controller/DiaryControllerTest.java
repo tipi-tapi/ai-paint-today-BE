@@ -35,6 +35,7 @@ import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
@@ -131,6 +132,63 @@ class DiaryControllerTest extends ControllerTestSetup {
                 .andExpect(
                     jsonPath("$.data[0].date").value(monthlyDiaries.get(0).getDate().toString()));
         }
+    }
+
+    @Nested
+    @DisplayName("getDiaryExistByDate 메서드는")
+    class GetDiaryExistByDateTest {
+
+        @Nested
+        @DisplayName("주어진 날짜에 일기가 존재하지 않는다면")
+        class if_diary_not_exist_at_date {
+
+            @Test
+            @DisplayName("false를 응답한다.")
+            void return_false() throws Exception {
+                // given
+                int year = 2023, month = 7, day = 1;
+                given(diaryService.getDiaryExistByDate(REQUEST_USER_ID, year, month, day))
+                    .willReturn(GetDiaryExistByDateResponse.ofNotExist());
+
+                // when
+                ResultActions result = mockMvc.perform(get(BASIC_URL + "/calendar/date")
+                    .queryParam("year", String.valueOf(year))
+                    .queryParam("month", String.valueOf(month))
+                    .queryParam("day", String.valueOf(day)));
+
+                // then
+                result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.exist").value(false))
+                    .andExpect(jsonPath("$.data.diaryId").doesNotExist());
+            }
+        }
+
+        @Nested
+        @DisplayName("주어진 날짜에 일기가 존재한다면")
+        class if_diary_exist_at_date {
+
+            @Test
+            @DisplayName("true와 일기 ID를 응답한다.")
+            void return_true_and_diary_id() throws Exception {
+                // given
+                int year = 2023, month = 7, day = 1;
+                long diaryId = 1L;
+                given(diaryService.getDiaryExistByDate(REQUEST_USER_ID, year, month, day))
+                    .willReturn(GetDiaryExistByDateResponse.ofExist(diaryId));
+
+                // when
+                ResultActions result = mockMvc.perform(get(BASIC_URL + "/calendar/date")
+                    .queryParam("year", String.valueOf(year))
+                    .queryParam("month", String.valueOf(month))
+                    .queryParam("day", String.valueOf(day)));
+
+                // then
+                result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.exist").value(true))
+                    .andExpect(jsonPath("$.data.diaryId").value(diaryId));
+            }
+        }
+
     }
 
     @Nested
