@@ -106,10 +106,6 @@ public class DiaryController {
             description = "C001 : month 값이 1~12 사이의 정수가 아닙니다.\n"
                 + "C001 : day 값이 1~31 사이의 정수가 아닙니다.",
             content = @Content(schema = @Schema(hidden = true))),
-        @ApiResponse(
-            responseCode = "404",
-            description = "U001: 해당 토큰의 유저를 찾을 수 없습니다.",
-            content = @Content(schema = @Schema(hidden = true))),
     })
     @GetMapping("/calendar/date")
     public ResponseEntity<SuccessResponse<GetDiaryExistByDateResponse>> getDiaryExistByDate(
