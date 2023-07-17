@@ -1,10 +1,14 @@
 package tipitapi.drawmytoday.diary.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.common.exception.BusinessException;
+import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
@@ -38,24 +42,26 @@ public class CreateDiaryService {
         noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
             ImageInputStreamFailException.class})
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
-        String notes, boolean test)
+        String notes, LocalDate diaryDate, boolean test)
         throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
         // TODO: 광고 추가시 일기 생성 제한 로직으로 변경 필요
-        User user = validateUserService.validateUserById(userId);
+        User user = validateUserService.validateUserWithDrawLimit(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
+        validateCreateDiaryDate(diaryDate);
         String prompt = promptTextService.createPromptText(emotion, keyword);
         String encryptedNotes = encryptor.encrypt(notes);
 
         if (test) {
-            return createDummyDiary(user, emotion, prompt, encryptedNotes);
+            return createDummyDiary(user, emotion, prompt, encryptedNotes, diaryDate);
         }
 
         try {
             byte[] dallEImage = dallEService.getImageAsUrl(prompt);
 
             Diary diary = diaryRepository.save(
-                Diary.builder().user(user).emotion(emotion).diaryDate(LocalDateTime.now())
+                Diary.builder().user(user).emotion(emotion)
+                    .diaryDate(diaryDate.atTime(LocalTime.now()))
                     .notes(encryptedNotes)
                     .isAi(true).build());
             promptService.createPrompt(diary, prompt, true);
@@ -71,15 +77,22 @@ public class CreateDiaryService {
         }
     }
 
+    private void validateCreateDiaryDate(LocalDate diaryDate) {
+        if (diaryDate.isAfter(LocalDate.now())) {
+            throw new BusinessException(ErrorCode.INVALID_CREATE_DIARY_DATE);
+        }
+    }
+
     private String getImagePath(Long diaryId, int index) {
         return String.format("post/%d/%s_%d.png", diaryId,
             new Date().getTime(), index);
     }
 
     private CreateDiaryResponse createDummyDiary(User user, Emotion emotion, String prompt,
-        String notes) {
+        String notes, LocalDate diaryDate) {
         Diary diary = diaryRepository.save(
-            Diary.builder().user(user).emotion(emotion).diaryDate(LocalDateTime.now())
+            Diary.builder().user(user).emotion(emotion)
+                .diaryDate(diaryDate.atTime(LocalTime.now()))
                 .notes(notes).isAi(true).build());
         promptService.createPrompt(diary, prompt, true);
         imageService.createImage(diary, DUMMY_IMAGE_PATH, true);

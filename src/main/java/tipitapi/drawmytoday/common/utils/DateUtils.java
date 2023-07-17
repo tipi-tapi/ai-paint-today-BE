@@ -1,5 +1,7 @@
 package tipitapi.drawmytoday.common.utils;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
@@ -20,8 +22,20 @@ public class DateUtils {
         return LocalDateTime.of(year, month, getMaxDay(month), 23, 59);
     }
 
+    public static Date getDate(int year, int month, int day) {
+        validateDate(month, day);
+        return Date.valueOf(LocalDate.of(year, month, day));
+    }
+
     private static void validateMonth(int month) {
         if (month > 12 || month < 1) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
+
+    private static void validateDate(int month, int day) {
+        validateMonth(month);
+        if (day > getMaxDay(month) || day < 1) {
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
         }
     }

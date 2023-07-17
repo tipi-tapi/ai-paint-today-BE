@@ -29,6 +29,7 @@ import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
+import tipitapi.drawmytoday.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
@@ -74,7 +75,7 @@ public class DiaryController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "입력한 연도의 월에 해당하는 일기 목록이 없으면 배열을 반환하지 않는다."),
+            description = "입력한 연도와 월에 해당하는 일기 목록을 반환한다."),
         @ApiResponse(
             responseCode = "400",
             description = "C001 : month 값이 1~12 사이의 정수가 아닙니다.",
@@ -92,6 +93,29 @@ public class DiaryController {
     ) {
         return SuccessResponse.of(
             diaryService.getMonthlyDiaries(tokenInfo.getUserId(), year, month)
+        ).asHttp(HttpStatus.OK);
+    }
+
+    @Operation(summary = "특정 날짜 일기 존재 여부 조회", description = "특정 날짜에 일기가 존재하는지 조회하여 반환한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "존재 여부와, 존재할 경우 일기 ID를 반환한다."),
+        @ApiResponse(
+            responseCode = "400",
+            description = "C001 : month 값이 1~12 사이의 정수가 아닙니다.\n"
+                + "C001 : day 값이 1~31 사이의 정수가 아닙니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+    })
+    @GetMapping("/calendar/date")
+    public ResponseEntity<SuccessResponse<GetDiaryExistByDateResponse>> getDiaryExistByDate(
+        @Parameter(description = "조회할 연도", in = ParameterIn.QUERY) @RequestParam("year") int year,
+        @Parameter(description = "조회할 달", in = ParameterIn.QUERY) @RequestParam("month") int month,
+        @Parameter(description = "조회할 일", in = ParameterIn.QUERY) @RequestParam("day") int day,
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+    ) {
+        return SuccessResponse.of(
+            diaryService.getDiaryExistByDate(tokenInfo.getUserId(), year, month, day)
         ).asHttp(HttpStatus.OK);
     }
 
@@ -141,7 +165,8 @@ public class DiaryController {
     ) throws DallERequestFailException, ImageInputStreamFailException {
         return SuccessResponse.of(
             createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
-                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(), test)
+                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
+                createDiaryRequest.getDiaryDate(), test)
         ).asHttp(HttpStatus.CREATED);
     }
 
@@ -193,7 +218,7 @@ public class DiaryController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "일기 생성 가능 여부 조회", description = "유저가 금일 일기를 생성할 수 있는지 여부를 반환한다.")
+    @Operation(summary = "일기 생성 가능 여부 조회", description = "유저가 일기를 생성할 수 있는지 여부를 반환한다.")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",

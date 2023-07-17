@@ -25,6 +25,7 @@ jobs:
                     files: ${{ env.APPLICATION_PATH }}
                 env:
                     encryptor.secret.key: ${{ secrets.ENCRYPTOR_SECRET_KEY }}
+                    presigned-image.expiration.admin-diaries: ${{ secrets.PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES }}
 
             -   name: application-prod.yml setting
                 uses: microsoft/variable-substitution@v1
