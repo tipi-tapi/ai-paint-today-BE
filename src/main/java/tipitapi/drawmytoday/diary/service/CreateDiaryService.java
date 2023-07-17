@@ -77,8 +77,8 @@ public class CreateDiaryService {
         }
     }
 
-    private void validateCreateDiaryDate(LocalDate createDiaryDate) {
-        if (createDiaryDate.isAfter(LocalDate.now())) {
+    private void validateCreateDiaryDate(LocalDate diaryDate) {
+        if (diaryDate.isAfter(LocalDate.now())) {
             throw new BusinessException(ErrorCode.INVALID_CREATE_DIARY_DATE);
         }
     }
