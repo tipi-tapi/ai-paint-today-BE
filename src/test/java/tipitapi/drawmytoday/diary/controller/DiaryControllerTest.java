@@ -218,7 +218,7 @@ class DiaryControllerTest extends ControllerTestSetup {
 
         private final String keyword = "keyword";
         private final String notes = "notes";
-        private final LocalDate createDiaryDate = LocalDate.now();
+        private final LocalDate diaryDate = LocalDate.now();
         private final Long emotionId = 1L;
 
         @Nested
@@ -303,7 +303,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 Long diaryId = 1L;
                 given(createDiaryService.createDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, createDiaryDate, false))
+                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate, false))
                     .willReturn(new CreateDiaryResponse(diaryId));
 
                 // when
@@ -311,7 +311,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 requestMap.put("emotionId", emotionId);
                 requestMap.put("keyword", keyword);
                 requestMap.put("notes", notes);
-                requestMap.put("createDiaryDate", createDiaryDate);
+                requestMap.put("diaryDate", diaryDate);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
 
                 ResultActions result = mockMvc.perform(post(BASIC_URL)
@@ -329,7 +329,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 Long testDiaryId = 1L;
                 given(createDiaryService.createDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, createDiaryDate, true))
+                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate, true))
                     .willReturn(new CreateDiaryResponse(testDiaryId));
 
                 // when
@@ -337,7 +337,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 requestMap.put("emotionId", emotionId);
                 requestMap.put("keyword", keyword);
                 requestMap.put("notes", notes);
-                requestMap.put("createDiaryDate", createDiaryDate);
+                requestMap.put("diaryDate", diaryDate);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
 
                 ResultActions result = mockMvc.perform(post(BASIC_URL)

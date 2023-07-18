@@ -49,7 +49,7 @@ class AdminDiaryServiceTest {
                 "angry , purple , canvas-textured, Oil Pastel, school",
                 "2023-06-17 15:00:00.0"));
             given(
-                diaryRepository.getAllDiariesForMonitorAsPage(any(Pageable.class)))
+                diaryRepository.getAllDiariesForMonitorAsPage(any(Pageable.class), any()))
                 .willReturn(new PageImpl<>(diaries));
 
             // when

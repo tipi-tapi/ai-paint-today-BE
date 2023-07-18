@@ -106,7 +106,7 @@ class CreateDiaryServiceTest {
                 String prompt = "test prompt";
                 String encryptedNotes = "encrypted notes";
                 Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
-                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(encryptor.encrypt(NOTES)).willReturn(encryptedNotes);
@@ -122,7 +122,7 @@ class CreateDiaryServiceTest {
                 verify(dallEService, never()).getImageAsUrl(any(String.class));
                 verify(s3Service, never()).uploadImage(any(byte[].class), any(String.class));
                 verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
-                verify(imageService).createImage(eq(diary), any(String.class), eq(true));
+                verify(imageService).createImage(eq(diary), any(), eq(true));
             }
 
             @Test
@@ -139,7 +139,7 @@ class CreateDiaryServiceTest {
                 String encryptedNotes = "encrypted notes";
                 byte[] image = new byte[1];
                 Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
-                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(encryptor.encrypt(NOTES)).willReturn(encryptedNotes);
@@ -176,7 +176,7 @@ class CreateDiaryServiceTest {
                 user.setLastDiaryDate(lastDateTime);
                 Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
                 String prompt = "test prompt";
-                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(dallEService.getImageAsUrl(eq(prompt))).willThrow(exceptionClass);
