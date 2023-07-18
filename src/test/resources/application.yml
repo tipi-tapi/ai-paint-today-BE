@@ -21,3 +21,7 @@ logging:
     level:
         org.hibernate.sql: debug
         org.hibernate.type: trace
+
+dummy:
+    image:
+        path: "test/dummy.png"

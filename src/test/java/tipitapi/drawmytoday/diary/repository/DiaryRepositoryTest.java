@@ -8,11 +8,13 @@ import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -22,8 +24,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.jdbc.Sql;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
+import tipitapi.drawmytoday.common.testdata.TestDiary;
+import tipitapi.drawmytoday.common.testdata.TestEmotion;
+import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.diary.domain.Diary;
+import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.diary.dto.DiaryForMonitorQueryResponse;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.User;
@@ -225,6 +231,9 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
     @DisplayName("getAllDiariesForMonitorAsPage 메소드 테스트")
     class GetAllDiariesForMonitorAsPageTest {
 
+        @Value("${dummy.image.path}")
+        private String dummyImageUrl;
+
         @Nested
         @DisplayName("삭제된 일기가 있을 경우")
         class if_deleted_diary_exist {
@@ -237,13 +246,43 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                 int size = 5;
                 Direction direction = Direction.DESC;
                 Page<DiaryForMonitorQueryResponse> response = diaryRepository.getAllDiariesForMonitorAsPage(
-                    PageRequest.of(page, size, Sort.by(direction, "created_at", "diary_id")));
+                    PageRequest.of(page, size, Sort.by(direction, "created_at", "diary_id")),
+                    dummyImageUrl);
 
                 assertThat(response.getTotalElements()).isEqualTo(10);
                 assertThat(response.getContent().size()).isEqualTo(5);
                 assertThat(response.getTotalPages()).isEqualTo(2);
                 assertThat(response.getSort().isSorted()).isTrue();
                 assertThat(response.getContent().get(0).getId()).isEqualTo(10L);
+            }
+        }
+
+        @Nested
+        @DisplayName("더미 이미지가 있을 경우")
+        class if_dummy_image_exist {
+
+            @Test
+            @DisplayName("더미 이미지를 제외한 일기 리스트를 반환한다.")
+            @Sql("GetAllDiariesForMonitorAsPageTest.sql")
+            void return_diary_list_excludes_dummy_image() {
+                User user = userRepository.save(TestUser.createUser());
+                Emotion emotion = emotionRepository.save(TestEmotion.createEmotion());
+                Diary diary = TestDiary.createDiary(user, emotion);
+                Image dummyImage = Image.create(diary, dummyImageUrl, true);
+                diaryRepository.save(diary);
+                imageRepository.save(dummyImage);
+
+                int page = 0;
+                int size = 5;
+                Direction direction = Direction.DESC;
+                Page<DiaryForMonitorQueryResponse> response = diaryRepository.getAllDiariesForMonitorAsPage(
+                    PageRequest.of(page, size, Sort.by(direction, "created_at", "diary_id")),
+                    dummyImageUrl);
+
+                assertThat(response.get()
+                    .filter(diaryResponse -> Objects.equals(diaryResponse.getImageUrl(),
+                        dummyImage.getImageUrl()))
+                    .findAny()).isEmpty();
             }
         }
     }
