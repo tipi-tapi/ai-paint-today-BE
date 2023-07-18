@@ -24,11 +24,13 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
         value =
             "SELECT d.diary_id AS id, i.image_url AS imageUrl, p.prompt_text AS prompt, d.created_at AS createdAt FROM diary AS d "
                 + "LEFT JOIN image AS i ON d.diary_id = i.diary_id "
-                + "LEFT JOIN prompt AS p ON d.diary_id = p.diary_id",
+                + "LEFT JOIN prompt AS p ON d.diary_id = p.diary_id "
+                + "WHERE i.image_url != :dummyImageUrl",
         countQuery = "SELECT COUNT(*) FROM diary",
         nativeQuery = true
     )
-    Page<DiaryForMonitorQueryResponse> getAllDiariesForMonitorAsPage(Pageable pageable);
+    Page<DiaryForMonitorQueryResponse> getAllDiariesForMonitorAsPage(Pageable pageable,
+        String dummyImageUrl);
 
     @Query("select d from Diary d where d.user.userId = ?1 and DATE(d.diaryDate) = ?2 order by d.createdAt desc")
     List<Diary> findByUserIdAndDiaryDate(Long userId, Date diaryDate);

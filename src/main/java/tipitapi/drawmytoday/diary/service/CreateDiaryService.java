@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.exception.BusinessException;
@@ -36,7 +37,9 @@ public class CreateDiaryService {
     private final PromptService promptService;
     private final PromptTextService promptTextService;
     private final Encryptor encryptor;
-    private final String DUMMY_IMAGE_PATH = "test/dummy.png";
+
+    @Value("${dummy.image.path}")
+    private String DUMMY_IMAGE_PATH;
 
     @Transactional(
         noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
