@@ -10,7 +10,12 @@ public class TestDiary {
 
     public static Diary createDiary(User user, Emotion emotion) {
         return Diary.builder().user(user).emotion(emotion)
-            .diaryDate(LocalDateTime.now()).isAi(true).build();
+            .diaryDate(LocalDateTime.now()).isAi(true).isTest(false).build();
+    }
+
+    public static Diary createTestDiary(User user, Emotion emotion) {
+        return Diary.builder().user(user).emotion(emotion)
+            .diaryDate(LocalDateTime.now()).isAi(true).isTest(true).build();
     }
 
     public static Diary createDiaryWithId(Long diaryId, User user, Emotion emotion) {

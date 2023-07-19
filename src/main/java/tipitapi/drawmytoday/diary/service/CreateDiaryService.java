@@ -63,7 +63,7 @@ public class CreateDiaryService {
                 Diary.builder().user(user).emotion(emotion)
                     .diaryDate(diaryDate.atTime(LocalTime.now()))
                     .notes(encryptedNotes)
-                    .isAi(true).build());
+                    .isAi(true).isTest(false).build());
             promptService.createPrompt(diary, prompt, true);
 
             String imagePath = getImagePath(diary.getDiaryId(), 1);
@@ -93,7 +93,7 @@ public class CreateDiaryService {
         Diary diary = diaryRepository.save(
             Diary.builder().user(user).emotion(emotion)
                 .diaryDate(diaryDate.atTime(LocalTime.now()))
-                .notes(notes).isAi(true).build());
+                .notes(notes).isAi(true).isTest(true).build());
         promptService.createPrompt(diary, prompt, true);
         imageService.createImage(diary, DUMMY_IMAGE_PATH, true);
         user.setLastDiaryDate(LocalDateTime.now());

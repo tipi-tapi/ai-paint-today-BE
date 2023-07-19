@@ -25,6 +25,7 @@ import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.diary.dto.DiaryForMonitorQueryResponse;
 import tipitapi.drawmytoday.diary.service.AdminDiaryService;
+import tipitapi.drawmytoday.s3.service.S3PreSignedService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserAccessDeniedException;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
@@ -36,6 +37,8 @@ class AdminServiceTest {
     ValidateUserService validateUserService;
     @Mock
     AdminDiaryService adminDiaryService;
+    @Mock
+    S3PreSignedService s3PreSignedService;
     @InjectMocks
     AdminService adminService;
 
@@ -83,6 +86,8 @@ class AdminServiceTest {
                     "2023-06-17 15:00:00.0"));
                 given(adminDiaryService.getDiaries(any(Integer.class), any(Integer.class),
                     any(Direction.class))).willReturn(new PageImpl<>(diaries));
+                given(s3PreSignedService.getPreSignedUrlForShare(any(String.class), anyLong()))
+                    .willReturn("imageUrl");
 
                 // when
                 Page<GetDiaryAdminResponse> response = adminService.getDiaries(1L, 10, 0,

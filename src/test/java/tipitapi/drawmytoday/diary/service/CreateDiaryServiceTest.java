@@ -106,7 +106,7 @@ class CreateDiaryServiceTest {
                 String prompt = "test prompt";
                 String encryptedNotes = "encrypted notes";
                 Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
-                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(encryptor.encrypt(NOTES)).willReturn(encryptedNotes);
@@ -139,7 +139,7 @@ class CreateDiaryServiceTest {
                 String encryptedNotes = "encrypted notes";
                 byte[] image = new byte[1];
                 Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
-                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(encryptor.encrypt(NOTES)).willReturn(encryptedNotes);
@@ -176,7 +176,7 @@ class CreateDiaryServiceTest {
                 user.setLastDiaryDate(lastDateTime);
                 Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
                 String prompt = "test prompt";
-                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(dallEService.getImageAsUrl(eq(prompt))).willThrow(exceptionClass);
