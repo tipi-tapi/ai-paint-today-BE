@@ -122,7 +122,7 @@ class CreateDiaryServiceTest {
                 verify(dallEService, never()).getImageAsUrl(any(String.class));
                 verify(s3Service, never()).uploadImage(any(byte[].class), any(String.class));
                 verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
-                verify(imageService).createImage(eq(diary), any(), eq(true));
+                verify(imageService).createImage(eq(diary), any(String.class), eq(true));
             }
 
             @Test
