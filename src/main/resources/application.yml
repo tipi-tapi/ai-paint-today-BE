@@ -8,6 +8,3 @@ encryptor:
 presigned-image:
     expiration:
         admin-diaries: ${PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES}
-dummy:
-    image:
-        path: "test/dummy.png"
