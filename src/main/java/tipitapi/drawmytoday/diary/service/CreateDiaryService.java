@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.exception.BusinessException;
@@ -37,9 +36,7 @@ public class CreateDiaryService {
     private final PromptService promptService;
     private final PromptTextService promptTextService;
     private final Encryptor encryptor;
-
-    @Value("${dummy.image.path}")
-    private String DUMMY_IMAGE_PATH;
+    private final String DUMMY_IMAGE_PATH = "test/dummy.png";
 
     @Transactional(
         noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
@@ -66,7 +63,7 @@ public class CreateDiaryService {
                 Diary.builder().user(user).emotion(emotion)
                     .diaryDate(diaryDate.atTime(LocalTime.now()))
                     .notes(encryptedNotes)
-                    .isAi(true).build());
+                    .isAi(true).isTest(false).build());
             promptService.createPrompt(diary, prompt, true);
 
             String imagePath = getImagePath(diary.getDiaryId(), 1);
@@ -96,7 +93,7 @@ public class CreateDiaryService {
         Diary diary = diaryRepository.save(
             Diary.builder().user(user).emotion(emotion)
                 .diaryDate(diaryDate.atTime(LocalTime.now()))
-                .notes(notes).isAi(true).build());
+                .notes(notes).isAi(true).isTest(true).build());
         promptService.createPrompt(diary, prompt, true);
         imageService.createImage(diary, DUMMY_IMAGE_PATH, true);
         user.setLastDiaryDate(LocalDateTime.now());

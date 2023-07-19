@@ -71,10 +71,14 @@ public class Diary extends BaseEntityWithUpdate {
 
     private LocalDateTime deletedAt;
 
+    @NotNull
+    @Column(nullable = false)
+    private boolean isTest;
+
     @Builder
     public Diary(User user, Emotion emotion, LocalDateTime diaryDate, String notes, boolean isAi,
         String title,
-        String weather, ReviewType review) {
+        String weather, ReviewType review, boolean isTest) {
         this.user = user;
         this.emotion = emotion;
         this.diaryDate = diaryDate;
@@ -83,6 +87,7 @@ public class Diary extends BaseEntityWithUpdate {
         this.title = title;
         this.weather = weather;
         this.review = review;
+        this.isTest = isTest;
         this.imageList = new ArrayList<>();
     }
 
