@@ -60,6 +60,7 @@ public enum ErrorCode {
     // OAuth
     OAUTH_NOT_FOUND(404, "O001", "유저의 refresh token을 찾을 수 없습니다."),
     OAUTH_SERVER_FAILED(500, "O002", "OAuth 서버와의 통신 중 에러가 발생하였습니다."),
+    GENERATE_KEY_FAILED(500, "O003", "키 생성에 실패하였습니다."),
 
     // REST
     REST_CLIENT_FAILED(500, "R001", "외부로의 REST 통신에 실패하였습니다.");
