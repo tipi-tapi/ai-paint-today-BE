@@ -28,6 +28,14 @@ public class AppleClientSecret {
     private final ObjectMapper objectMapper;
     private String clientSecret;
 
+    public String getClientSecret(String teamId, String keyId, String privateKey,
+        String clientId) {
+        if (isClientSecretNotValidOrExpired()) {
+            clientSecret = generateClientSecret(teamId, keyId, privateKey, clientId, 29);
+        }
+        return clientSecret;
+    }
+
     private String generateClientSecret(String teamId, String keyId, String privateKey,
         String clientId, int expireDays) {
         Date expirationDate = Date.from(
@@ -77,11 +85,4 @@ public class AppleClientSecret {
         }
     }
 
-    public String getClientSecret(String teamId, String keyId, String privateKey,
-        String clientId) {
-        if (isClientSecretNotValidOrExpired()) {
-            clientSecret = generateClientSecret(teamId, keyId, privateKey, clientId, 29);
-        }
-        return clientSecret;
-    }
 }
