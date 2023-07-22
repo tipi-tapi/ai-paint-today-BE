@@ -1,6 +1,8 @@
 package tipitapi.drawmytoday.diary.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -22,6 +24,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
+import tipitapi.drawmytoday.common.exception.BusinessException;
+import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.User;
 
@@ -76,7 +80,7 @@ public class Diary extends BaseEntityWithUpdate {
     private boolean isTest;
 
     @Builder
-    public Diary(User user, Emotion emotion, LocalDateTime diaryDate, String notes, boolean isAi,
+    private Diary(User user, Emotion emotion, LocalDateTime diaryDate, String notes, boolean isAi,
         String title,
         String weather, ReviewType review, boolean isTest) {
         this.user = user;
@@ -89,6 +93,35 @@ public class Diary extends BaseEntityWithUpdate {
         this.review = review;
         this.isTest = isTest;
         this.imageList = new ArrayList<>();
+    }
+
+    public static Diary of(User user, Emotion emotion, LocalDate diaryDate, String notes) {
+        return Diary.builder()
+            .user(user)
+            .emotion(emotion)
+            .diaryDate(validateCreateDiaryDate(diaryDate))
+            .notes(notes)
+            .isAi(true)
+            .isTest(false)
+            .build();
+    }
+
+    public static Diary ofTest(User user, Emotion emotion, LocalDate diaryDate, String notes) {
+        return Diary.builder()
+            .user(user)
+            .emotion(emotion)
+            .diaryDate(validateCreateDiaryDate(diaryDate))
+            .notes(notes)
+            .isAi(true)
+            .isTest(true)
+            .build();
+    }
+
+    private static LocalDateTime validateCreateDiaryDate(LocalDate diaryDate) {
+        if (diaryDate.isAfter(LocalDate.now())) {
+            throw new BusinessException(ErrorCode.INVALID_CREATE_DIARY_DATE);
+        }
+        return diaryDate.atTime(LocalTime.now());
     }
 
     public void setNotes(String notes) {

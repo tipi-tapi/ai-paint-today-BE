@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.common.testdata;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.springframework.test.util.ReflectionTestUtils;
 import tipitapi.drawmytoday.diary.domain.Diary;
@@ -9,13 +10,11 @@ import tipitapi.drawmytoday.user.domain.User;
 public class TestDiary {
 
     public static Diary createDiary(User user, Emotion emotion) {
-        return Diary.builder().user(user).emotion(emotion)
-            .diaryDate(LocalDateTime.now()).isAi(true).isTest(false).build();
+        return Diary.of(user, emotion, LocalDate.now(), null);
     }
 
     public static Diary createTestDiary(User user, Emotion emotion) {
-        return Diary.builder().user(user).emotion(emotion)
-            .diaryDate(LocalDateTime.now()).isAi(true).isTest(true).build();
+        return Diary.ofTest(user, emotion, LocalDate.now(), null);
     }
 
     public static Diary createDiaryWithId(Long diaryId, User user, Emotion emotion) {

@@ -37,4 +37,10 @@ public class PromptTextService {
         return sb.toString();
     }
 
+    private String validateKeywordSize(String keyword) {
+        if (keyword.length() > 100) {
+            return keyword.substring(0, 100);
+        }
+        return keyword;
+    }
 }
