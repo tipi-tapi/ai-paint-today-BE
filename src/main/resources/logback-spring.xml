@@ -8,6 +8,54 @@
 
   <property name="LOG_PATH" value="./logs"/>
 
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_INFO">
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>INFO</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/info-%d{yyyy-MM}.log</fileNamePattern>
+      <maxHistory>12</maxHistory>
+      <totalSizeCap>100MB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_WARN">
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>WARN</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/warn-%d{yyyy-MM}.log</fileNamePattern>
+      <maxHistory>12</maxHistory>
+      <totalSizeCap>100MB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_ERROR">
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>ERROR</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/error-%d{yyyy-MM}.log</fileNamePattern>
+      <maxHistory>12</maxHistory>
+      <totalSizeCap>100MB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+
   <springProfile name="develop">
 
     <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
@@ -23,55 +71,6 @@
 
   <springProfile name="test">
     <property name="LOG_PATH" value="~/TipiTapiTestServer/log"/>
-
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_INFO">
-      <encoder>
-        <pattern>${FILE_LOG_PATTERN}</pattern>
-      </encoder>
-      <filter class="ch.qos.logback.classic.filter.LevelFilter">
-        <level>INFO</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
-      </filter>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/info-%d{yyyy-MM}.log</fileNamePattern>
-        <maxHistory>12</maxHistory>
-        <totalSizeCap>100MB</totalSizeCap>
-      </rollingPolicy>
-    </appender>
-
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_WARN">
-      <encoder>
-        <pattern>${FILE_LOG_PATTERN}</pattern>
-      </encoder>
-      <filter class="ch.qos.logback.classic.filter.LevelFilter">
-        <level>WARN</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
-      </filter>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/warn-%d{yyyy-MM}.log</fileNamePattern>
-        <maxHistory>12</maxHistory>
-        <totalSizeCap>100MB</totalSizeCap>
-      </rollingPolicy>
-    </appender>
-
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_ERROR">
-      <encoder>
-        <pattern>${FILE_LOG_PATTERN}</pattern>
-      </encoder>
-      <filter class="ch.qos.logback.classic.filter.LevelFilter">
-        <level>ERROR</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
-      </filter>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/error-%d{yyyy-MM}.log</fileNamePattern>
-        <maxHistory>12</maxHistory>
-        <totalSizeCap>100MB</totalSizeCap>
-      </rollingPolicy>
-    </appender>
-
     <root level="INFO">
       <appender-ref ref="FILE_INFO"/>
       <appender-ref ref="FILE_WARN"/>
@@ -81,55 +80,6 @@
 
   <springProfile name="prod">
     <property name="LOG_PATH" value="~/SpringServer/log"/>
-
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_INFO">
-      <encoder>
-        <pattern>${FILE_LOG_PATTERN}</pattern>
-      </encoder>
-      <filter class="ch.qos.logback.classic.filter.LevelFilter">
-        <level>INFO</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
-      </filter>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/info-%d{yyyy-MM}.log</fileNamePattern>
-        <maxHistory>12</maxHistory>
-        <totalSizeCap>100MB</totalSizeCap>
-      </rollingPolicy>
-    </appender>
-
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_WARN">
-      <encoder>
-        <pattern>${FILE_LOG_PATTERN}</pattern>
-      </encoder>
-      <filter class="ch.qos.logback.classic.filter.LevelFilter">
-        <level>WARN</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
-      </filter>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/warn-%d{yyyy-MM}.log</fileNamePattern>
-        <maxHistory>12</maxHistory>
-        <totalSizeCap>100MB</totalSizeCap>
-      </rollingPolicy>
-    </appender>
-
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_ERROR">
-      <encoder>
-        <pattern>${FILE_LOG_PATTERN}</pattern>
-      </encoder>
-      <filter class="ch.qos.logback.classic.filter.LevelFilter">
-        <level>ERROR</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
-      </filter>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/error-%d{yyyy-MM}.log</fileNamePattern>
-        <maxHistory>12</maxHistory>
-        <totalSizeCap>100MB</totalSizeCap>
-      </rollingPolicy>
-    </appender>
-
     <root level="INFO">
       <appender-ref ref="FILE_INFO"/>
       <appender-ref ref="FILE_WARN"/>
