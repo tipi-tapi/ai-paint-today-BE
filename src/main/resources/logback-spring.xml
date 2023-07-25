@@ -1,0 +1,89 @@
+<configuration>
+
+  <property name="CONSOLE_LOG_PATTERN"
+    value="[%d{HH:mm:ss}:%-4relative] %green([%thread]) %highlight(%-5level) %boldWhite([%C.%M:%yellow(%L)]) - %msg%n"/>
+
+  <property name="FILE_LOG_PATTERN"
+    value="[%d{HH:mm:ss}:%-4relative] %green([%thread]) %highlight(%-5level) %boldWhite([%C.%M:%yellow(%L)]) - %msg%n"/>
+
+  <property name="LOG_PATH" value="./logs"/>
+
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_INFO">
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>INFO</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/info-%d{yyyy-MM}.log</fileNamePattern>
+      <maxHistory>12</maxHistory>
+      <totalSizeCap>100MB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_WARN">
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>WARN</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/warn-%d{yyyy-MM}.log</fileNamePattern>
+      <maxHistory>12</maxHistory>
+      <totalSizeCap>100MB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_ERROR">
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>ERROR</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/error-%d{yyyy-MM}.log</fileNamePattern>
+      <maxHistory>12</maxHistory>
+      <totalSizeCap>100MB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+
+  <springProfile name="develop">
+
+    <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+      <encoder>
+        <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+      </encoder>
+    </appender>
+
+    <root level="INFO">
+      <appender-ref ref="STDOUT"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="test">
+    <property name="LOG_PATH" value="~/TipiTapiTestServer/log"/>
+    <root level="INFO">
+      <appender-ref ref="FILE_INFO"/>
+      <appender-ref ref="FILE_WARN"/>
+      <appender-ref ref="FILE_ERROR"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="prod">
+    <property name="LOG_PATH" value="./logs"/>
+    <root level="INFO">
+      <appender-ref ref="FILE_INFO"/>
+      <appender-ref ref="FILE_WARN"/>
+      <appender-ref ref="FILE_ERROR"/>
+    </root>
+  </springProfile>
+</configuration>
