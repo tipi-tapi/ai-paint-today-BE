@@ -42,7 +42,6 @@ public class CreateDiaryService {
         String notes, LocalDate diaryDate, boolean test)
         throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
-        // TODO: 광고 추가시 일기 생성 제한 로직으로 변경 필요
         User user = validateUserService.validateUserWithDrawLimit(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         String encryptedNotes = encryptor.encrypt(notes);
