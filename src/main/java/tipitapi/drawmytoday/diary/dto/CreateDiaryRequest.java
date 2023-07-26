@@ -23,6 +23,7 @@ public class CreateDiaryRequest {
     @Schema(description = "감정 ID")
     private Long emotionId;
 
+    @Size(max = 100)
     @Schema(description = "일기 키워드", nullable = true)
     private String keyword;
 
