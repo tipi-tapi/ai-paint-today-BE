@@ -27,7 +27,7 @@ public class ImageService {
         return imageRepository.save(Image.create(diary, imagePath, isSelected));
     }
 
-    public Image uploadImage(Diary diary, byte[] dallEImage, boolean isSelected) {
+    public Image uploadAndCreateImage(Diary diary, byte[] dallEImage, boolean isSelected) {
         String imagePath = String.format("post/%d/%s_%d.png", diary.getDiaryId(),
             new Date().getTime(), 1);
         s3Service.uploadImage(dallEImage, imagePath);

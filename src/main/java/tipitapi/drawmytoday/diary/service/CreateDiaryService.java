@@ -48,7 +48,7 @@ public class CreateDiaryService {
 
             Diary diary = saveDiary(notes, user, emotion, diaryDate, false);
             promptService.createPrompt(diary, prompt, true);
-            imageService.uploadImage(diary, dallEImage, true);
+            imageService.uploadAndCreateImage(diary, dallEImage, true);
 
             return new CreateDiaryResponse(diary.getDiaryId());
         } catch (DallERequestFailException | ImageInputStreamFailException e) {

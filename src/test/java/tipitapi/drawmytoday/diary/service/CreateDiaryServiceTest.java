@@ -130,7 +130,7 @@ class CreateDiaryServiceTest {
 
                 verify(dallEService).getImageAsUrl(any(String.class));
                 verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
-                verify(imageService).uploadImage(eq(diary), any(byte[].class), eq(true));
+                verify(imageService).uploadAndCreateImage(eq(diary), any(byte[].class), eq(true));
             }
         }
     }

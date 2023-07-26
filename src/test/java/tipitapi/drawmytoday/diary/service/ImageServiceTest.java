@@ -101,8 +101,8 @@ class ImageServiceTest {
     }
 
     @Nested
-    @DisplayName("uploadImage 메서드는")
-    class UploadImageTest {
+    @DisplayName("uploadAndCreateImage 메서드는")
+    class UploadAndCreateImageTest {
 
         @Test
         @DisplayName("이미지를 업로드하고 생성한다")
@@ -116,7 +116,7 @@ class ImageServiceTest {
             given(imageRepository.save(any(Image.class))).willReturn(image);
 
             // when
-            Image createdImage = imageService.uploadImage(diary, new byte[1], true);
+            Image createdImage = imageService.uploadAndCreateImage(diary, new byte[1], true);
 
             // then
             assertThat(createdImage).isEqualTo(image);
