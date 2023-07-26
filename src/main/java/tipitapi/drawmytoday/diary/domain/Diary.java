@@ -1,6 +1,8 @@
 package tipitapi.drawmytoday.diary.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -76,7 +78,7 @@ public class Diary extends BaseEntityWithUpdate {
     private boolean isTest;
 
     @Builder
-    public Diary(User user, Emotion emotion, LocalDateTime diaryDate, String notes, boolean isAi,
+    private Diary(User user, Emotion emotion, LocalDateTime diaryDate, String notes, boolean isAi,
         String title,
         String weather, ReviewType review, boolean isTest) {
         this.user = user;
@@ -89,6 +91,28 @@ public class Diary extends BaseEntityWithUpdate {
         this.review = review;
         this.isTest = isTest;
         this.imageList = new ArrayList<>();
+    }
+
+    public static Diary of(User user, Emotion emotion, LocalDate diaryDate, String notes) {
+        return Diary.builder()
+            .user(user)
+            .emotion(emotion)
+            .diaryDate(diaryDate.atTime(LocalTime.now()))
+            .notes(notes)
+            .isAi(true)
+            .isTest(false)
+            .build();
+    }
+
+    public static Diary ofTest(User user, Emotion emotion, LocalDate diaryDate, String notes) {
+        return Diary.builder()
+            .user(user)
+            .emotion(emotion)
+            .diaryDate(diaryDate.atTime(LocalTime.now()))
+            .notes(notes)
+            .isAi(true)
+            .isTest(true)
+            .build();
     }
 
     public void setNotes(String notes) {

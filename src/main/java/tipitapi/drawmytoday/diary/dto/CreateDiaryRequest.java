@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import tipitapi.drawmytoday.common.validator.ValidDiaryDate;
 
 @Getter
 @Schema(description = "일기 생성 Request")
@@ -31,6 +32,7 @@ public class CreateDiaryRequest {
     private String notes;
 
     @NotNull
+    @ValidDiaryDate
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
