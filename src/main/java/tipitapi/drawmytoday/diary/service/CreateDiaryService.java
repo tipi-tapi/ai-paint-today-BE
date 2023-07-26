@@ -15,7 +15,6 @@ import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.emotion.service.ValidateEmotionService;
-import tipitapi.drawmytoday.s3.service.S3Service;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
 
@@ -28,7 +27,6 @@ public class CreateDiaryService {
     private final ImageService imageService;
     private final ValidateUserService validateUserService;
     private final ValidateEmotionService validateEmotionService;
-    private final S3Service s3Service;
     private final DallEService dallEService;
     private final PromptService promptService;
     private final PromptTextService promptTextService;
@@ -54,21 +52,14 @@ public class CreateDiaryService {
 
             diaryRepository.save(diary);
             promptService.createPrompt(diary, prompt, true);
+            imageService.uploadImage(diary, dallEImage, true);
 
-            String imagePath = getImagePath(diary.getDiaryId(), 1);
-            s3Service.uploadImage(dallEImage, imagePath);
-            imageService.createImage(diary, imagePath, true);
             user.setLastDiaryDate(LocalDateTime.now());
             return new CreateDiaryResponse(diary.getDiaryId());
         } catch (DallERequestFailException | ImageInputStreamFailException e) {
             promptService.createPrompt(prompt, false);
             throw e;
         }
-    }
-
-    private String getImagePath(Long diaryId, int index) {
-        return String.format("post/%d/%s_%d.png", diaryId,
-            new Date().getTime(), index);
     }
 
     @Transactional(readOnly = false)
