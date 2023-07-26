@@ -51,20 +51,17 @@ public class GoogleOAuthService {
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request) throws JsonProcessingException {
         OAuthAccessToken accessToken = getAccessToken(request);
-
         OAuthUserProfile oAuthUserProfile = getUserProfile(accessToken);
 
         User user = validateUserService.validateRegisteredUserByEmail(
             oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
         if (user != null) {
-            Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
-            auth.setRefreshToken(accessToken.getRefreshToken());
+            authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
         } else {
-            user = userService.registerUser(oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
-            authRepository.save(new Auth(user, accessToken.getRefreshToken()));
+            user = registerUser(oAuthUserProfile, accessToken);
         }
 
-        // // create JWT token
+        // create JWT token
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
             user.getUserRole());
         String jwtRefreshToken = jwtTokenProvider.createRefreshToken(user.getUserId(),
@@ -100,6 +97,13 @@ public class GoogleOAuthService {
         }
 
         user.deleteUser();
+    }
+
+
+    private User registerUser(OAuthUserProfile oAuthUserProfile, OAuthAccessToken accessToken) {
+        User user = userService.registerUser(oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
+        authRepository.save(new Auth(user, accessToken.getRefreshToken()));
+        return user;
     }
 
     private OAuthAccessToken getAccessToken(HttpServletRequest request)
