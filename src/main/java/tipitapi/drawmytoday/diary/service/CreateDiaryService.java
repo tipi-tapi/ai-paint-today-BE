@@ -2,7 +2,6 @@ package tipitapi.drawmytoday.diary.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,19 +41,15 @@ public class CreateDiaryService {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
         User user = validateUserService.validateUserWithDrawLimit(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
-        String encryptedNotes = encryptor.encrypt(notes);
         String prompt = promptTextService.createPromptText(emotion, keyword);
-        Diary diary = Diary.of(user, emotion, diaryDate, encryptedNotes);
-
 
         try {
             byte[] dallEImage = dallEService.getImageAsUrl(prompt);
 
-            diaryRepository.save(diary);
+            Diary diary = saveDiary(notes, user, emotion, diaryDate, false);
             promptService.createPrompt(diary, prompt, true);
             imageService.uploadImage(diary, dallEImage, true);
 
-            user.setLastDiaryDate(LocalDateTime.now());
             return new CreateDiaryResponse(diary.getDiaryId());
         } catch (DallERequestFailException | ImageInputStreamFailException e) {
             promptService.createPrompt(prompt, false);
@@ -65,11 +60,26 @@ public class CreateDiaryService {
     @Transactional(readOnly = false)
     public CreateDiaryResponse createTestDiary(Long userId, Long emotionId, String keyword,
         String notes, LocalDate diaryDate) {
-        Diary diary = diaryRepository.save(
-            Diary.ofTest(user, emotion, diaryDate, notes));
+        User user = validateUserService.validateUserWithDrawLimit(userId);
+        Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
+
+        Diary diary = saveDiary(notes, user, emotion, diaryDate, true);
+        String prompt = promptTextService.createPromptText(emotion, keyword);
         promptService.createPrompt(diary, prompt, true);
         imageService.createImage(diary, DUMMY_IMAGE_PATH, true);
-        user.setLastDiaryDate(LocalDateTime.now());
+
         return new CreateDiaryResponse(diary.getDiaryId());
+    }
+
+    private Diary saveDiary(String notes, User user, Emotion emotion, LocalDate diaryDate,
+        boolean testDiary) {
+        String encryptedNotes = encryptor.encrypt(notes);
+        user.setLastDiaryDate(LocalDateTime.now());
+
+        if (testDiary) {
+            return diaryRepository.save(Diary.ofTest(user, emotion, diaryDate, encryptedNotes));
+        } else {
+            return diaryRepository.save(Diary.of(user, emotion, diaryDate, encryptedNotes));
+        }
     }
 }
