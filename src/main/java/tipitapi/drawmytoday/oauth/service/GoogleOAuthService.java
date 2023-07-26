@@ -55,9 +55,8 @@ public class GoogleOAuthService {
 
         User user = validateUserService.validateRegisteredUserByEmail(
             oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
-        if (user != null) {
-            authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
-        } else {
+
+        if (user == null) {
             user = registerUser(oAuthUserProfile, accessToken);
         }
 
