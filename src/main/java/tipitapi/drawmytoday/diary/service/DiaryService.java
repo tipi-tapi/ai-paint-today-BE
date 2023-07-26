@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.adreward.domain.AdReward;
 import tipitapi.drawmytoday.adreward.service.ValidateAdRewardService;
+import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.common.utils.Encryptor;
@@ -40,7 +41,7 @@ public class DiaryService {
     private final ValidateDiaryService validateDiaryService;
     private final ValidateAdRewardService validateAdRewardService;
 
-    public GetDiaryResponse getDiary(Long userId, Long diaryId) {
+    public GetDiaryResponse getDiary(Long userId, Long diaryId, Language language) {
         User user = validateUserService.validateUserById(userId);
 
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
@@ -49,10 +50,12 @@ public class DiaryService {
         String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
             imageService.getImage(diary).getImageUrl(), 30);
 
+        String emotionText = diary.getEmotion().getEmotionText(language);
+
         Optional<Prompt> prompt = promptService.getPromptByDiaryId(diaryId);
         String promptText = prompt.map(Prompt::getPromptText).orElse(null);
 
-        return GetDiaryResponse.of(diary, imageUrl, diary.getEmotion(), promptText);
+        return GetDiaryResponse.of(diary, imageUrl, emotionText, promptText);
     }
 
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
