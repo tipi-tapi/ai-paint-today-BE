@@ -11,7 +11,7 @@ public class PromptTextService {
 
     public String createPromptText(Emotion emotion, String keyword) {
         if (!StringUtils.hasText(keyword)) {
-            keyword = "emotional";
+            keyword = "emotions";
         }
         return promptTextBuilder(
             emotion.getEmotionPrompt(),
