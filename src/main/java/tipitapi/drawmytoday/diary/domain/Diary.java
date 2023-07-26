@@ -24,8 +24,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
-import tipitapi.drawmytoday.common.exception.BusinessException;
-import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.User;
 
@@ -99,7 +97,7 @@ public class Diary extends BaseEntityWithUpdate {
         return Diary.builder()
             .user(user)
             .emotion(emotion)
-            .diaryDate(validateCreateDiaryDate(diaryDate))
+            .diaryDate(diaryDate.atTime(LocalTime.now()))
             .notes(notes)
             .isAi(true)
             .isTest(false)
@@ -110,18 +108,11 @@ public class Diary extends BaseEntityWithUpdate {
         return Diary.builder()
             .user(user)
             .emotion(emotion)
-            .diaryDate(validateCreateDiaryDate(diaryDate))
+            .diaryDate(diaryDate.atTime(LocalTime.now()))
             .notes(notes)
             .isAi(true)
             .isTest(true)
             .build();
-    }
-
-    private static LocalDateTime validateCreateDiaryDate(LocalDate diaryDate) {
-        if (diaryDate.isAfter(LocalDate.now())) {
-            throw new BusinessException(ErrorCode.INVALID_CREATE_DIARY_DATE);
-        }
-        return diaryDate.atTime(LocalTime.now());
     }
 
     public void setNotes(String notes) {
