@@ -163,11 +163,19 @@ public class DiaryController {
         @Parameter(description = "테스트 여부", in = ParameterIn.QUERY)
         @RequestParam(value = "test", required = false, defaultValue = "false") boolean test
     ) throws DallERequestFailException, ImageInputStreamFailException {
-        return SuccessResponse.of(
-            createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
+        CreateDiaryResponse response;
+        if (test) {
+            response = createDiaryService.createTestDiary(tokenInfo.getUserId(),
+                createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate(), test)
-        ).asHttp(HttpStatus.CREATED);
+                createDiaryRequest.getDiaryDate());
+        } else {
+            response = createDiaryService.createDiary(tokenInfo.getUserId(),
+                createDiaryRequest.getEmotionId(),
+                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
+                createDiaryRequest.getDiaryDate());
+        }
+        return SuccessResponse.of(response).asHttp(HttpStatus.CREATED);
     }
 
     @Operation(summary = "일기 수정", description = "주어진 일기의 내용을 수정한다.")

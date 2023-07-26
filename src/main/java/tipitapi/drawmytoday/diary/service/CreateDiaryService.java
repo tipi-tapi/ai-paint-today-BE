@@ -39,7 +39,7 @@ public class CreateDiaryService {
         noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
             ImageInputStreamFailException.class})
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
-        String notes, LocalDate diaryDate, boolean test)
+        String notes, LocalDate diaryDate)
         throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
         User user = validateUserService.validateUserWithDrawLimit(userId);
@@ -48,9 +48,6 @@ public class CreateDiaryService {
         String prompt = promptTextService.createPromptText(emotion, keyword);
         Diary diary = Diary.of(user, emotion, diaryDate, encryptedNotes);
 
-        if (test) {
-            return createDummyDiary(user, emotion, prompt, encryptedNotes, diaryDate);
-        }
 
         try {
             byte[] dallEImage = dallEService.getImageAsUrl(prompt);
@@ -74,7 +71,8 @@ public class CreateDiaryService {
             new Date().getTime(), index);
     }
 
-    private CreateDiaryResponse createDummyDiary(User user, Emotion emotion, String prompt,
+    @Transactional(readOnly = false)
+    public CreateDiaryResponse createTestDiary(Long userId, Long emotionId, String keyword,
         String notes, LocalDate diaryDate) {
         Diary diary = diaryRepository.save(
             Diary.ofTest(user, emotion, diaryDate, notes));
