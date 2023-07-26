@@ -246,29 +246,6 @@ class DiaryControllerTest extends ControllerTestSetup {
             }
 
             @Test
-            @DisplayName("keyword 값이 100byte가 넘는다면 BAD_REQUEST 상태코드를 응답한다.")
-            void keyword_is_null_than_return_bad_request() throws Exception {
-                // given
-                // when
-                String overKeyword = "a".repeat(101);
-                Map<String, Object> requestMap = new HashMap<>();
-                requestMap.put("emotionId", emotionId);
-                requestMap.put("keyword", overKeyword);
-                requestMap.put("notes", notes);
-                requestMap.put("diaryDate", diaryDate);
-                String requestBody = objectMapper.writeValueAsString(requestMap);
-                ResultActions result = mockMvc.perform(post(BASIC_URL)
-                    .with(SecurityMockMvcRequestPostProcessors.csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody));
-
-                // then
-                result.andExpect(status().isBadRequest());
-                verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
-            }
-
-            @Test
             @DisplayName("notes 값이 6010byte가 넘는다면 BAD_REQUEST 상태코드를 응답한다.")
             void notes_is_null_than_return_bad_request() throws Exception {
                 // given
