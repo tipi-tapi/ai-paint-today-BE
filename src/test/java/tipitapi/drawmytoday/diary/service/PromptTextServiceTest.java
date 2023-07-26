@@ -53,6 +53,23 @@ class PromptTextServiceTest {
                 //then
                 assertThat(promptText).contains("emotions");
             }
+
+            @Test
+            @DisplayName("키워드가 100자를 초과할 경우 100자로 자른다.")
+            void over100CharThanSubstring() throws Exception {
+                //given
+                Emotion emotion = TestEmotion.createEmotion();
+                String keyword_over_max = "a".repeat(101);
+                String keyword_not_over_max = "a".repeat(100);
+
+                //when
+                String promptText = promptTextService.createPromptText(emotion, keyword_over_max);
+
+                //then
+                assertThat(promptText).isEqualTo(
+                    emotion.getEmotionPrompt() + ", " + emotion.getColorPrompt() + ", "
+                        + "canvas-textured, Oil Pastel, " + keyword_not_over_max);
+            }
         }
     }
 }
