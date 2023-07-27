@@ -29,6 +29,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
+import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
@@ -73,13 +74,17 @@ class DiaryControllerTest extends ControllerTestSetup {
                 long diaryId = 1L;
                 User user = TestUser.createUser();
                 Emotion emotion = TestEmotion.createEmotion();
+                Language language = Language.ko;
+                String emotionText = emotion.getEmotionText(language);
                 Diary diary = TestDiary.createDiaryWithIdAndCreatedAt(
                     diaryId, LocalDateTime.now(), user, emotion);
                 String imageUrl = "imageUrl";
                 String promptText = "promptText";
-                GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl, emotion,
+                GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl,
+                    emotionText,
                     promptText);
-                given(diaryService.getDiary(REQUEST_USER_ID, diaryId)).willReturn(getDiaryResponse);
+                given(diaryService.getDiary(REQUEST_USER_ID, diaryId, language)).willReturn(
+                    getDiaryResponse);
 
                 // when
                 ResultActions result = mockMvc.perform(get(BASIC_URL + "/" + diaryId));
@@ -92,7 +97,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                         parseLocalDateTime(diary.getDiaryDate())))
                     .andExpect(jsonPath("$.data.createdAt").value(
                         parseLocalDateTime(diary.getCreatedAt())))
-                    .andExpect(jsonPath("$.data.emotion").value(emotion.getName()))
+                    .andExpect(jsonPath("$.data.emotion").value(emotionText))
                     .andExpect(jsonPath("$.data.notes").value(diary.getNotes()))
                     .andExpect(jsonPath("$.data.prompt").value(promptText));
             }
