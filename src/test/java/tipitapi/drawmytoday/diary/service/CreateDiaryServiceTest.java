@@ -19,7 +19,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
@@ -32,7 +31,6 @@ import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.emotion.service.ValidateEmotionService;
-import tipitapi.drawmytoday.s3.service.S3Service;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
 
@@ -50,8 +48,6 @@ class CreateDiaryServiceTest {
     @Mock
     private ValidateEmotionService validateEmotionService;
     @Mock
-    private S3Service s3Service;
-    @Mock
     private DallEService dallEService;
     @Mock
     private PromptService promptService;
@@ -68,97 +64,7 @@ class CreateDiaryServiceTest {
         private final Long EMOTION_ID = 1L;
         private final String KEYWORD = "키워드";
         private final String NOTES = "노트";
-        private final LocalDate CREATE_DIARY_DATE = LocalDate.now();
-        private final boolean NON_TEST = false;
-
-        @Nested
-        @DisplayName("파라미터로 받은 createDiaryDate가")
-        class Create_diary_date_param_is {
-
-            @Test
-            @DisplayName("오늘 이후의 날짜일 경우 BusinessException을 던진다")
-            void is_after_today_date_then_throw_exception() throws Exception {
-                //given
-                LocalDate afterCreateDiaryDate = CREATE_DIARY_DATE.plusDays(1L);
-
-                //when
-                //then
-                assertThatThrownBy(() -> createDiaryService.createDiary(
-                    USER_ID, EMOTION_ID, KEYWORD, NOTES, afterCreateDiaryDate, NON_TEST))
-                    .isInstanceOf(BusinessException.class);
-            }
-        }
-
-        @Nested
-        @DisplayName("파라미터로 받은 test가")
-        class Test_param_is {
-
-            @Test
-            @DisplayName("true일 경우 그림을 생성하지 않는다.")
-            void true_then_not_draw_image() throws Exception {
-                //given
-                boolean test = true;
-                Long diaryId = 1L;
-                User user = TestUser.createUserWithId(USER_ID);
-                LocalDateTime lastDateTime = CREATE_DIARY_DATE.minusDays(1L).atTime(1, 1);
-                user.setLastDiaryDate(lastDateTime);
-                Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
-                String prompt = "test prompt";
-                String encryptedNotes = "encrypted notes";
-                Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
-                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
-                given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
-                given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
-                given(encryptor.encrypt(NOTES)).willReturn(encryptedNotes);
-                given(diaryRepository.save(any(Diary.class))).willReturn(diary);
-
-                //when
-                CreateDiaryResponse createDiaryResponse = createDiaryService.createDiary(
-                    USER_ID, EMOTION_ID, KEYWORD, NOTES, CREATE_DIARY_DATE, test);
-
-                //then
-                assertThat(createDiaryResponse.getId()).isEqualTo(diaryId);
-                assertThat(user.getLastDiaryDate().isAfter(lastDateTime)).isTrue();
-                verify(dallEService, never()).getImageAsUrl(any(String.class));
-                verify(s3Service, never()).uploadImage(any(byte[].class), any(String.class));
-                verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
-                verify(imageService).createImage(eq(diary), any(String.class), eq(true));
-            }
-
-            @Test
-            @DisplayName("false일 경우 그림을 생성한다.")
-            void false_then_draw_image() throws Exception {
-                //given
-                boolean test = false;
-                Long diaryId = 1L;
-                User user = TestUser.createUserWithId(USER_ID);
-                LocalDateTime lastDateTime = CREATE_DIARY_DATE.minusDays(1L).atTime(1, 1);
-                user.setLastDiaryDate(lastDateTime);
-                Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
-                String prompt = "test prompt";
-                String encryptedNotes = "encrypted notes";
-                byte[] image = new byte[1];
-                Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
-                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
-                given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
-                given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
-                given(encryptor.encrypt(NOTES)).willReturn(encryptedNotes);
-                given(dallEService.getImageAsUrl(prompt)).willReturn(image);
-                given(diaryRepository.save(any(Diary.class))).willReturn(diary);
-
-                //when
-                CreateDiaryResponse createDiaryResponse = createDiaryService.createDiary(
-                    USER_ID, EMOTION_ID, KEYWORD, NOTES, CREATE_DIARY_DATE, test);
-
-                //then
-                assertThat(createDiaryResponse.getId()).isEqualTo(diaryId);
-                assertThat(user.getLastDiaryDate().isAfter(lastDateTime)).isTrue();
-                verify(dallEService).getImageAsUrl(any(String.class));
-                verify(s3Service).uploadImage(eq(image), any(String.class));
-                verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
-                verify(imageService).createImage(eq(diary), any(String.class), eq(true));
-            }
-        }
+        private final LocalDate DIARY_DATE = LocalDate.now();
 
         @Nested
         @DisplayName("dallE 요청 시")
@@ -172,24 +78,103 @@ class CreateDiaryServiceTest {
                 throws Exception {
                 //given
                 User user = TestUser.createUserWithId(USER_ID);
-                LocalDateTime lastDateTime = CREATE_DIARY_DATE.minusDays(1L).atTime(1, 1);
+                LocalDateTime lastDateTime = DIARY_DATE.minusDays(1L).atTime(1, 1);
                 user.setLastDiaryDate(lastDateTime);
                 Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
                 String prompt = "test prompt";
-                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
+
+                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(dallEService.getImageAsUrl(eq(prompt))).willThrow(exceptionClass);
 
                 //when
                 //then
-                assertThatThrownBy(() -> createDiaryService.createDiary(
-                    USER_ID, EMOTION_ID, KEYWORD, NOTES, CREATE_DIARY_DATE, NON_TEST))
-                    .isInstanceOf(exceptionClass);
+                assertThatThrownBy(
+                    () -> createDiaryService.createDiary(USER_ID, EMOTION_ID, KEYWORD, NOTES,
+                        DIARY_DATE)).isInstanceOf(exceptionClass);
                 assertThat(user.getLastDiaryDate().isEqual(lastDateTime)).isTrue();
+
                 verify(promptService).createPrompt(eq(prompt), eq(false));
                 verify(promptService, never()).createPrompt(any(Diary.class), eq(prompt), eq(true));
             }
+
+            @Test
+            @DisplayName("정상일 경우 일기를 생성한다.")
+            void success_then_create_diary() throws Exception {
+                //given
+                Long diaryId = 1L;
+                LocalDateTime lastDateTime = DIARY_DATE.minusDays(1L).atTime(1, 1);
+                String prompt = "test prompt";
+                byte[] image = new byte[1];
+
+                User user = TestUser.createUserWithId(USER_ID);
+                user.setLastDiaryDate(lastDateTime);
+                Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
+                Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
+
+                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
+                given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
+                given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
+                given(dallEService.getImageAsUrl(prompt)).willReturn(image);
+                given(encryptor.encrypt(NOTES)).willReturn("암호화된 노트");
+                given(diaryRepository.save(any(Diary.class))).willReturn(diary);
+
+                //when
+                CreateDiaryResponse createDiaryResponse = createDiaryService.createDiary(
+                    USER_ID, EMOTION_ID, KEYWORD, NOTES, DIARY_DATE);
+
+                //then
+                assertThat(createDiaryResponse.getId()).isEqualTo(diaryId);
+                assertThat(user.getLastDiaryDate().isAfter(lastDateTime)).isTrue();
+
+                verify(dallEService).getImageAsUrl(any(String.class));
+                verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
+                verify(imageService).uploadAndCreateImage(eq(diary), any(byte[].class), eq(true));
+            }
         }
     }
+
+    @Nested
+    @DisplayName("createTestDiary 메서드는")
+    class Create_test_diary_test {
+
+        @Test
+        @DisplayName("그림을 생성하지 않는다.")
+        void not_draw_image() throws Exception {
+            //given
+            Long userId = 1L;
+            LocalDate diaryDate = LocalDate.now();
+            Long emotionId = 1L;
+            Long diaryId = 1L;
+            String prompt = "test prompt";
+            String notes = "노트";
+            String keyword = "키워드";
+            LocalDateTime lastDateTime = diaryDate.minusDays(1L).atTime(1, 1);
+
+            User user = TestUser.createUserWithId(userId);
+            user.setLastDiaryDate(lastDateTime);
+            Emotion emotion = TestEmotion.createEmotionWithId(emotionId);
+            Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
+
+            given(validateUserService.validateUserWithDrawLimit(userId)).willReturn(user);
+            given(validateEmotionService.validateEmotionById(emotionId)).willReturn(emotion);
+            given(encryptor.encrypt(notes)).willReturn("암호화된 노트");
+            given(diaryRepository.save(any(Diary.class))).willReturn(diary);
+            given(promptTextService.createPromptText(emotion, keyword)).willReturn(prompt);
+
+            //when
+            CreateDiaryResponse response = createDiaryService.createTestDiary(
+                userId, emotionId, keyword, notes, diaryDate);
+
+            //then
+            assertThat(response.getId()).isEqualTo(diaryId);
+            assertThat(user.getLastDiaryDate().isAfter(lastDateTime)).isTrue();
+
+            verify(dallEService, never()).getImageAsUrl(any(String.class));
+            verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
+            verify(imageService).createImage(eq(diary), any(String.class), eq(true));
+        }
+    }
+
 }

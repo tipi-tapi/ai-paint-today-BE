@@ -28,7 +28,7 @@ class PromptTextServiceTest {
         class KeywordIs {
 
             @Test
-            @DisplayName("null이면 keyword 자리에 emotional을 넣어 반환한다.")
+            @DisplayName("null이면 keyword 자리에 emotions을 넣어 반환한다.")
             void nullThanAddEmotional() throws Exception {
                 //given
                 Emotion emotion = TestEmotion.createEmotion();
@@ -37,12 +37,12 @@ class PromptTextServiceTest {
                 String promptText = promptTextService.createPromptText(emotion, keyword);
 
                 //then
-                assertThat(promptText).contains("emotional");
+                assertThat(promptText).contains("emotions");
             }
 
             @ParameterizedTest
             @ValueSource(strings = {"", " ", "  "})
-            @DisplayName("비어있으면 keyword 자리에 emotional을 넣어 반환한다.")
+            @DisplayName("비어있으면 keyword 자리에 emotions을 넣어 반환한다.")
             void emptyThanAddEmotional(String keyword) throws Exception {
                 //given
                 Emotion emotion = TestEmotion.createEmotion();
@@ -51,7 +51,24 @@ class PromptTextServiceTest {
                 String promptText = promptTextService.createPromptText(emotion, keyword);
 
                 //then
-                assertThat(promptText).contains("emotional");
+                assertThat(promptText).contains("emotions");
+            }
+
+            @Test
+            @DisplayName("키워드가 100자를 초과할 경우 100자로 자른다.")
+            void over100CharThanSubstring() throws Exception {
+                //given
+                Emotion emotion = TestEmotion.createEmotion();
+                String keyword_over_max = "a".repeat(101);
+                String keyword_not_over_max = "a".repeat(100);
+
+                //when
+                String promptText = promptTextService.createPromptText(emotion, keyword_over_max);
+
+                //then
+                assertThat(promptText).isEqualTo(
+                    emotion.getEmotionPrompt() + ", " + emotion.getColorPrompt() + ", "
+                        + "canvas-textured, Oil Pastel, " + keyword_not_over_max);
             }
         }
     }

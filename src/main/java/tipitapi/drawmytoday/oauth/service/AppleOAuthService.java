@@ -85,14 +85,14 @@ public class AppleOAuthService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("client_id", properties.getIosClientId());
-        body.add("client_secret", properties.getIosClientSecret());
+        body.add("client_id", properties.getClientId());
+        body.add("client_secret", properties.getClientSecret());
         body.add("token", refreshToken);
         body.add("token_type_hint", "refresh_token");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        String url = properties.getIosDeleteAccountUrl();
+        String url = properties.getDeleteAccountUrl();
 
         String response = restTemplate.postForObject(url, request, String.class);
         if (response != null) {
@@ -107,8 +107,8 @@ public class AppleOAuthService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        String clientId = properties.getIosClientId();
-        String clientSecret = properties.getIosClientSecret();
+        String clientId = properties.getClientId();
+        String clientSecret = properties.getClientSecret();
         String appleTokenUrl = properties.getTokenUrl();
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();

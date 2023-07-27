@@ -2,8 +2,12 @@ package tipitapi.drawmytoday.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiary;
+import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithId;
 import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotion;
 import static tipitapi.drawmytoday.common.testdata.TestImage.createImageWithId;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
@@ -20,12 +24,15 @@ import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.repository.ImageRepository;
+import tipitapi.drawmytoday.s3.service.S3Service;
 
 @ExtendWith(MockitoExtension.class)
 class ImageServiceTest {
 
     @Mock
     ImageRepository imageRepository;
+    @Mock
+    S3Service s3Service;
     @InjectMocks
     ImageService imageService;
 
@@ -67,6 +74,54 @@ class ImageServiceTest {
                 assertThatThrownBy(() -> imageService.getImage(diary))
                     .isInstanceOf(ImageNotFoundException.class);
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("createImage 메서드는")
+    class CreateImageTest {
+
+        @Test
+        @DisplayName("이미지를 생성한다.")
+        void it_creates_image() {
+            // given
+            Diary diary = createDiary(createUser(), createEmotion());
+            Image image = createImageWithId(1L, diary);
+
+            given(imageRepository.save(any(Image.class))).willReturn(image);
+
+            // when
+            Image createdImage = imageService.createImage(diary, "post/1/1234_1.png", true);
+
+            // then
+            assertThat(createdImage).isEqualTo(image);
+
+            verify(imageRepository).save(any(Image.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("uploadAndCreateImage 메서드는")
+    class UploadAndCreateImageTest {
+
+        @Test
+        @DisplayName("이미지를 업로드하고 생성한다")
+        void it_uploads_and_creates_image() {
+            // given
+            Long diaryId = 1L;
+            Diary diary = createDiaryWithId(diaryId, createUser(), createEmotion());
+            Image image = createImageWithId(1L, diary);
+            String imagePathRegex = "post/" + diaryId + "/\\d+_1.png";
+
+            given(imageRepository.save(any(Image.class))).willReturn(image);
+
+            // when
+            Image createdImage = imageService.uploadAndCreateImage(diary, new byte[1], true);
+
+            // then
+            assertThat(createdImage).isEqualTo(image);
+            verify(s3Service).uploadImage(any(byte[].class), matches(imagePathRegex));
+            verify(imageRepository).save(any(Image.class));
         }
     }
 }

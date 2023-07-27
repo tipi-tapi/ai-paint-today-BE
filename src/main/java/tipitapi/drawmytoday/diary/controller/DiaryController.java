@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
@@ -63,11 +64,13 @@ public class DiaryController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<SuccessResponse<GetDiaryResponse>> getDiary(
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
+        @Parameter(description = "감정 반환 언어(ko/en)", in = ParameterIn.QUERY)
+        @RequestParam(name = "lan", required = false, defaultValue = "ko") Language language
         , @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
-            diaryService.getDiary(tokenInfo.getUserId(), diaryId)
+            diaryService.getDiary(tokenInfo.getUserId(), diaryId, language)
         ).asHttp(HttpStatus.OK);
     }
 
@@ -163,11 +166,19 @@ public class DiaryController {
         @Parameter(description = "테스트 여부", in = ParameterIn.QUERY)
         @RequestParam(value = "test", required = false, defaultValue = "false") boolean test
     ) throws DallERequestFailException, ImageInputStreamFailException {
-        return SuccessResponse.of(
-            createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest.getEmotionId(),
+        CreateDiaryResponse response;
+        if (test) {
+            response = createDiaryService.createTestDiary(tokenInfo.getUserId(),
+                createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate(), test)
-        ).asHttp(HttpStatus.CREATED);
+                createDiaryRequest.getDiaryDate());
+        } else {
+            response = createDiaryService.createDiary(tokenInfo.getUserId(),
+                createDiaryRequest.getEmotionId(),
+                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
+                createDiaryRequest.getDiaryDate());
+        }
+        return SuccessResponse.of(response).asHttp(HttpStatus.CREATED);
     }
 
     @Operation(summary = "일기 수정", description = "주어진 일기의 내용을 수정한다.")

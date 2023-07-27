@@ -23,6 +23,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
     implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation platform('software.amazon.awssdk:bom:2.20.26')
@@ -30,6 +31,7 @@ dependencies {
 
 //	스프링 시큐리티, jwt 설정
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-jwt:1.1.1.RELEASE'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
@@ -63,9 +65,9 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it,
-                exclude: [
-                    'tipitapi/drawmytoday/common/**'
-                ])
+                    exclude: [
+                            'tipitapi/drawmytoday/common/**'
+                    ])
         }))
     }
 
@@ -85,7 +87,7 @@ jacocoTestCoverageVerification {
             }
 
             excludes = [
-                'tipitapi/drawmytoday/common/**'
+                    'tipitapi/drawmytoday/common/**'
             ]
         }
     }

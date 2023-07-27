@@ -10,6 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.client.RestTemplate;
+import tipitapi.drawmytoday.common.log.MDCRequestLoggingFilter;
 import tipitapi.drawmytoday.common.security.jwt.JwtAuthenticationEntryPoint;
 import tipitapi.drawmytoday.common.security.jwt.JwtAuthenticationFilter;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
@@ -58,7 +59,8 @@ public class SecurityConfig {
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, permitAllEndpointList),
                 UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtAuthenticationEntryPoint(objectMapper()),
-                JwtAuthenticationFilter.class);
+                JwtAuthenticationFilter.class)
+            .addFilterBefore(new MDCRequestLoggingFilter(), JwtAuthenticationEntryPoint.class);
 
         return http.build();
     }

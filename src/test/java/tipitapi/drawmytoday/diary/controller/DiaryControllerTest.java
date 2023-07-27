@@ -1,7 +1,6 @@
 package tipitapi.drawmytoday.diary.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -30,6 +29,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
+import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
@@ -74,13 +74,17 @@ class DiaryControllerTest extends ControllerTestSetup {
                 long diaryId = 1L;
                 User user = TestUser.createUser();
                 Emotion emotion = TestEmotion.createEmotion();
+                Language language = Language.ko;
+                String emotionText = emotion.getEmotionText(language);
                 Diary diary = TestDiary.createDiaryWithIdAndCreatedAt(
                     diaryId, LocalDateTime.now(), user, emotion);
                 String imageUrl = "imageUrl";
                 String promptText = "promptText";
-                GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl, emotion,
+                GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl,
+                    emotionText,
                     promptText);
-                given(diaryService.getDiary(REQUEST_USER_ID, diaryId)).willReturn(getDiaryResponse);
+                given(diaryService.getDiary(REQUEST_USER_ID, diaryId, language)).willReturn(
+                    getDiaryResponse);
 
                 // when
                 ResultActions result = mockMvc.perform(get(BASIC_URL + "/" + diaryId));
@@ -93,7 +97,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                         parseLocalDateTime(diary.getDiaryDate())))
                     .andExpect(jsonPath("$.data.createdAt").value(
                         parseLocalDateTime(diary.getCreatedAt())))
-                    .andExpect(jsonPath("$.data.emotion").value(emotion.getName()))
+                    .andExpect(jsonPath("$.data.emotion").value(emotionText))
                     .andExpect(jsonPath("$.data.notes").value(diary.getNotes()))
                     .andExpect(jsonPath("$.data.prompt").value(promptText));
             }
@@ -218,7 +222,7 @@ class DiaryControllerTest extends ControllerTestSetup {
 
         private final String keyword = "keyword";
         private final String notes = "notes";
-        private final LocalDate createDiaryDate = LocalDate.now();
+        private final LocalDate diaryDate = LocalDate.now();
         private final Long emotionId = 1L;
 
         @Nested
@@ -233,6 +237,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 Map<String, Object> requestMap = new HashMap<>();
                 requestMap.put("keyword", keyword);
                 requestMap.put("notes", notes);
+                requestMap.put("diaryDate", diaryDate);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
                 ResultActions result = mockMvc.perform(post(BASIC_URL)
                     .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -242,31 +247,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
-                    anyBoolean());
-            }
-
-            @Test
-            @DisplayName("keyword 값이 100byte가 넘는다면 BAD_REQUEST 상태코드를 응답한다.")
-            void keyword_is_null_than_return_bad_request() throws Exception {
-                // given
-                // when
-                String overKeyword = "a".repeat(101);
-                Map<String, Object> requestMap = new HashMap<>();
-                requestMap.put("emotionId", emotionId);
-                requestMap.put("keyword", overKeyword);
-                requestMap.put("notes", notes);
-                String requestBody = objectMapper.writeValueAsString(requestMap);
-                ResultActions result = mockMvc.perform(post(BASIC_URL)
-                    .with(SecurityMockMvcRequestPostProcessors.csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody));
-
-                // then
-                result.andExpect(status().isBadRequest());
-                verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
-                    anyBoolean());
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
             }
 
             @Test
@@ -279,6 +260,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 requestMap.put("emotionId", emotionId);
                 requestMap.put("keyword", keyword);
                 requestMap.put("notes", overNotes);
+                requestMap.put("diaryDate", diaryDate);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
                 ResultActions result = mockMvc.perform(post(BASIC_URL)
                     .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -288,8 +270,28 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
-                    anyBoolean());
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
+            }
+
+            @Test
+            @DisplayName("diaryDate가 미래의 날짜라면 BAD_REQUEST 상태코드를 응답한다.")
+            void diaryDate_is_After_now() throws Exception {
+                // given
+                // when
+                Map<String, Object> requestMap = new HashMap<>();
+                requestMap.put("keyword", keyword);
+                requestMap.put("notes", notes);
+                requestMap.put("diaryDate", LocalDate.now().plusDays(1));
+                String requestBody = objectMapper.writeValueAsString(requestMap);
+                ResultActions result = mockMvc.perform(post(BASIC_URL)
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody));
+
+                // then
+                result.andExpect(status().isBadRequest());
+                verify(createDiaryService, never()).createDiary(any(Long.class),
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
             }
         }
 
@@ -303,7 +305,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 Long diaryId = 1L;
                 given(createDiaryService.createDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, createDiaryDate, false))
+                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate))
                     .willReturn(new CreateDiaryResponse(diaryId));
 
                 // when
@@ -311,7 +313,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 requestMap.put("emotionId", emotionId);
                 requestMap.put("keyword", keyword);
                 requestMap.put("notes", notes);
-                requestMap.put("createDiaryDate", createDiaryDate);
+                requestMap.put("diaryDate", diaryDate);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
 
                 ResultActions result = mockMvc.perform(post(BASIC_URL)
@@ -328,8 +330,8 @@ class DiaryControllerTest extends ControllerTestSetup {
             void true_than_create_test_diary() throws Exception {
                 // given
                 Long testDiaryId = 1L;
-                given(createDiaryService.createDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, createDiaryDate, true))
+                given(createDiaryService.createTestDiary(
+                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate))
                     .willReturn(new CreateDiaryResponse(testDiaryId));
 
                 // when
@@ -337,7 +339,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 requestMap.put("emotionId", emotionId);
                 requestMap.put("keyword", keyword);
                 requestMap.put("notes", notes);
-                requestMap.put("createDiaryDate", createDiaryDate);
+                requestMap.put("diaryDate", diaryDate);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
 
                 ResultActions result = mockMvc.perform(post(BASIC_URL)

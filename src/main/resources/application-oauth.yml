@@ -9,7 +9,9 @@ oauth2:
     apple:
         ios:
             client-id: ${APPLE_IOS_CLIENT_ID}
-            client-secret: ${APPLE_IOS_CLIENT_SECRET}
+            team-id: ${APPLE_IOS_TEAM_ID}
+            key-id: ${APPLE_IOS_KEY_ID}
+            private-key: ${APPLE_IOS_PRIVATE_KEY}
             token-url: ${APPLE_IOS_TOKEN_URL}
             delete-account-url: ${APPLE_IOS_DELETE_ACCOUNT_URL}
 

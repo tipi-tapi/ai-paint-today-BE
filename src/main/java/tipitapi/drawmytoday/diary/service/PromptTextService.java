@@ -11,7 +11,9 @@ public class PromptTextService {
 
     public String createPromptText(Emotion emotion, String keyword) {
         if (!StringUtils.hasText(keyword)) {
-            keyword = "emotional";
+            keyword = "emotions";
+        } else {
+            keyword = validateKeywordSize(keyword);
         }
         return promptTextBuilder(
             emotion.getEmotionPrompt(),
@@ -37,4 +39,10 @@ public class PromptTextService {
         return sb.toString();
     }
 
+    private String validateKeywordSize(String keyword) {
+        if (keyword.length() > 100) {
+            return keyword.substring(0, 100);
+        }
+        return keyword;
+    }
 }
