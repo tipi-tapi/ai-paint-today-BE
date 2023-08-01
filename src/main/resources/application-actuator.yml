@@ -8,3 +8,8 @@ management:
       enabled: true
   server:
     port: 9292
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
