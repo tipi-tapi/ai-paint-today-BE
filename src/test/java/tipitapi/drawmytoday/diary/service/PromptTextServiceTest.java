@@ -55,20 +55,17 @@ class PromptTextServiceTest {
             }
 
             @Test
-            @DisplayName("키워드가 100자를 초과할 경우 100자로 자른다.")
-            void over100CharThanSubstring() throws Exception {
+            @DisplayName("생성한 프롬프트가 1000자를 초과할 경우 1000자로 자른다.")
+            void over1000CharThanSubstring() throws Exception {
                 //given
                 Emotion emotion = TestEmotion.createEmotion();
-                String keyword_over_max = "a".repeat(101);
-                String keyword_not_over_max = "a".repeat(100);
+                String keyword = "a".repeat(1000);
 
                 //when
-                String promptText = promptTextService.createPromptText(emotion, keyword_over_max);
+                String promptText = promptTextService.createPromptText(emotion, keyword);
 
                 //then
-                assertThat(promptText).isEqualTo(
-                    emotion.getEmotionPrompt() + ", " + emotion.getColorPrompt() + ", "
-                        + "canvas-textured, Oil Pastel, " + keyword_not_over_max);
+                assertThat(promptText.length()).isEqualTo(1000);
             }
         }
     }
