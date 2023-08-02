@@ -28,7 +28,7 @@ public class Prompt extends BaseEntity {
     private Diary diary;
 
     @NotNull
-    @Column(length = 300)
+    @Column(length = 1100)
     private String promptText;
 
     @NotNull
