@@ -38,7 +38,7 @@ public class Emotion extends BaseEntity {
     private String emotionPrompt;
 
     @NotNull
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 200)
     private String colorPrompt;
 
     private Emotion(String name, String color, boolean isActive, String emotionPrompt,
