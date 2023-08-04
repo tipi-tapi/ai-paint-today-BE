@@ -1,8 +1,11 @@
 package tipitapi.drawmytoday.common.utils;
 
 import java.sql.Date;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,9 +20,23 @@ public class DateUtils {
         return LocalDateTime.of(year, month, 1, 0, 0, 0);
     }
 
+    public static LocalDateTime getStartDate(ZoneId timezone, int year, int month) {
+        validateMonth(month);
+        Instant startDate = LocalDateTime.of(year, month, 1, 0, 0, 0)
+            .toInstant(ZoneOffset.UTC);
+        return LocalDateTime.ofInstant(startDate, timezone);
+    }
+
     public static LocalDateTime getEndDate(int year, int month) {
         validateMonth(month);
         return LocalDateTime.of(year, month, getMaxDay(month), 23, 59);
+    }
+
+    public static LocalDateTime getEndDate(ZoneId timezone, int year, int month) {
+        validateMonth(month);
+        Instant endDate = LocalDateTime.of(year, month, getMaxDay(month), 23, 59, 59)
+            .toInstant(ZoneOffset.UTC);
+        return LocalDateTime.ofInstant(endDate, timezone);
     }
 
     public static Date getDate(int year, int month, int day) {

@@ -1,6 +1,7 @@
 package tipitapi.drawmytoday.diary.service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -58,10 +59,11 @@ public class DiaryService {
         return GetDiaryResponse.of(diary, imageUrl, emotionText, promptText);
     }
 
-    public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
+    public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month,
+        ZoneId timezone) {
         User user = validateUserService.validateUserById(userId);
-        LocalDateTime startMonth = DateUtils.getStartDate(year, month);
-        LocalDateTime endMonth = DateUtils.getEndDate(year, month);
+        LocalDateTime startMonth = DateUtils.getStartDate(timezone, year, month);
+        LocalDateTime endMonth = DateUtils.getEndDate(timezone, year, month);
         List<Diary> getDiaryList = diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
             user.getUserId(), startMonth, endMonth);
         return convertDiariesToResponse(getDiaryList);
