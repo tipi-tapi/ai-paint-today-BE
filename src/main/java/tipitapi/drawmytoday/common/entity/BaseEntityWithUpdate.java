@@ -1,6 +1,8 @@
 package tipitapi.drawmytoday.common.entity;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
@@ -18,4 +20,8 @@ public abstract class BaseEntityWithUpdate extends BaseEntity {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    public ZonedDateTime getUpdatedAtWithZone() {
+        return updatedAt.atZone(ZoneOffset.UTC);
+    }
 }
