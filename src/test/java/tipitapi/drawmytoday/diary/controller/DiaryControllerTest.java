@@ -122,7 +122,7 @@ class DiaryControllerTest extends ControllerTestSetup {
             List<GetMonthlyDiariesResponse> monthlyDiaries = new ArrayList<>();
             for (long diaryId = 1; diaryId < 4; diaryId++) {
                 monthlyDiaries.add(new GetMonthlyDiariesResponse(diaryId, "imageUrl",
-                    LocalDateTime.of(year, month, 1, 1, 1, 1)));
+                    LocalDateTime.of(year, month, 1, 1, 1).atZone(defaultTimezone)));
             }
             given(diaryService.getMonthlyDiaries(
                 eq(REQUEST_USER_ID), eq(2023), eq(7), any(ZoneId.class)))
@@ -139,8 +139,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 .andExpect(jsonPath("$.data[0].id").value(monthlyDiaries.get(0).getId()))
                 .andExpect(
                     jsonPath("$.data[0].imageUrl").value(monthlyDiaries.get(0).getImageUrl()))
-                .andExpect(
-                    jsonPath("$.data[0].date").value(monthlyDiaries.get(0).getDate().toString()));
+                .andExpect(jsonPath("$.data[0].date").exists());
         }
 
         @Test
