@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.diary.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -14,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,19 +110,21 @@ class DiaryControllerTest extends ControllerTestSetup {
     @DisplayName("getMonthlyDiaries 메서드는")
     class GetMonthlyDiariesTest {
 
+        private final int year = 2023;
+        private final int month = 7;
+        private final ZoneId defaultTimezone = ZoneId.of("UTC");
+
         @Test
         @DisplayName("요청한 유저의 해당 월 일기 아이디, 이미지 url, 생성일을 리스트로 응답한다.")
         void return_monthly_diaries() throws Exception {
             // given
-            int year = 2023;
-            int month = 7;
             List<GetMonthlyDiariesResponse> monthlyDiaries = new ArrayList<>();
             for (long diaryId = 1; diaryId < 4; diaryId++) {
                 monthlyDiaries.add(new GetMonthlyDiariesResponse(diaryId, "imageUrl",
                     LocalDateTime.of(year, month, 1, 1, 1, 1)));
             }
-            given(diaryService.getMonthlyDiaries(REQUEST_USER_ID, 2023, 7)).willReturn(
-                monthlyDiaries);
+            given(diaryService.getMonthlyDiaries(REQUEST_USER_ID, 2023, 7, defaultTimezone))
+                .willReturn(monthlyDiaries);
 
             // when
             ResultActions result = mockMvc.perform(get(BASIC_URL + "/calendar/monthly")
@@ -135,6 +139,22 @@ class DiaryControllerTest extends ControllerTestSetup {
                     jsonPath("$.data[0].imageUrl").value(monthlyDiaries.get(0).getImageUrl()))
                 .andExpect(
                     jsonPath("$.data[0].date").value(monthlyDiaries.get(0).getDate().toString()));
+        }
+
+        @Test
+        @DisplayName("쿼리 파라미터로 받은 timezone이 없다면 기본값으로 KST를 사용한다.")
+        void timezone_is_not_exits_than_use_KST() throws Exception {
+            // given
+            // when
+            ResultActions result = mockMvc.perform(get(BASIC_URL + "/calendar/monthly")
+                .queryParam("year", String.valueOf(year))
+                .queryParam("month", String.valueOf(month)));
+
+            // then
+            result.andExpect(status().isOk());
+            then(diaryService).should()
+                .getMonthlyDiaries(REQUEST_USER_ID, year, month, ZoneId.of("Asia/Seoul"));
+
         }
     }
 

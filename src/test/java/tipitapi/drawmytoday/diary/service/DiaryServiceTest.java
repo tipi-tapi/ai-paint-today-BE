@@ -14,6 +14,7 @@ import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -192,6 +193,8 @@ class DiaryServiceTest {
     @DisplayName("getMonthlyDiaries 메소드 테스트")
     class GetMonthlyDiariesTest {
 
+        private final ZoneId timezone = ZoneId.of("Asia/Seoul");
+
         @Nested
         @DisplayName("userId에 해당하는 유저가 존재하지 않을 경우")
         class if_user_not_exists {
@@ -202,7 +205,7 @@ class DiaryServiceTest {
                 given(validateUserService.validateUserById(1L)).willThrow(
                     new UserNotFoundException());
 
-                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, 6))
+                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, 6, timezone))
                     .isInstanceOf(UserNotFoundException.class);
             }
         }
@@ -218,7 +221,7 @@ class DiaryServiceTest {
                 User user = createUser();
                 given(validateUserService.validateUserById(1L)).willReturn(user);
 
-                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, value))
+                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, value, timezone))
                     .isInstanceOf(BusinessException.class);
             }
 
@@ -229,7 +232,7 @@ class DiaryServiceTest {
                 User user = createUser();
                 given(validateUserService.validateUserById(1L)).willReturn(user);
 
-                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, value))
+                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, value, timezone))
                     .isInstanceOf(BusinessException.class);
             }
         }
@@ -248,7 +251,7 @@ class DiaryServiceTest {
                     any(Long.class), any(LocalDateTime.class), any(LocalDateTime.class)))
                     .willReturn(List.of(diary));
 
-                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, 6))
+                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, 6, timezone))
                     .isInstanceOf(ImageNotFoundException.class);
             }
 
@@ -265,7 +268,7 @@ class DiaryServiceTest {
 
                 List<GetMonthlyDiariesResponse> getDiaryResponses = diaryService.getMonthlyDiaries(
                     1L,
-                    2023, 6);
+                    2023, 6, timezone);
 
                 assertThat(getDiaryResponses).hasSize(1);
                 assertThat(getDiaryResponses.get(0).getId()).isEqualTo(diary.getDiaryId());
