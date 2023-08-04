@@ -84,7 +84,8 @@ class DiaryServiceTest {
             @DisplayName("일기를 반환한다.")
             void it_returns_diary() {
                 User user = createUserWithId(1L);
-                Diary diary = createDiaryWithId(1L, user, createEmotion());
+                Diary diary = createDiaryWithIdAndCreatedAt(1L, LocalDateTime.now(), user,
+                    createEmotion());
                 Image image = createImage(diary);
                 Language language = Language.ko;
 
@@ -107,7 +108,7 @@ class DiaryServiceTest {
             void if_lan_en_then_return_emotionPrompt() {
                 User user = createUserWithId(1L);
                 Emotion emotion = createEmotion();
-                Diary diary = createDiaryWithId(1L, user, emotion);
+                Diary diary = createDiaryWithIdAndCreatedAt(1L, LocalDateTime.now(), user, emotion);
                 Image image = createImage(diary);
 
                 Language language = Language.en;
@@ -131,7 +132,7 @@ class DiaryServiceTest {
             void if_lan_ko_then_return_name() {
                 User user = createUserWithId(1L);
                 Emotion emotion = createEmotion();
-                Diary diary = createDiaryWithId(1L, user, emotion);
+                Diary diary = createDiaryWithIdAndCreatedAt(1L, LocalDateTime.now(), user, emotion);
                 Image image = createImage(diary);
 
                 Language language = Language.ko;
