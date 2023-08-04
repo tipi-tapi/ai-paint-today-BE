@@ -1,13 +1,11 @@
 package tipitapi.drawmytoday.diary.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import tipitapi.drawmytoday.diary.domain.Diary;
@@ -23,17 +21,15 @@ public class GetDiaryResponse {
     @Schema(description = "이미지 URL", requiredMode = RequiredMode.REQUIRED)
     private final String imageUrl;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonSerialize(using = ZonedDateTimeSerializer.class)
     @Schema(description = "일기 날짜", requiredMode = RequiredMode.REQUIRED)
-    private final LocalDateTime date;
+    private final ZonedDateTime date;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonSerialize(using = ZonedDateTimeSerializer.class)
     @Schema(description = "일기 작성 시간", requiredMode = RequiredMode.REQUIRED)
-    private final LocalDateTime createdAt;
+    private final ZonedDateTime createdAt;
 
     @Schema(description = "감정", requiredMode = RequiredMode.REQUIRED)
     private final String emotion;
@@ -46,7 +42,7 @@ public class GetDiaryResponse {
 
     public static GetDiaryResponse of(Diary diary, String imageUrl, String emotionText,
         String promptText) {
-        return new GetDiaryResponse(diary.getDiaryId(), imageUrl, diary.getDiaryDate(),
-            diary.getCreatedAt(), emotionText, diary.getNotes(), promptText);
+        return new GetDiaryResponse(diary.getDiaryId(), imageUrl, diary.getDiaryDateWithZone(),
+            diary.getCreatedAtWithZone(), emotionText, diary.getNotes(), promptText);
     }
 }
