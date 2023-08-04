@@ -94,7 +94,7 @@ public class DiaryController {
         @Parameter(description = "조회할 연도", in = ParameterIn.QUERY) @RequestParam("year") int year,
         @Parameter(description = "조회할 달", in = ParameterIn.QUERY) @RequestParam("month") int month,
         @Parameter(description = "유저 타임존", in = ParameterIn.QUERY)
-        @RequestParam(name = "timezone", required = false, defaultValue = "+09:00") ZoneId timezone,
+        @RequestParam(name = "timezone", required = false, defaultValue = "Asia/Seoul") ZoneId timezone,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
