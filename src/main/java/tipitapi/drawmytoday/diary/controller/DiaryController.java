@@ -89,11 +89,12 @@ public class DiaryController {
             description = "U001: 해당 토큰의 유저를 찾을 수 없습니다.",
             content = @Content(schema = @Schema(hidden = true))),
     })
+    @Parameter(name = "timezone", description = "유저 타임존", in = ParameterIn.QUERY,
+        schema = @Schema(type = "string", defaultValue = "Asia/Seoul"))
     @GetMapping("/calendar/monthly")
     public ResponseEntity<SuccessResponse<List<GetMonthlyDiariesResponse>>> getMonthlyDiaries(
         @Parameter(description = "조회할 연도", in = ParameterIn.QUERY) @RequestParam("year") int year,
         @Parameter(description = "조회할 달", in = ParameterIn.QUERY) @RequestParam("month") int month,
-        @Parameter(description = "유저 타임존", in = ParameterIn.QUERY)
         @RequestParam(name = "timezone", required = false, defaultValue = "Asia/Seoul") ZoneId timezone,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
