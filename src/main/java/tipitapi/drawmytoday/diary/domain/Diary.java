@@ -3,6 +3,8 @@ package tipitapi.drawmytoday.diary.domain;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -117,5 +119,9 @@ public class Diary extends BaseEntityWithUpdate {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public ZonedDateTime getDiaryDateWithZone() {
+        return this.diaryDate.atZone(ZoneOffset.UTC);
     }
 }

@@ -138,7 +138,7 @@ public class DiaryService {
                 String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
                     diary.getImageList().get(0).getImageUrl(), 30);
                 return GetMonthlyDiariesResponse.of(diary.getDiaryId(), imageUrl,
-                    diary.getDiaryDate());
+                    diary.getDiaryDateWithZone());
             })
             .collect(Collectors.toList());
     }
