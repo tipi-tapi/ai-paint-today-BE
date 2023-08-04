@@ -1,6 +1,7 @@
 package tipitapi.drawmytoday.diary.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
@@ -123,7 +124,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 monthlyDiaries.add(new GetMonthlyDiariesResponse(diaryId, "imageUrl",
                     LocalDateTime.of(year, month, 1, 1, 1, 1)));
             }
-            given(diaryService.getMonthlyDiaries(REQUEST_USER_ID, 2023, 7, defaultTimezone))
+            given(diaryService.getMonthlyDiaries(
+                eq(REQUEST_USER_ID), eq(2023), eq(7), any(ZoneId.class)))
                 .willReturn(monthlyDiaries);
 
             // when
