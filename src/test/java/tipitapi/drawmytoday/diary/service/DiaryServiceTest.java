@@ -16,7 +16,6 @@ import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -280,6 +279,8 @@ class DiaryServiceTest {
     @DisplayName("getDiaryExistByDate 메소드 테스트")
     class GetDiaryExistByDateTest {
 
+        private final ZoneId timezone = ZoneId.of("UTC");
+
         @Nested
         @DisplayName("userId에 해당하는 유저가 존재하지 않을 경우")
         class if_user_not_exists {
@@ -290,7 +291,7 @@ class DiaryServiceTest {
                 given(validateUserService.validateUserById(1L)).willThrow(
                     new UserNotFoundException());
 
-                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, 1))
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, 1, timezone))
                     .isInstanceOf(UserNotFoundException.class);
             }
         }
@@ -306,7 +307,8 @@ class DiaryServiceTest {
                 User user = createUser();
                 given(validateUserService.validateUserById(1L)).willReturn(user);
 
-                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, value, 1))
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, value, 1,
+                    timezone))
                     .isInstanceOf(BusinessException.class);
             }
 
@@ -317,7 +319,8 @@ class DiaryServiceTest {
                 User user = createUser();
                 given(validateUserService.validateUserById(1L)).willReturn(user);
 
-                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, value, 1))
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, value, 1,
+                    timezone))
                     .isInstanceOf(BusinessException.class);
             }
         }
@@ -333,7 +336,8 @@ class DiaryServiceTest {
                 User user = createUser();
                 given(validateUserService.validateUserById(1L)).willReturn(user);
 
-                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, value))
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, value,
+                    timezone))
                     .isInstanceOf(BusinessException.class);
             }
 
@@ -344,7 +348,8 @@ class DiaryServiceTest {
                 User user = createUser();
                 given(validateUserService.validateUserById(1L)).willReturn(user);
 
-                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, value))
+                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, value,
+                    timezone))
                     .isInstanceOf(BusinessException.class);
             }
 
@@ -354,7 +359,8 @@ class DiaryServiceTest {
                 User user = createUser();
                 given(validateUserService.validateUserById(1L)).willReturn(user);
 
-                assertThatThrownBy(() -> diaryService.getDiaryExistByDate(1L, 2023, 6, 31))
+                assertThatThrownBy(
+                    () -> diaryService.getDiaryExistByDate(1L, 2023, 6, 31, timezone))
                     .isInstanceOf(BusinessException.class);
             }
         }
@@ -368,11 +374,12 @@ class DiaryServiceTest {
             void it_returns_false() {
                 User user = createUserWithId(1L);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findByUserIdAndDiaryDate(anyLong(), any(Date.class)))
+                given(diaryRepository.findByUserIdAndDiaryDate(anyLong(), any(LocalDateTime.class),
+                    any(LocalDateTime.class)))
                     .willReturn(new ArrayList<>());
 
                 GetDiaryExistByDateResponse response = diaryService.getDiaryExistByDate(
-                    1L, 2023, 6, 1);
+                    1L, 2023, 6, 1, timezone);
 
                 assertThat(response.isExist()).isFalse();
             }
@@ -388,11 +395,12 @@ class DiaryServiceTest {
                 User user = createUserWithId(1L);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 Diary diary = createDiaryWithId(1L, user, createEmotion());
-                given(diaryRepository.findByUserIdAndDiaryDate(anyLong(), any(Date.class)))
+                given(diaryRepository.findByUserIdAndDiaryDate(anyLong(), any(LocalDateTime.class),
+                    any(LocalDateTime.class)))
                     .willReturn(List.of(diary));
 
                 GetDiaryExistByDateResponse response = diaryService.getDiaryExistByDate(
-                    1L, 2023, 6, 1);
+                    1L, 2023, 6, 1, timezone);
 
                 assertThat(response.isExist()).isTrue();
                 assertThat(response.getDiaryId()).isEqualTo(1L);

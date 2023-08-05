@@ -5,7 +5,6 @@ import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithCrea
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithDate;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -78,8 +77,8 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
     @DisplayName("findAllByUserUserIdAndDiaryDateBetween 메소드 테스트")
     class findAllByUserUserIdAndDiaryDateBetweenTest {
 
-        private final LocalDateTime START_DATE = DateUtils.getStartDate(2023, 6);
-        private final LocalDateTime END_DATE = DateUtils.getStartDate(2023, 6);
+        private final LocalDateTime START_DATE = DateUtils.getStartDayOfMonth(2023, 6);
+        private final LocalDateTime END_DATE = DateUtils.getStartDayOfMonth(2023, 6);
 
         @Nested
         @DisplayName("userId에 해당하는 유저가 없을 경우")
@@ -284,7 +283,8 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
     class FindByUserIdAndDiaryDateTest {
 
         private final LocalDateTime DIARY_DATE_TIME = LocalDateTime.of(2021, 1, 1, 0, 0);
-        private final Date DIARY_DATE = Date.valueOf(DIARY_DATE_TIME.toLocalDate());
+        private final LocalDateTime START_DATE = LocalDateTime.of(2021, 1, 1, 0, 0);
+        private final LocalDateTime END_DATE = LocalDateTime.of(2021, 1, 1, 23, 59, 59);
 
         @Nested
         @DisplayName("해당 날짜에 일기가 없을 경우")
@@ -294,7 +294,8 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
             @DisplayName("빈 리스트를 반환한다.")
             void return_empty_list() {
                 assertThat(
-                    diaryRepository.findByUserIdAndDiaryDate(createUser().getUserId(), DIARY_DATE))
+                    diaryRepository.findByUserIdAndDiaryDate(createUser().getUserId(),
+                        START_DATE, END_DATE))
                     .isEmpty();
             }
         }
@@ -318,7 +319,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                         createDiaryWithDate(DIARY_DATE_TIME, user, emotion));
 
                     List<Diary> diaries = diaryRepository.findByUserIdAndDiaryDate(user.getUserId(),
-                        DIARY_DATE);
+                        START_DATE, END_DATE);
 
                     assertThat(diaries.size()).isEqualTo(2);
                     assertThat(diaries.get(0).getDiaryId()).isEqualTo(lastDiary.getDiaryId());
@@ -339,7 +340,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                         createDiaryWithDate(diaryDate, user, createEmotion()));
 
                     List<Diary> diaryList = diaryRepository.findByUserIdAndDiaryDate(
-                        user.getUserId(), DIARY_DATE);
+                        user.getUserId(), START_DATE, END_DATE);
                     assertThat(diaryList.size()).isEqualTo(1);
                     assertThat(diaryList.get(0).getDiaryId()).isEqualTo(diary.getDiaryId());
                 }

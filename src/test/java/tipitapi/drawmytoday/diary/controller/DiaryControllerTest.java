@@ -172,7 +172,8 @@ class DiaryControllerTest extends ControllerTestSetup {
             void return_false() throws Exception {
                 // given
                 int year = 2023, month = 7, day = 1;
-                given(diaryService.getDiaryExistByDate(REQUEST_USER_ID, year, month, day))
+                ZoneId timezone = ZoneId.of("Asia/Seoul");
+                given(diaryService.getDiaryExistByDate(REQUEST_USER_ID, year, month, day, timezone))
                     .willReturn(GetDiaryExistByDateResponse.ofNotExist());
 
                 // when
@@ -198,7 +199,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 int year = 2023, month = 7, day = 1;
                 long diaryId = 1L;
-                given(diaryService.getDiaryExistByDate(REQUEST_USER_ID, year, month, day))
+                ZoneId timezone = ZoneId.of("Asia/Seoul");
+                given(diaryService.getDiaryExistByDate(REQUEST_USER_ID, year, month, day, timezone))
                     .willReturn(GetDiaryExistByDateResponse.ofExist(diaryId));
 
                 // when
@@ -214,6 +216,33 @@ class DiaryControllerTest extends ControllerTestSetup {
             }
         }
 
+        @Nested
+        @DisplayName("쿼리 파라미터로 받은 timezone이")
+        class If_timezone_is {
+
+            @Test
+            @DisplayName("없다면 기본값으로 KST를 사용한다.")
+            void not_exist_then_return_KST() throws Exception {
+                // given
+                int year = 2023, month = 7, day = 1;
+                long diaryId = 1L;
+                given(diaryService.getDiaryExistByDate(eq(REQUEST_USER_ID), eq(year), eq(month),
+                    eq(day), any(ZoneId.class)))
+                    .willReturn(GetDiaryExistByDateResponse.ofExist(diaryId));
+
+                // when
+                ResultActions result = mockMvc.perform(get(BASIC_URL + "/calendar/date")
+                    .queryParam("year", String.valueOf(year))
+                    .queryParam("month", String.valueOf(month))
+                    .queryParam("day", String.valueOf(day)));
+
+                // then
+                result.andExpect(status().isOk());
+                then(diaryService).should()
+                    .getDiaryExistByDate(REQUEST_USER_ID, year, month, day,
+                        ZoneId.of("Asia/Seoul"));
+            }
+        }
     }
 
     @Nested
