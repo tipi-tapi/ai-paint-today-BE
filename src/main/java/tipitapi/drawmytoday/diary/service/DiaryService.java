@@ -2,7 +2,6 @@ package tipitapi.drawmytoday.diary.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -62,19 +61,21 @@ public class DiaryService {
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month,
         ZoneId timezone) {
         User user = validateUserService.validateUserById(userId);
-        LocalDateTime startMonth = DateUtils.getStartDate(timezone, year, month);
-        LocalDateTime endMonth = DateUtils.getEndDate(timezone, year, month);
+        LocalDateTime startMonth = DateUtils.getStartDayOfMonth(timezone, year, month);
+        LocalDateTime endMonth = DateUtils.getEndDayOfMonth(timezone, year, month);
         List<Diary> getDiaryList = diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
             user.getUserId(), startMonth, endMonth);
         return convertDiariesToResponse(getDiaryList);
     }
 
     public GetDiaryExistByDateResponse getDiaryExistByDate(Long userId, int year, int month,
-        int day) {
+        int day, ZoneId timezone) {
         User user = validateUserService.validateUserById(userId);
-        Date date = DateUtils.getDate(year, month, day);
+        LocalDateTime startDate = DateUtils.getStartDate(timezone, year, month, day);
+        LocalDateTime endDate = DateUtils.getEndDate(timezone, year, month, day);
+
         List<Diary> diaries = diaryRepository.findByUserIdAndDiaryDate(
-            user.getUserId(), date);
+            user.getUserId(), startDate, endDate);
         if (diaries.isEmpty()) {
             return GetDiaryExistByDateResponse.ofNotExist();
         } else {

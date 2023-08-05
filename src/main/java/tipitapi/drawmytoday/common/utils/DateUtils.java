@@ -15,26 +15,42 @@ import tipitapi.drawmytoday.common.exception.ErrorCode;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DateUtils {
 
-    public static LocalDateTime getStartDate(int year, int month) {
+    public static LocalDateTime getStartDayOfMonth(int year, int month) {
         validateMonth(month);
         return LocalDateTime.of(year, month, 1, 0, 0, 0);
     }
 
-    public static LocalDateTime getStartDate(ZoneId timezone, int year, int month) {
+    public static LocalDateTime getStartDayOfMonth(ZoneId timezone, int year, int month) {
         validateMonth(month);
         Instant startDate = LocalDateTime.of(year, month, 1, 0, 0, 0)
             .toInstant(ZoneOffset.UTC);
         return LocalDateTime.ofInstant(startDate, timezone);
     }
 
-    public static LocalDateTime getEndDate(int year, int month) {
+    public static LocalDateTime getStartDate(ZoneId timezone, int year, int month, int day) {
+        validateDate(month, day);
+        Instant date = LocalDate.of(year, month, day)
+            .atStartOfDay()
+            .toInstant(ZoneOffset.UTC);
+        return LocalDateTime.ofInstant(date, timezone);
+    }
+
+    public static LocalDateTime getEndDayOfMonth(int year, int month) {
         validateMonth(month);
         return LocalDateTime.of(year, month, getMaxDay(month), 23, 59);
     }
 
-    public static LocalDateTime getEndDate(ZoneId timezone, int year, int month) {
+    public static LocalDateTime getEndDayOfMonth(ZoneId timezone, int year, int month) {
         validateMonth(month);
         Instant endDate = LocalDateTime.of(year, month, getMaxDay(month), 23, 59, 59)
+            .toInstant(ZoneOffset.UTC);
+        return LocalDateTime.ofInstant(endDate, timezone);
+    }
+
+    public static LocalDateTime getEndDate(ZoneId timezone, int year, int month, int day) {
+        validateDate(month, day);
+        Instant endDate = LocalDate.of(year, month, day)
+            .atTime(23, 59, 59)
             .toInstant(ZoneOffset.UTC);
         return LocalDateTime.ofInstant(endDate, timezone);
     }

@@ -1,7 +1,6 @@
 package tipitapi.drawmytoday.diary.repository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -31,6 +30,10 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     )
     Page<DiaryForMonitorQueryResponse> getAllDiariesForMonitorAsPage(Pageable pageable);
 
-    @Query("select d from Diary d where d.user.userId = ?1 and DATE(d.diaryDate) = ?2 order by d.createdAt desc")
-    List<Diary> findByUserIdAndDiaryDate(Long userId, Date diaryDate);
+    @Query(value = "SELECT * FROM Diary d WHERE d.user_id = :userId AND d.diary_date >= :startDate "
+        + "AND d.diary_date < :endDate ORDER BY d.created_at DESC",
+        nativeQuery = true
+    )
+    List<Diary> findByUserIdAndDiaryDate(Long userId, LocalDateTime startDate,
+        LocalDateTime endDate);
 }

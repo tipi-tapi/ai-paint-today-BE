@@ -114,15 +114,18 @@ public class DiaryController {
                 + "C001 : day 값이 1~31 사이의 정수가 아닙니다.",
             content = @Content(schema = @Schema(hidden = true))),
     })
+    @Parameter(name = "timezone", description = "유저 타임존", in = ParameterIn.QUERY,
+        schema = @Schema(type = "string", defaultValue = "Asia/Seoul"))
     @GetMapping("/calendar/date")
     public ResponseEntity<SuccessResponse<GetDiaryExistByDateResponse>> getDiaryExistByDate(
         @Parameter(description = "조회할 연도", in = ParameterIn.QUERY) @RequestParam("year") int year,
         @Parameter(description = "조회할 달", in = ParameterIn.QUERY) @RequestParam("month") int month,
         @Parameter(description = "조회할 일", in = ParameterIn.QUERY) @RequestParam("day") int day,
+        @RequestParam(name = "timezone", required = false, defaultValue = "Asia/Seoul") ZoneId timezone,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
-            diaryService.getDiaryExistByDate(tokenInfo.getUserId(), year, month, day)
+            diaryService.getDiaryExistByDate(tokenInfo.getUserId(), year, month, day, timezone)
         ).asHttp(HttpStatus.OK);
     }
 
