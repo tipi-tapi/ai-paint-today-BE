@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -66,6 +67,8 @@ class CreateDiaryServiceTest {
         private final String NOTES = "노트";
         private final LocalDate DIARY_DATE = LocalDate.now();
 
+        private final ZoneId TIMEZONE = ZoneId.of("UTC");
+
         @Nested
         @DisplayName("dallE 요청 시")
         class DallE_request {
@@ -83,7 +86,8 @@ class CreateDiaryServiceTest {
                 Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
                 String prompt = "test prompt";
 
-                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserWithDrawLimit(USER_ID, TIMEZONE)).willReturn(
+                    user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(dallEService.getImageAsUrl(eq(prompt))).willThrow(exceptionClass);
@@ -92,7 +96,7 @@ class CreateDiaryServiceTest {
                 //then
                 assertThatThrownBy(
                     () -> createDiaryService.createDiary(USER_ID, EMOTION_ID, KEYWORD, NOTES,
-                        DIARY_DATE)).isInstanceOf(exceptionClass);
+                        DIARY_DATE, TIMEZONE)).isInstanceOf(exceptionClass);
                 assertThat(user.getLastDiaryDate().isEqual(lastDateTime)).isTrue();
 
                 verify(promptService).createPrompt(eq(prompt), eq(false));
@@ -113,7 +117,8 @@ class CreateDiaryServiceTest {
                 Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
                 Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
 
-                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserWithDrawLimit(USER_ID, TIMEZONE)).willReturn(
+                    user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(dallEService.getImageAsUrl(prompt)).willReturn(image);
@@ -122,7 +127,7 @@ class CreateDiaryServiceTest {
 
                 //when
                 CreateDiaryResponse createDiaryResponse = createDiaryService.createDiary(
-                    USER_ID, EMOTION_ID, KEYWORD, NOTES, DIARY_DATE);
+                    USER_ID, EMOTION_ID, KEYWORD, NOTES, DIARY_DATE, TIMEZONE);
 
                 //then
                 assertThat(createDiaryResponse.getId()).isEqualTo(diaryId);
@@ -151,13 +156,14 @@ class CreateDiaryServiceTest {
             String notes = "노트";
             String keyword = "키워드";
             LocalDateTime lastDateTime = diaryDate.minusDays(1L).atTime(1, 1);
+            ZoneId timezone = ZoneId.of("UTC");
 
             User user = TestUser.createUserWithId(userId);
             user.setLastDiaryDate(lastDateTime);
             Emotion emotion = TestEmotion.createEmotionWithId(emotionId);
             Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
 
-            given(validateUserService.validateUserWithDrawLimit(userId)).willReturn(user);
+            given(validateUserService.validateUserWithDrawLimit(userId, timezone)).willReturn(user);
             given(validateEmotionService.validateEmotionById(emotionId)).willReturn(emotion);
             given(encryptor.encrypt(notes)).willReturn("암호화된 노트");
             given(diaryRepository.save(any(Diary.class))).willReturn(diary);
@@ -165,7 +171,7 @@ class CreateDiaryServiceTest {
 
             //when
             CreateDiaryResponse response = createDiaryService.createTestDiary(
-                userId, emotionId, keyword, notes, diaryDate);
+                userId, emotionId, keyword, notes, diaryDate, timezone);
 
             //then
             assertThat(response.getId()).isEqualTo(diaryId);
