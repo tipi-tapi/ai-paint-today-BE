@@ -84,7 +84,7 @@ public class DiaryService {
         validateUserService.validateUserById(userId);
         return new GetLastCreationResponse(
             diaryRepository.findFirstByUserUserIdOrderByCreatedAtDesc(userId)
-                .map(BaseEntity::getCreatedAt)
+                .map(BaseEntity::getCreatedAtWithZone)
                 .orElse(null));
     }
 
