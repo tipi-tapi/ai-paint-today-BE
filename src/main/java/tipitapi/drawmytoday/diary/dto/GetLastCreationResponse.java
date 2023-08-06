@@ -13,7 +13,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class GetLastCreationResponse {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZ")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
     @Schema(description = "마지막 일기 생성 날짜", nullable = true)
     private ZonedDateTime lastCreation;
