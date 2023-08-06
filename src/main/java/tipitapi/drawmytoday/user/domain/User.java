@@ -1,7 +1,9 @@
 package tipitapi.drawmytoday.user.domain;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -75,6 +77,12 @@ public class User extends BaseEntityWithUpdate {
     public boolean checkDrawLimit() {
         return this.getLastDiaryDate() == null
             || !this.getLastDiaryDate().toLocalDate().equals(LocalDate.now());
+    }
+
+    public boolean checkDrawLimit(ZoneId timezone) {
+        LocalDate today = LocalDate.ofInstant(Instant.now(), timezone);
+        return this.getLastDiaryDate() == null
+            || !this.getLastDiaryDate().toLocalDate().equals(today);
     }
 
     public boolean isAdmin() {

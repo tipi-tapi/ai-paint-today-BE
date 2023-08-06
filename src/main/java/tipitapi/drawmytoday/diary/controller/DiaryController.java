@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.time.ZoneId;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -159,24 +160,27 @@ public class DiaryController {
             description = "IIS001 : 이미지 스트림을 가져오는데 실패하였습니다.",
             content = @Content(schema = @Schema(hidden = true))),
     })
+    @Parameter(name = "timezone", description = "유저 타임존", in = ParameterIn.QUERY,
+        schema = @Schema(type = "string", defaultValue = "Asia/Seoul"))
     @PostMapping()
     public ResponseEntity<SuccessResponse<CreateDiaryResponse>> createDiary(
         @RequestBody @Valid CreateDiaryRequest createDiaryRequest,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo,
         @Parameter(description = "테스트 여부", in = ParameterIn.QUERY)
-        @RequestParam(value = "test", required = false, defaultValue = "false") boolean test
+        @RequestParam(value = "test", required = false, defaultValue = "false") boolean test,
+        @RequestParam(value = "timezone", required = false, defaultValue = "Asia/Seoul") ZoneId timezone
     ) throws DallERequestFailException, ImageInputStreamFailException {
         CreateDiaryResponse response;
         if (test) {
             response = createDiaryService.createTestDiary(tokenInfo.getUserId(),
                 createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate());
+                createDiaryRequest.getDiaryDate(), timezone);
         } else {
             response = createDiaryService.createDiary(tokenInfo.getUserId(),
                 createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate());
+                createDiaryRequest.getDiaryDate(), timezone);
         }
         return SuccessResponse.of(response).asHttp(HttpStatus.CREATED);
     }

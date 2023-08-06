@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.diary.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,10 +37,10 @@ public class CreateDiaryService {
         noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
             ImageInputStreamFailException.class})
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
-        String notes, LocalDate diaryDate)
+        String notes, LocalDate diaryDate, ZoneId timezone)
         throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
-        User user = validateUserService.validateUserWithDrawLimit(userId);
+        User user = validateUserService.validateUserWithDrawLimit(userId, timezone);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         String prompt = promptTextService.createPromptText(emotion, keyword);
 
@@ -59,8 +60,8 @@ public class CreateDiaryService {
 
     @Transactional(readOnly = false)
     public CreateDiaryResponse createTestDiary(Long userId, Long emotionId, String keyword,
-        String notes, LocalDate diaryDate) {
-        User user = validateUserService.validateUserWithDrawLimit(userId);
+        String notes, LocalDate diaryDate, ZoneId timezone) {
+        User user = validateUserService.validateUserWithDrawLimit(userId, timezone);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
 
         Diary diary = saveDiary(notes, user, emotion, diaryDate, true);
