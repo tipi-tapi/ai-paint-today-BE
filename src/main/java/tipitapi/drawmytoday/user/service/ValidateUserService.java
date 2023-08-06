@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.user.service;
 
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +33,9 @@ public class ValidateUserService {
             .orElse(null);
     }
 
-    public User validateUserWithDrawLimit(Long userId) {
+    public User validateUserWithDrawLimit(Long userId, ZoneId timezone) {
         User user = validateUserById(userId);
-        if (user.checkDrawLimit()) {
+        if (user.checkDrawLimit(timezone)) {
             return user;
         } else {
             if (useAdRewardService.useReward(userId)) {
