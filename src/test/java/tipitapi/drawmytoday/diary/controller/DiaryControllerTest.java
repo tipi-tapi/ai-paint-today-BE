@@ -14,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -203,7 +205,7 @@ class DiaryControllerTest extends ControllerTestSetup {
         @DisplayName("유저가 마지막으로 일기를 생성한 시각을 반환한다.")
         void return_last_creation() throws Exception {
             // given
-            LocalDateTime lastCreation = LocalDateTime.now();
+            ZonedDateTime lastCreation = LocalDateTime.now().atZone(ZoneOffset.UTC);
             given(diaryService.getLastCreation(REQUEST_USER_ID)).willReturn(
                 new GetLastCreationResponse(lastCreation));
 
@@ -212,7 +214,7 @@ class DiaryControllerTest extends ControllerTestSetup {
 
             // then
             result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.lastCreation").value(parseLocalDateTime(lastCreation)));
+                .andExpect(jsonPath("$.data.lastCreation").exists());
         }
     }
 

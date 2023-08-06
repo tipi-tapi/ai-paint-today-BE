@@ -14,6 +14,7 @@ import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -452,7 +453,8 @@ class DiaryServiceTest {
 
                 GetLastCreationResponse response = diaryService.getLastCreation(1L);
 
-                assertThat(response.getLastCreation()).isEqualTo(lastCreation);
+                assertThat(response.getLastCreation()).isEqualTo(
+                    lastCreation.atZone(ZoneOffset.UTC));
             }
         }
     }
