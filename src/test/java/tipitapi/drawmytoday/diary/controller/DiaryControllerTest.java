@@ -1,7 +1,9 @@
 package tipitapi.drawmytoday.diary.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -14,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -227,6 +230,8 @@ class DiaryControllerTest extends ControllerTestSetup {
         private final LocalDate diaryDate = LocalDate.now();
         private final Long emotionId = 1L;
 
+        private final ZoneId timezone = ZoneId.of("Asia/Seoul");
+
         @Nested
         @DisplayName("content 값 중")
         class If_content_value {
@@ -249,7 +254,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
+                    any(ZoneId.class));
             }
 
             @Test
@@ -272,7 +278,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
+                    any(ZoneId.class));
             }
 
             @Test
@@ -293,7 +300,41 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
+                    any(ZoneId.class));
+            }
+        }
+
+        @Nested
+        @DisplayName("timezone 쿼리 파라미터가")
+        class Timezone_query_param_is {
+
+            @Test
+            @DisplayName("없다면 기본값으로 KST를 사용한다.")
+            void not_exist_then_use_KST() throws Exception {
+                // given
+                Long diaryId = 1L;
+                given(createDiaryService.createDiary(
+                    any(), any(), any(), any(), any(), any(ZoneId.class)))
+                    .willReturn(new CreateDiaryResponse(diaryId));
+
+                // when
+                Map<String, Object> requestMap = new HashMap<>();
+                requestMap.put("emotionId", emotionId);
+                requestMap.put("keyword", keyword);
+                requestMap.put("notes", notes);
+                requestMap.put("diaryDate", diaryDate);
+                String requestBody = objectMapper.writeValueAsString(requestMap);
+
+                ResultActions result = mockMvc.perform(post(BASIC_URL)
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody));
+
+                // then
+                result.andExpect(status().isCreated());
+                then(createDiaryService).should().createDiary(
+                    any(), any(), any(), any(), any(), eq(ZoneId.of("Asia/Seoul")));
             }
         }
 
@@ -307,7 +348,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 Long diaryId = 1L;
                 given(createDiaryService.createDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate))
+                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate, timezone))
                     .willReturn(new CreateDiaryResponse(diaryId));
 
                 // when
@@ -333,7 +374,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 Long testDiaryId = 1L;
                 given(createDiaryService.createTestDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate))
+                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate, timezone))
                     .willReturn(new CreateDiaryResponse(testDiaryId));
 
                 // when
