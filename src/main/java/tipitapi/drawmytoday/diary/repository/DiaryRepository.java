@@ -30,10 +30,8 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     )
     Page<DiaryForMonitorQueryResponse> getAllDiariesForMonitorAsPage(Pageable pageable);
 
-    @Query(value = "SELECT * FROM Diary d WHERE d.user_id = :userId AND d.diary_date >= :startDate "
-        + "AND d.diary_date < :endDate ORDER BY d.created_at DESC",
-        nativeQuery = true
-    )
+    @Query("SELECT d FROM Diary d WHERE d.user.userId = :userId AND "
+        + "d.diaryDate BETWEEN :startDate AND :endDate ORDER BY d.createdAt DESC")
     List<Diary> findByUserIdAndDiaryDate(Long userId, LocalDateTime startDate,
         LocalDateTime endDate);
 }
