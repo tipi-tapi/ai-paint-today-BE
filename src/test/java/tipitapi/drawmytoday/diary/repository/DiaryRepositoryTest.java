@@ -325,6 +325,25 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                     assertThat(diaries.get(0).getDiaryId()).isEqualTo(lastDiary.getDiaryId());
                     assertThat(diaries.get(1).getDiaryId()).isEqualTo(prevDiary.getDiaryId());
                 }
+
+                @Test
+                @DisplayName("시작 날짜와 끝 날짜 사이의 일기 리스트를 반환한다.")
+                void return_diaries_between_start_date_and_end_date() {
+                    User user = createUser();
+                    Emotion emotion = createEmotion();
+                    List<LocalDateTime> date = List.of(
+                        START_DATE.minusSeconds(1L),
+                        START_DATE,
+                        END_DATE,
+                        END_DATE.plusSeconds(1L)
+                    );
+                    date.forEach(dateTime -> diaryRepository.save(
+                        createDiaryWithDate(dateTime, user, emotion)));
+                    List<Diary> diaries = diaryRepository.findByUserIdAndDiaryDate(user.getUserId(),
+                        START_DATE, END_DATE);
+
+                    assertThat(diaries.size()).isEqualTo(2);
+                }
             }
 
             @Nested
