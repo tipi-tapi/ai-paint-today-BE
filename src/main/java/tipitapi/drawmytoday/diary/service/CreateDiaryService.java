@@ -1,7 +1,6 @@
 package tipitapi.drawmytoday.diary.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class CreateDiaryService {
         try {
             byte[] dallEImage = dallEService.getImageAsUrl(prompt);
 
-            Diary diary = saveDiary(notes, user, emotion, diaryDate, false);
+            Diary diary = saveDiary(notes, user, emotion, diaryDate, timezone, false);
             promptService.createPrompt(diary, prompt, true);
             imageService.uploadAndCreateImage(diary, dallEImage, true);
 
@@ -64,7 +63,7 @@ public class CreateDiaryService {
         User user = validateUserService.validateUserWithDrawLimit(userId, timezone);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
 
-        Diary diary = saveDiary(notes, user, emotion, diaryDate, true);
+        Diary diary = saveDiary(notes, user, emotion, diaryDate, timezone, true);
         String prompt = promptTextService.createPromptText(emotion, keyword);
         promptService.createPrompt(diary, prompt, true);
         imageService.createImage(diary, DUMMY_IMAGE_PATH, true);
@@ -73,14 +72,16 @@ public class CreateDiaryService {
     }
 
     private Diary saveDiary(String notes, User user, Emotion emotion, LocalDate diaryDate,
-        boolean testDiary) {
+        ZoneId timezone, boolean testDiary) {
         String encryptedNotes = encryptor.encrypt(notes);
-        user.setLastDiaryDate(LocalDateTime.now());
+        user.updateLastDiaryDate(timezone);
 
         if (testDiary) {
-            return diaryRepository.save(Diary.ofTest(user, emotion, diaryDate, encryptedNotes));
+            return diaryRepository.save(
+                Diary.ofTest(user, emotion, diaryDate, timezone, encryptedNotes));
         } else {
-            return diaryRepository.save(Diary.of(user, emotion, diaryDate, encryptedNotes));
+            return diaryRepository.save(
+                Diary.of(user, emotion, diaryDate, timezone, encryptedNotes));
         }
     }
 }

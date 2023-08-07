@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.diary.domain;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -93,22 +94,24 @@ public class Diary extends BaseEntityWithUpdate {
         this.imageList = new ArrayList<>();
     }
 
-    public static Diary of(User user, Emotion emotion, LocalDate diaryDate, String notes) {
+    public static Diary of(User user, Emotion emotion, LocalDate diaryDate, ZoneId timezone,
+        String notes) {
         return Diary.builder()
             .user(user)
             .emotion(emotion)
-            .diaryDate(diaryDate.atTime(LocalTime.now()))
+            .diaryDate(diaryDate.atTime(LocalTime.now(timezone)))
             .notes(notes)
             .isAi(true)
             .isTest(false)
             .build();
     }
 
-    public static Diary ofTest(User user, Emotion emotion, LocalDate diaryDate, String notes) {
+    public static Diary ofTest(User user, Emotion emotion, LocalDate diaryDate, ZoneId timezone,
+        String notes) {
         return Diary.builder()
             .user(user)
             .emotion(emotion)
-            .diaryDate(diaryDate.atTime(LocalTime.now()))
+            .diaryDate(diaryDate.atTime(LocalTime.now(timezone)))
             .notes(notes)
             .isAi(true)
             .isTest(true)

@@ -1,6 +1,5 @@
 package tipitapi.drawmytoday.user.domain;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -80,12 +79,16 @@ public class User extends BaseEntityWithUpdate {
     }
 
     public boolean checkDrawLimit(ZoneId timezone) {
-        LocalDate today = LocalDate.ofInstant(Instant.now(), timezone);
+        LocalDate userBasedToday = LocalDate.now(timezone);
         return this.getLastDiaryDate() == null
-            || !this.getLastDiaryDate().toLocalDate().equals(today);
+            || !this.getLastDiaryDate().toLocalDate().equals(userBasedToday);
     }
 
     public boolean isAdmin() {
         return this.userRole == UserRole.ADMIN;
+    }
+
+    public void updateLastDiaryDate(ZoneId timezone) {
+        this.lastDiaryDate = LocalDateTime.now(timezone);
     }
 }
