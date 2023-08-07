@@ -7,6 +7,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import tipitapi.drawmytoday.common.converter.StringToLanguageConverter;
+import tipitapi.drawmytoday.common.converter.StringToZoneIdConverter;
 import tipitapi.drawmytoday.common.resolver.AuthUserArgumentResolver;
 
 @Configuration
@@ -15,6 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final AuthUserArgumentResolver authUserArgumentResolver;
     private final StringToLanguageConverter stringToLanguageConverter;
+    private final StringToZoneIdConverter stringToZoneOffsetConverter;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -24,5 +26,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(stringToLanguageConverter);
+        registry.addConverter(stringToZoneOffsetConverter);
     }
 }
