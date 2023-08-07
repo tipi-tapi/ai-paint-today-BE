@@ -67,7 +67,7 @@ class CreateDiaryServiceTest {
         private final String NOTES = "노트";
         private final LocalDate DIARY_DATE = LocalDate.now();
 
-        private final ZoneId TIMEZONE = ZoneId.of("UTC");
+        private final ZoneId TIMEZONE = ZoneId.of("Asia/Seoul");
 
         @Nested
         @DisplayName("dallE 요청 시")
@@ -156,7 +156,7 @@ class CreateDiaryServiceTest {
             String notes = "노트";
             String keyword = "키워드";
             LocalDateTime lastDateTime = diaryDate.minusDays(1L).atTime(1, 1);
-            ZoneId timezone = ZoneId.of("UTC");
+            ZoneId timezone = ZoneId.of("Asia/Seoul");
 
             User user = TestUser.createUserWithId(userId);
             user.setLastDiaryDate(lastDateTime);
