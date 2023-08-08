@@ -39,11 +39,6 @@ public class GetDiaryAdminResponse {
         this.createdAt = createdAt;
     }
 
-    public static GetDiaryAdminResponse of(Long id, String imageURL, String prompt,
-        LocalDateTime createdAt) {
-        return new GetDiaryAdminResponse(id, imageURL, prompt, createdAt);
-    }
-
     public void updateImageUrl(String imageUrl) {
         this.imageURL = imageUrl;
     }
