@@ -4,15 +4,12 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.dto.DiaryForMonitorQueryResponse;
 
-public interface DiaryRepository extends JpaRepository<Diary, Long> {
+public interface DiaryRepository extends JpaRepository<Diary, Long>, DiaryQueryRepository {
 
     @EntityGraph(attributePaths = {"imageList"})
     List<Diary> findAllByUserUserIdAndDiaryDateBetween(Long userId, LocalDateTime startMonth,
