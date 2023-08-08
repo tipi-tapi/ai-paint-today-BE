@@ -1,7 +1,5 @@
 package tipitapi.drawmytoday.admin.service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -9,7 +7,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
-import tipitapi.drawmytoday.diary.dto.DiaryForMonitorQueryResponse;
 import tipitapi.drawmytoday.diary.service.AdminDiaryService;
 import tipitapi.drawmytoday.s3.service.S3PreSignedService;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
@@ -28,17 +25,13 @@ public class AdminService {
     public Page<GetDiaryAdminResponse> getDiaries(Long userId, int size, int page,
         Direction direction) {
         validateUserService.validateAdminUserById(userId);
-        return adminDiaryService.getDiaries(size, page, direction)
-            .map(this::buildGetDiaryAdminResponse);
+        return adminDiaryService.getDiaries(size, page, direction).map(this::buildImageUrl);
     }
 
-    private GetDiaryAdminResponse buildGetDiaryAdminResponse(
-        DiaryForMonitorQueryResponse response) {
-        LocalDateTime createdAt = LocalDateTime.parse(response.getCreatedAt(),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.n"));
-        String imageUrl = s3PreSignedService.getPreSignedUrlForShare(response.getImageUrl(),
+    private GetDiaryAdminResponse buildImageUrl(GetDiaryAdminResponse response) {
+        String imageUrl = s3PreSignedService.getPreSignedUrlForShare(response.getImageURL(),
             getDiariesExpiration);
-        return GetDiaryAdminResponse.of(response.getId(), imageUrl, response.getPrompt(),
-            createdAt);
+        response.updateImageUrl(imageUrl);
+        return response;
     }
 }
