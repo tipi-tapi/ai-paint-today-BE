@@ -50,22 +50,24 @@ class AdminControllerTest extends ControllerTestSetup {
             Pageable pageable = PageRequest.of(page, size,
                 Sort.by(direction, "created_at", "diary_id"));
             List<GetDiaryAdminResponse> diaries = new ArrayList<>();
-            diaries.add(GetDiaryAdminResponse.of(1L,
+            diaries.add(new GetDiaryAdminResponse(1L,
                 "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/1.png",
                 "happy , pink , canvas-textured, Oil Pastel, a crowded subway",
                 LocalDateTime.now().minusDays(5)));
-            diaries.add(GetDiaryAdminResponse.of(2L,
+            diaries.add(new GetDiaryAdminResponse(2L,
                 "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/2.png",
                 "angry , blue , glass-textured, crayon, school",
                 LocalDateTime.now().minusDays(1)));
-            given(adminService.getDiaries(anyLong(), anyInt(), anyInt(), any(Direction.class)))
+            given(adminService.getDiaries(anyLong(), anyInt(), anyInt(), any(Direction.class),
+                anyLong()))
                 .willReturn(new PageImpl<>(diaries, pageable, 2));
 
             // when
             ResultActions result = mockMvc.perform(get(BASIC_URL + "/diaries")
                 .queryParam("size", String.valueOf(size))
                 .queryParam("page", String.valueOf(page))
-                .queryParam("direction", "ASC"));
+                .queryParam("direction", "ASC")
+                .queryParam("emotion", "1"));
 
             // then
             result.andExpect(status().isOk())

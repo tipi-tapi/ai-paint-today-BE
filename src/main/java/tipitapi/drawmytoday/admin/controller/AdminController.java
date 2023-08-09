@@ -49,10 +49,12 @@ public class AdminController {
         @RequestParam(value = "page", required = false, defaultValue = "0") int page,
         @Parameter(name = "direction", description = "페이지네이션의 정렬기준. DESC=최신순, ASC=오래된순", in = ParameterIn.QUERY)
         @RequestParam(name = "direction", required = false, defaultValue = "DESC") Direction direction,
+        @Parameter(name = "emotion", description = "필터링할 감정 ID", in = ParameterIn.QUERY)
+        @RequestParam(name = "emotion", required = false) Long emotionId,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
-            adminService.getDiaries(tokenInfo.getUserId(), size, page, direction)
+            adminService.getDiaries(tokenInfo.getUserId(), size, page, direction, emotionId)
         ).asHttp(HttpStatus.OK);
     }
 }

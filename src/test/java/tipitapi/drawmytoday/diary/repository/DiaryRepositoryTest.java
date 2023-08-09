@@ -17,24 +17,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.jdbc.Sql;
+import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
+import tipitapi.drawmytoday.common.config.QuerydslConfig;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestImage;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.dto.DiaryForMonitorQueryResponse;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.User;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
+@Import(QuerydslConfig.class)
 class DiaryRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
@@ -227,8 +229,8 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
     }
 
     @Nested
-    @DisplayName("getAllDiariesForMonitorAsPage 메소드 테스트")
-    class GetAllDiariesForMonitorAsPageTest {
+    @DisplayName("getDiariesForMonitorAsPage 메소드 테스트")
+    class GetDiariesForMonitorAsPageTest {
 
         @Nested
         @DisplayName("삭제된 일기가 있을 경우")
@@ -236,13 +238,12 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
 
             @Test
             @DisplayName("삭제된 일기를 포함한 일기 리스트를 반환한다.")
-            @Sql("GetAllDiariesForMonitorAsPageTest.sql")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
             void return_diary_list_includes_deleted() {
                 int page = 0;
                 int size = 5;
-                Direction direction = Direction.DESC;
-                Page<DiaryForMonitorQueryResponse> response = diaryRepository.getAllDiariesForMonitorAsPage(
-                    PageRequest.of(page, size, Sort.by(direction, "created_at", "diary_id")));
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
 
                 assertThat(response.getTotalElements()).isEqualTo(10);
                 assertThat(response.getContent().size()).isEqualTo(5);
@@ -258,7 +259,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
 
             @Test
             @DisplayName("더미 이미지를 제외한 일기 리스트를 반환한다.")
-            @Sql("GetAllDiariesForMonitorAsPageTest.sql")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
             void return_diary_list_excludes_dummy_image() {
                 User user = userRepository.save(TestUser.createUser());
                 Emotion emotion = emotionRepository.save(TestEmotion.createEmotion());
@@ -267,14 +268,50 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
 
                 int page = 0;
                 int size = 5;
-                Direction direction = Direction.DESC;
-                Page<DiaryForMonitorQueryResponse> response = diaryRepository.getAllDiariesForMonitorAsPage(
-                    PageRequest.of(page, size, Sort.by(direction, "created_at", "diary_id")));
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
 
                 assertThat(response.get()
-                    .filter(diaryResponse -> Objects.equals(diaryResponse.getId(),
-                        diary.getDiaryId()))
+                    .filter(
+                        diaryResponse -> Objects.equals(diaryResponse.getId(), diary.getDiaryId()))
                     .findAny()).isEmpty();
+            }
+        }
+
+        @Nested
+        @DisplayName("감정 ID가 주어졌을 경우")
+        class if_emotion_id_given {
+
+            @Test
+            @DisplayName("해당 감정이 존재한다면, 필터링한다.")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
+            void return_diary_list_with_emotion_filtered() {
+                int page = 0;
+                int size = 5;
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, 1L);
+
+                assertThat(response.getTotalElements()).isEqualTo(5);
+                assertThat(response.getContent().size()).isEqualTo(5);
+                assertThat(response.getTotalPages()).isEqualTo(1);
+                assertThat(response.getSort().isSorted()).isTrue();
+                assertThat(response.getContent().get(0).getId()).isEqualTo(5L);
+            }
+
+            @Test
+            @DisplayName("해당 감정이 존재하지 않는다면, 필터링을 적용하지 않는다.")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
+            void return_diary_list_without_emotion_filtered() {
+                int page = 0;
+                int size = 5;
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
+
+                assertThat(response.getTotalElements()).isEqualTo(10);
+                assertThat(response.getContent().size()).isEqualTo(5);
+                assertThat(response.getTotalPages()).isEqualTo(2);
+                assertThat(response.getSort().isSorted()).isTrue();
+                assertThat(response.getContent().get(0).getId()).isEqualTo(10L);
             }
         }
     }
