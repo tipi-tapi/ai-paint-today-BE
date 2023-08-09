@@ -48,12 +48,12 @@ class AdminDiaryServiceTest {
                 LocalDateTime.of(2023, 6, 17, 15, 0, 0)));
             given(
                 diaryRepository.getDiariesForMonitorAsPage(any(Pageable.class),
-                    any(Direction.class)))
+                    any(Direction.class), 1L))
                 .willReturn(new PageImpl<>(diaries));
 
             // when
             Page<GetDiaryAdminResponse> response = adminDiaryService.getDiaries(10, 0,
-                Direction.ASC);
+                Direction.ASC, 1L);
 
             // then
             assertThat(response.getContent().size()).isEqualTo(2);

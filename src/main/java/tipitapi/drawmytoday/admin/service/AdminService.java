@@ -18,8 +18,8 @@ public class AdminService {
     private final AdminDiaryService adminDiaryService;
 
     public Page<GetDiaryAdminResponse> getDiaries(Long userId, int size, int page,
-        Direction direction) {
+        Direction direction, Long emotionId) {
         validateUserService.validateAdminUserById(userId);
-        return adminDiaryService.getDiaries(size, page, direction);
+        return adminDiaryService.getDiaries(size, page, direction, emotionId);
     }
 }

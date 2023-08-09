@@ -21,9 +21,11 @@ public class AdminDiaryService {
     @Value("${presigned-image.expiration.admin-diaries}")
     private int imageExpiration;
 
-    public Page<GetDiaryAdminResponse> getDiaries(int size, int page, Direction direction) {
+    public Page<GetDiaryAdminResponse> getDiaries(int size, int page, Direction direction,
+        Long emotionId) {
         return diaryRepository.getDiariesForMonitorAsPage(
-            Pageable.ofSize(size).withPage(page), direction).map(this::generatePresignedURL);
+                Pageable.ofSize(size).withPage(page), direction, emotionId)
+            .map(this::generatePresignedURL);
     }
 
     private GetDiaryAdminResponse generatePresignedURL(GetDiaryAdminResponse response) {

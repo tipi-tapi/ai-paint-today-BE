@@ -8,5 +8,5 @@ import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
 public interface DiaryQueryRepository {
 
     Page<GetDiaryAdminResponse> getDiariesForMonitorAsPage(Pageable pageable,
-        Direction direction);
+        Direction direction, Long emotionId);
 }

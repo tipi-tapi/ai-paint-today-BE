@@ -58,14 +58,16 @@ class AdminControllerTest extends ControllerTestSetup {
                 "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/2.png",
                 "angry , blue , glass-textured, crayon, school",
                 LocalDateTime.now().minusDays(1)));
-            given(adminService.getDiaries(anyLong(), anyInt(), anyInt(), any(Direction.class)))
+            given(adminService.getDiaries(anyLong(), anyInt(), anyInt(), any(Direction.class),
+                anyLong()))
                 .willReturn(new PageImpl<>(diaries, pageable, 2));
 
             // when
             ResultActions result = mockMvc.perform(get(BASIC_URL + "/diaries")
                 .queryParam("size", String.valueOf(size))
                 .queryParam("page", String.valueOf(page))
-                .queryParam("direction", "ASC"));
+                .queryParam("direction", "ASC")
+                .queryParam("emotion", "1"));
 
             // then
             result.andExpect(status().isOk())

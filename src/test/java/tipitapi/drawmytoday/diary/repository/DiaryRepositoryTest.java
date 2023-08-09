@@ -243,7 +243,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                 int page = 0;
                 int size = 5;
                 Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
-                    Pageable.ofSize(size).withPage(page), Direction.DESC);
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
 
                 assertThat(response.getTotalElements()).isEqualTo(10);
                 assertThat(response.getContent().size()).isEqualTo(5);
@@ -269,12 +269,49 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                 int page = 0;
                 int size = 5;
                 Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
-                    Pageable.ofSize(size).withPage(page), Direction.DESC);
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
 
                 assertThat(response.get()
                     .filter(
                         diaryResponse -> Objects.equals(diaryResponse.getId(), diary.getDiaryId()))
                     .findAny()).isEmpty();
+            }
+        }
+
+        @Nested
+        @DisplayName("감정 ID가 주어졌을 경우")
+        class if_emotion_id_given {
+
+            @Test
+            @DisplayName("해당 감정이 존재한다면, 필터링한다.")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
+            void return_diary_list_with_emotion_filtered() {
+                int page = 0;
+                int size = 5;
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, 1L);
+
+                assertThat(response.getTotalElements()).isEqualTo(5);
+                assertThat(response.getContent().size()).isEqualTo(5);
+                assertThat(response.getTotalPages()).isEqualTo(1);
+                assertThat(response.getSort().isSorted()).isTrue();
+                assertThat(response.getContent().get(0).getId()).isEqualTo(5L);
+            }
+
+            @Test
+            @DisplayName("해당 감정이 존재하지 않는다면, 필터링을 적용하지 않는다.")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
+            void return_diary_list_without_emotion_filtered() {
+                int page = 0;
+                int size = 5;
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
+
+                assertThat(response.getTotalElements()).isEqualTo(10);
+                assertThat(response.getContent().size()).isEqualTo(5);
+                assertThat(response.getTotalPages()).isEqualTo(2);
+                assertThat(response.getSort().isSorted()).isTrue();
+                assertThat(response.getContent().get(0).getId()).isEqualTo(10L);
             }
         }
     }

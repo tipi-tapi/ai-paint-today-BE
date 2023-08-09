@@ -56,7 +56,7 @@ class AdminServiceTest {
 
                 // when
                 // then
-                assertThatThrownBy(() -> adminService.getDiaries(1L, 10, 0, Direction.ASC))
+                assertThatThrownBy(() -> adminService.getDiaries(1L, 10, 0, Direction.ASC, 1L))
                     .isInstanceOf(UserAccessDeniedException.class);
             }
         }
@@ -82,13 +82,13 @@ class AdminServiceTest {
                     "angry , purple , canvas-textured, Oil Pastel, school",
                     LocalDateTime.of(2023, 6, 17, 15, 0, 0)));
                 given(adminDiaryService.getDiaries(any(Integer.class), any(Integer.class),
-                    any(Direction.class))).willReturn(new PageImpl<>(diaries));
+                    any(Direction.class), anyLong())).willReturn(new PageImpl<>(diaries));
                 given(s3PreSignedService.getPreSignedUrlForShare(any(String.class), anyLong()))
                     .willReturn("imageUrl");
 
                 // when
                 Page<GetDiaryAdminResponse> response = adminService.getDiaries(1L, 10, 0,
-                    Direction.ASC);
+                    Direction.ASC, 1L);
 
                 // then
                 assertThat(response.getContent().size()).isEqualTo(2);
