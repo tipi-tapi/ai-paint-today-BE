@@ -30,7 +30,8 @@ public class SecurityConfig {
         "/oauth2/apple/login",
         "/oauth2/refresh",
         "/oauth2/expiredJwt",
-        "/health/server"
+        "/health/server",
+        "/actuator/**"
     };
 
     @Bean
