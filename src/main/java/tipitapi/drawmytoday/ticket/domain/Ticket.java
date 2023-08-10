@@ -35,13 +35,13 @@ public class Ticket extends BaseEntity {
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private TicketType type;
+    private TicketType ticketType;
 
     private LocalDateTime usedAt;
 
     private Ticket(User user, TicketType type) {
         this.user = user;
-        this.type = type;
+        this.ticketType = type;
     }
 
     public static Ticket of(User user, TicketType type) {
