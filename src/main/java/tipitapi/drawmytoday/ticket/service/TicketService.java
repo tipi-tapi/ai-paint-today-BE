@@ -25,4 +25,8 @@ public class TicketService {
         }
         ticketRepository.saveAll(tickets);
     }
+
+    public void createTicketByAdReward(User user) {
+        ticketRepository.save(Ticket.of(user, TicketType.AD_REWARD))
+    }
 }
