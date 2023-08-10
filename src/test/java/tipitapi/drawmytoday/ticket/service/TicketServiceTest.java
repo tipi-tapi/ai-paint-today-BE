@@ -1,6 +1,6 @@
 package tipitapi.drawmytoday.ticket.service;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
@@ -9,10 +9,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.ticket.domain.Ticket;
+import tipitapi.drawmytoday.ticket.domain.TicketType;
 import tipitapi.drawmytoday.ticket.repository.TicketRepository;
 import tipitapi.drawmytoday.user.domain.User;
 
@@ -35,7 +37,9 @@ public class TicketServiceTest {
 
             ticketService.createTicketByJoin(user);
 
-            verify(ticketRepository, times(7)).save(any(Ticket.class));
+            ArgumentCaptor<Ticket> ticketArgumentCaptor = ArgumentCaptor.forClass(Ticket.class);
+            verify(ticketRepository, times(1)).save(ticketArgumentCaptor.capture());
+            assertEquals(ticketArgumentCaptor.getValue().getTicketType(), TicketType.JOIN);
         }
     }
 }
