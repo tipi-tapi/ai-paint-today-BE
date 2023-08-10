@@ -26,6 +26,7 @@ public class CreateDiaryService {
     private final ImageService imageService;
     private final ValidateUserService validateUserService;
     private final ValidateEmotionService validateEmotionService;
+    private final ValidateDiaryService validateDiaryService;
     private final DallEService dallEService;
     private final PromptService promptService;
     private final PromptTextService promptTextService;
@@ -40,6 +41,7 @@ public class CreateDiaryService {
         throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
         User user = validateUserService.validateUserWithDrawLimit(userId);
+        validateDiaryService.validateExistsByDate(userId, diaryDate);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         String prompt = promptTextService.createPromptText(emotion, keyword);
 
