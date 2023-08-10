@@ -3,12 +3,14 @@ package tipitapi.drawmytoday.diary.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithId;
 import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotion;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.diary.domain.Diary;
+import tipitapi.drawmytoday.diary.exception.DiaryDateAlreadyExistsException;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
@@ -102,6 +105,27 @@ class ValidateDiaryServiceTest {
                 Diary validatedDiary = validateDiaryService.validateDiaryById(1L, user);
 
                 assertThat(validatedDiary).isEqualTo(diary);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("validateExistsByDate 메소드 테스트")
+    class ValidateExistsByDateTest {
+
+        @Nested
+        @DisplayName("해당 날짜에 일기가 존재할 경우")
+        class if_diary_exists_on_date {
+
+            @Test
+            @DisplayName("DiaryDateAlreadyExistsException 예외를 발생시킨다.")
+            void it_throws_DiaryNotFoundException() {
+                given(diaryRepository.getDiaryExistsByDiaryDate(anyLong(), any(LocalDate.class)))
+                    .willReturn(Optional.empty());
+
+                assertThatThrownBy(
+                    () -> validateDiaryService.validateExistsByDate(1L, LocalDate.now()))
+                    .isInstanceOf(DiaryDateAlreadyExistsException.class);
             }
         }
     }

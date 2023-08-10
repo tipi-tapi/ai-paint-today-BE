@@ -8,7 +8,9 @@ import static tipitapi.drawmytoday.emotion.domain.QEmotion.emotion;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.support.PageableExecutionUtils;
 import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.admin.dto.QGetDiaryAdminResponse;
+import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 
 @RequiredArgsConstructor
@@ -56,4 +59,12 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
+    @Override
+    public Optional<Diary> getDiaryExistsByDiaryDate(Long userId, LocalDate diaryDate) {
+
+        return Optional.ofNullable(queryFactory.selectFrom(diary)
+            .where(diary.diaryDate.between(diaryDate.atStartOfDay(), diaryDate.atTime(23, 59, 59))
+                .and(diary.user.userId.eq(userId)))
+            .fetchFirst());
+    }
 }
