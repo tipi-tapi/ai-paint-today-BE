@@ -13,9 +13,8 @@ import static tipitapi.drawmytoday.common.testdata.TestImage.createImage;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -365,8 +364,8 @@ class DiaryServiceTest {
             void it_returns_false() {
                 User user = createUserWithId(1L);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findByUserIdAndDiaryDate(anyLong(), any(Date.class)))
-                    .willReturn(new ArrayList<>());
+                given(diaryRepository.getDiaryExistsByDiaryDate(anyLong(), any(LocalDate.class)))
+                    .willReturn(Optional.empty());
 
                 GetDiaryExistByDateResponse response = diaryService.getDiaryExistByDate(
                     1L, 2023, 6, 1);
@@ -385,8 +384,8 @@ class DiaryServiceTest {
                 User user = createUserWithId(1L);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 Diary diary = createDiaryWithId(1L, user, createEmotion());
-                given(diaryRepository.findByUserIdAndDiaryDate(anyLong(), any(Date.class)))
-                    .willReturn(List.of(diary));
+                given(diaryRepository.getDiaryExistsByDiaryDate(anyLong(), any(LocalDate.class)))
+                    .willReturn(Optional.of(diary));
 
                 GetDiaryExistByDateResponse response = diaryService.getDiaryExistByDate(
                     1L, 2023, 6, 1);

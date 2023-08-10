@@ -1,6 +1,5 @@
 package tipitapi.drawmytoday.common.utils;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
@@ -22,9 +21,9 @@ public class DateUtils {
         return LocalDateTime.of(year, month, getMaxDay(month), 23, 59);
     }
 
-    public static Date getDate(int year, int month, int day) {
+    public static LocalDate getDate(int year, int month, int day) {
         validateDate(month, day);
-        return Date.valueOf(LocalDate.of(year, month, day));
+        return LocalDate.of(year, month, day);
     }
 
     private static void validateMonth(int month) {

@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.diary.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -70,13 +70,14 @@ public class DiaryService {
     public GetDiaryExistByDateResponse getDiaryExistByDate(Long userId, int year, int month,
         int day) {
         User user = validateUserService.validateUserById(userId);
-        Date date = DateUtils.getDate(year, month, day);
-        List<Diary> diaries = diaryRepository.findByUserIdAndDiaryDate(
-            user.getUserId(), date);
-        if (diaries.isEmpty()) {
+        LocalDate date = DateUtils.getDate(year, month, day);
+
+        Optional<Diary> diary = diaryRepository.getDiaryExistsByDiaryDate(user.getUserId(), date);
+        
+        if (diary.isEmpty()) {
             return GetDiaryExistByDateResponse.ofNotExist();
         } else {
-            return GetDiaryExistByDateResponse.ofExist(diaries.get(0).getDiaryId());
+            return GetDiaryExistByDateResponse.ofExist(diary.get().getDiaryId());
         }
     }
 
