@@ -29,6 +29,7 @@ import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.exception.OAuthNotFoundException;
 import tipitapi.drawmytoday.oauth.properties.GoogleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
+import tipitapi.drawmytoday.ticket.service.TicketService;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.UserService;
@@ -46,6 +47,7 @@ public class GoogleOAuthService {
     private final ValidateUserService validateUserService;
     private final AuthRepository authRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TicketService ticketService;
 
 
     @Transactional
@@ -102,6 +104,7 @@ public class GoogleOAuthService {
     private User registerUser(OAuthUserProfile oAuthUserProfile, OAuthAccessToken accessToken) {
         User user = userService.registerUser(oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
         authRepository.save(new Auth(user, accessToken.getRefreshToken()));
+        ticketService.createTicketByJoin(user);
         return user;
     }
 
