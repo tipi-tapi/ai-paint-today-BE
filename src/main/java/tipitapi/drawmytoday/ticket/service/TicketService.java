@@ -15,6 +15,7 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
 
+    @Transactional
     public void createTicketByJoin(User user) {
         for (int i = 0; i < 7; i++) {
             createTicket(user, TicketType.JOIN);
