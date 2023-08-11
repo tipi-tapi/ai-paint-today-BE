@@ -2,6 +2,8 @@ package tipitapi.drawmytoday.ticket.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
@@ -45,6 +47,23 @@ public class TicketServiceTest {
             List<Ticket> tickets = ticketArgumentCaptor.getValue();
             assertEquals(tickets.size(), 7);
             assertThat(tickets).allMatch(ticket -> ticket.getTicketType() == TicketType.JOIN);
+        }
+    }
+
+    @Nested
+    @DisplayName("createTicketByAdReward 메소드 테스트")
+    class CreateTicketByAdRewardTest {
+
+        @Test
+        @DisplayName("AD_REWARD 타입의 티켓을 등록해야합니다.")
+        void it_creates_ad_reward_ticket() {
+            User user = createUser();
+
+            ticketService.createTicketByAdReward(user);
+
+            ArgumentCaptor<Ticket> ticketArgumentCaptor = ArgumentCaptor.forClass(Ticket.class);
+            verify(ticketRepository, times(1)).save(ticketArgumentCaptor.capture());
+            assertEquals(ticketArgumentCaptor.getValue().getTicketType(), TicketType.AD_REWARD);
         }
     }
 }
