@@ -1,10 +1,12 @@
 package tipitapi.drawmytoday.ticket.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
 
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,9 +39,12 @@ public class TicketServiceTest {
 
             ticketService.createTicketByJoin(user);
 
-            ArgumentCaptor<Ticket> ticketArgumentCaptor = ArgumentCaptor.forClass(Ticket.class);
-            verify(ticketRepository, times(1)).save(ticketArgumentCaptor.capture());
-            assertEquals(ticketArgumentCaptor.getValue().getTicketType(), TicketType.JOIN);
+            ArgumentCaptor<List<Ticket>> ticketArgumentCaptor = ArgumentCaptor.forClass(List.class);
+            verify(ticketRepository, times(1)).saveAll(ticketArgumentCaptor.capture());
+
+            List<Ticket> tickets = ticketArgumentCaptor.getValue();
+            assertEquals(tickets.size(), 7);
+            assertThat(tickets).allMatch(ticket -> ticket.getTicketType() == TicketType.JOIN);
         }
     }
 }

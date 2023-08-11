@@ -1,5 +1,7 @@
 package tipitapi.drawmytoday.ticket.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +19,10 @@ public class TicketService {
 
     @Transactional
     public void createTicketByJoin(User user) {
+        List<Ticket> tickets = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
-            createTicket(user, TicketType.JOIN);
+            tickets.add(Ticket.of(user, TicketType.JOIN));
         }
-    }
-
-    private void createTicket(User user, TicketType type) {
-        ticketRepository.save(Ticket.of(user, type));
+        ticketRepository.saveAll(tickets);
     }
 }
