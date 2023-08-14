@@ -64,7 +64,10 @@ public enum ErrorCode {
     GENERATE_KEY_FAILED(500, "O003", "키 생성에 실패하였습니다."),
 
     // REST
-    REST_CLIENT_FAILED(500, "R001", "외부로의 REST 통신에 실패하였습니다.");
+    REST_CLIENT_FAILED(500, "R001", "외부로의 REST 통신에 실패하였습니다."),
+
+    // Ticket
+    VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다.");
 
 
     private final int status;
