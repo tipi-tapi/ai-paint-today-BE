@@ -15,6 +15,7 @@ import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.emotion.service.ValidateEmotionService;
+import tipitapi.drawmytoday.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
 
@@ -28,6 +29,7 @@ public class CreateDiaryService {
     private final ValidateUserService validateUserService;
     private final ValidateEmotionService validateEmotionService;
     private final ValidateDiaryService validateDiaryService;
+    private final ValidateTicketService validateTicketService;
     private final DallEService dallEService;
     private final PromptService promptService;
     private final PromptTextService promptTextService;
@@ -41,8 +43,9 @@ public class CreateDiaryService {
         String notes, LocalDate diaryDate, LocalTime userTime)
         throws DallERequestFailException, ImageInputStreamFailException {
         // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
-        User user = validateUserService.validateUserWithDrawLimit(userId);
+        User user = validateUserService.validateUserById(userId);
         validateDiaryService.validateExistsByDate(userId, diaryDate);
+        validateTicketService.findAndUseTicket(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         String prompt = promptTextService.createPromptText(emotion, keyword);
         LocalDateTime diaryDateTime = diaryDate.atTime(userTime);
@@ -64,7 +67,8 @@ public class CreateDiaryService {
     @Transactional(readOnly = false)
     public CreateDiaryResponse createTestDiary(Long userId, Long emotionId, String keyword,
         String notes, LocalDate diaryDate, LocalTime userTime) {
-        User user = validateUserService.validateUserWithDrawLimit(userId);
+        User user = validateUserService.validateAdminUserById(userId);
+        validateDiaryService.validateExistsByDate(userId, diaryDate);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         LocalDateTime diaryDateTime = diaryDate.atTime(userTime);
 

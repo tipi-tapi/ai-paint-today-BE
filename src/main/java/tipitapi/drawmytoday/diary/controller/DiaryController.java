@@ -151,6 +151,14 @@ public class DiaryController {
             description = "E001 : 감정을 찾을 수 없습니다.",
             content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(
+            responseCode = "409",
+            description = "D001 : 이미 일기를 그린 날짜입니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "T001 : 유효한 티켓이 존재하지 않습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
             responseCode = "500",
             description = "DE001 : DALL-E 이미지 생성에 실패하였습니다.",
             content = @Content(schema = @Schema(hidden = true))),

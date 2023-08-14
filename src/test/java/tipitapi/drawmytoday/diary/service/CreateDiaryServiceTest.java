@@ -32,6 +32,7 @@ import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.emotion.service.ValidateEmotionService;
+import tipitapi.drawmytoday.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
 
@@ -48,6 +49,10 @@ class CreateDiaryServiceTest {
     private ValidateUserService validateUserService;
     @Mock
     private ValidateEmotionService validateEmotionService;
+    @Mock
+    private ValidateDiaryService validateDiaryService;
+    @Mock
+    private ValidateTicketService validateTicketService;
     @Mock
     private DallEService dallEService;
     @Mock
@@ -85,7 +90,7 @@ class CreateDiaryServiceTest {
                 Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
                 String prompt = "test prompt";
 
-                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(dallEService.getImageAsUrl(eq(prompt))).willThrow(exceptionClass);
@@ -115,7 +120,7 @@ class CreateDiaryServiceTest {
                 Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
                 Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
 
-                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(dallEService.getImageAsUrl(prompt)).willReturn(image);
@@ -160,7 +165,7 @@ class CreateDiaryServiceTest {
             Emotion emotion = TestEmotion.createEmotionWithId(emotionId);
             Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
 
-            given(validateUserService.validateUserWithDrawLimit(userId)).willReturn(user);
+            given(validateUserService.validateAdminUserById(userId)).willReturn(user);
             given(validateEmotionService.validateEmotionById(emotionId)).willReturn(emotion);
             given(encryptor.encrypt(notes)).willReturn("암호화된 노트");
             given(diaryRepository.save(any(Diary.class))).willReturn(diary);
