@@ -28,6 +28,6 @@ public class TicketService {
 
     @Transactional
     public void createTicketByAdReward(User user) {
-        ticketRepository.save(Ticket.of(user, TicketType.AD_REWARD))
+        ticketRepository.save(Ticket.of(user, TicketType.AD_REWARD));
     }
 }

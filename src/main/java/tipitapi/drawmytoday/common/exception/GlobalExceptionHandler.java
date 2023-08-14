@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,6 +50,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn("handleIllegalArgument", e);
         ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
         return handleExceptionInternal(e, errorCode);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+        HttpMessageNotReadableException e,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request) {
+        log.warn("handleHttpMessageNotReadable", e);
+        return handleExceptionInternal(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     // 이 외의 500 에러 처리
