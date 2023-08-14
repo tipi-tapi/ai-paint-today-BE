@@ -28,11 +28,11 @@ public class GetDiaryLimitResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @Schema(description = "유효 리워드 생성일자", requiredMode = RequiredMode.NOT_REQUIRED)
-    private LocalDateTime rewardCreatedAt;
+    @Schema(description = "유효 티켓 생성일자", requiredMode = RequiredMode.NOT_REQUIRED)
+    private LocalDateTime ticketCreatedAt;
 
     public static GetDiaryLimitResponse of(boolean available, LocalDateTime lastDiaryCreatedAt,
-        LocalDateTime rewardCreatedAt) {
-        return new GetDiaryLimitResponse(available, lastDiaryCreatedAt, rewardCreatedAt);
+        LocalDateTime ticketCreatedAt) {
+        return new GetDiaryLimitResponse(available, lastDiaryCreatedAt, ticketCreatedAt);
     }
 }
