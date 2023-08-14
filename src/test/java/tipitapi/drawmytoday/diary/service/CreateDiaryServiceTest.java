@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -65,6 +66,7 @@ class CreateDiaryServiceTest {
         private final String KEYWORD = "키워드";
         private final String NOTES = "노트";
         private final LocalDate DIARY_DATE = LocalDate.now();
+        private final LocalTime USER_TIME = LocalTime.now();
 
         @Nested
         @DisplayName("dallE 요청 시")
@@ -92,7 +94,7 @@ class CreateDiaryServiceTest {
                 //then
                 assertThatThrownBy(
                     () -> createDiaryService.createDiary(USER_ID, EMOTION_ID, KEYWORD, NOTES,
-                        DIARY_DATE)).isInstanceOf(exceptionClass);
+                        DIARY_DATE, USER_TIME)).isInstanceOf(exceptionClass);
                 assertThat(user.getLastDiaryDate().isEqual(lastDateTime)).isTrue();
 
                 verify(promptService).createPrompt(eq(prompt), eq(false));
@@ -122,7 +124,7 @@ class CreateDiaryServiceTest {
 
                 //when
                 CreateDiaryResponse createDiaryResponse = createDiaryService.createDiary(
-                    USER_ID, EMOTION_ID, KEYWORD, NOTES, DIARY_DATE);
+                    USER_ID, EMOTION_ID, KEYWORD, NOTES, DIARY_DATE, USER_TIME);
 
                 //then
                 assertThat(createDiaryResponse.getId()).isEqualTo(diaryId);
@@ -145,6 +147,7 @@ class CreateDiaryServiceTest {
             //given
             Long userId = 1L;
             LocalDate diaryDate = LocalDate.now();
+            LocalTime userTime = LocalTime.now();
             Long emotionId = 1L;
             Long diaryId = 1L;
             String prompt = "test prompt";
@@ -165,7 +168,7 @@ class CreateDiaryServiceTest {
 
             //when
             CreateDiaryResponse response = createDiaryService.createTestDiary(
-                userId, emotionId, keyword, notes, diaryDate);
+                userId, emotionId, keyword, notes, diaryDate, userTime);
 
             //then
             assertThat(response.getId()).isEqualTo(diaryId);
