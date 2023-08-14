@@ -452,7 +452,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 .andExpect(jsonPath("$.data.available").value(true))
                 .andExpect(jsonPath("$.data.lastDiaryCreatedAt").value(
                     parseLocalDateTime(lastDiaryCreatedDate)))
-                .andExpect(jsonPath("$.data.rewardCreatedAt").value(
+                .andExpect(jsonPath("$.data.ticketCreatedAt").value(
                     parseLocalDateTime(validRewardCreatedDate)));
         }
     }

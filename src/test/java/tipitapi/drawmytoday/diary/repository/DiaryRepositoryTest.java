@@ -231,6 +231,8 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
     @Nested
     @DisplayName("getDiariesForMonitorAsPage 메소드 테스트")
     class GetDiariesForMonitorAsPageTest {
+        // TODO: Diary 도메인의 @SQLDelete에 따른 @Where Clause 적용으로인해, queryDSL 기반 메서드임에도 삭제된 일기가 쿼리에서 제외됨. 그래서 아래 테스트 중 일부가 실패함.
+        //  따라서, diary 관련 레포지토리 메서드를 queryDSL 기반으로 변경한 후 @Where Clause 설정을 삭제해 개선해야함
 
         @Nested
         @DisplayName("삭제된 일기가 있을 경우")

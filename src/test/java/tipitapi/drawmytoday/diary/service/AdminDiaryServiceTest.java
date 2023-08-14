@@ -2,6 +2,9 @@ package tipitapi.drawmytoday.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import java.time.LocalDateTime;
@@ -20,12 +23,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
+import tipitapi.drawmytoday.s3.service.S3PreSignedService;
 
 @ExtendWith(MockitoExtension.class)
 class AdminDiaryServiceTest {
 
     @Mock
     DiaryRepository diaryRepository;
+    @Mock
+    S3PreSignedService s3PreSignedService;
     @InjectMocks
     AdminDiaryService adminDiaryService;
 
@@ -48,8 +54,11 @@ class AdminDiaryServiceTest {
                 LocalDateTime.of(2023, 6, 17, 15, 0, 0)));
             given(
                 diaryRepository.getDiariesForMonitorAsPage(any(Pageable.class),
-                    any(Direction.class), 1L))
+                    any(Direction.class), eq(1L)))
                 .willReturn(new PageImpl<>(diaries));
+            given(
+                s3PreSignedService.getPreSignedUrlForShare(anyString(), anyLong()))
+                .willReturn("https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/2.png");
 
             // when
             Page<GetDiaryAdminResponse> response = adminDiaryService.getDiaries(10, 0,

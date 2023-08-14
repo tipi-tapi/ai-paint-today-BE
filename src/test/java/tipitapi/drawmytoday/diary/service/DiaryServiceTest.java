@@ -27,8 +27,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import tipitapi.drawmytoday.adreward.domain.AdReward;
-import tipitapi.drawmytoday.adreward.service.ValidateAdRewardService;
 import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.utils.Encryptor;
@@ -45,6 +43,9 @@ import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.s3.service.S3PreSignedService;
+import tipitapi.drawmytoday.ticket.domain.Ticket;
+import tipitapi.drawmytoday.ticket.domain.TicketType;
+import tipitapi.drawmytoday.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
@@ -67,7 +68,7 @@ class DiaryServiceTest {
     @Mock
     PromptService promptService;
     @Mock
-    ValidateAdRewardService validateAdRewardService;
+    ValidateTicketService validateTicketService;
     @InjectMocks
     DiaryService diaryService;
 
@@ -597,96 +598,52 @@ class DiaryServiceTest {
         }
 
         @Nested
-        @DisplayName("user가 일기를 작성한 적이 없을 경우")
-        class if_user_never_wrote_diary {
-
-            @Test
-            @DisplayName("일기 생성 가능한 내용의 GetDrawLimitResponse 객체를 반환한다.")
-            void it_returns_available() {
-                User user = createUserWithId(1L);
-                given(validateUserService.validateUserById(1L)).willReturn(user);
-
-                GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
-
-                assertThat(response.isAvailable()).isTrue();
-                assertThat(response.getLastDiaryCreatedAt()).isNull();
-                assertThat(response.getRewardCreatedAt()).isNull();
-            }
-        }
-
-        @Nested
-        @DisplayName("user가 오늘 작성한 일기가 없을 경우")
-        class if_user_didnt_write_diary_today {
+        @DisplayName("유효한 티켓이 있을 경우")
+        class if_valid_ticket_exists {
 
             @Test
             @DisplayName("일기 생성 가능한 내용의 GetDrawLimitResponse 객체를 반환한다.")
             void it_returns_available() {
                 User user = createUser();
-                LocalDateTime lastDiaryDate = LocalDateTime.now().minusDays(1);
+                LocalDateTime lastDiaryDate = LocalDateTime.now().minusMinutes(10);
                 user.setLastDiaryDate(lastDiaryDate);
 
+                Ticket ticket = Ticket.of(user, TicketType.AD_REWARD);
+                LocalDateTime ticketCreatedAt = LocalDateTime.now().minusMinutes(30);
+                ReflectionTestUtils.setField(ticket, "createdAt", ticketCreatedAt);
+
                 given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateTicketService.findValidTicket(1L)).willReturn(
+                    Optional.of(ticket));
 
                 GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
 
                 assertThat(response.isAvailable()).isTrue();
                 assertThat(response.getLastDiaryCreatedAt()).isEqualTo(lastDiaryDate);
-                assertThat(response.getRewardCreatedAt()).isNull();
+                assertThat(response.getTicketCreatedAt()).isEqualTo(ticketCreatedAt);
             }
         }
 
         @Nested
-        @DisplayName("user가 오늘 작성한 일기가 있을 경우")
-        class if_user_wrote_diary_today {
+        @DisplayName("유효한 티켓이 없을 경우")
+        class if_valid_ticket_not_exists {
 
-            @Nested
-            @DisplayName("유효한 리워드가 있을 경우")
-            class if_valid_reward_exists {
+            @Test
+            @DisplayName("일기 생성 불가한 내용의 GetDrawLimitResponse 객체를 반환한다.")
+            void it_returns_unavailable() {
+                User user = createUserWithId(1L);
+                LocalDateTime lastDiaryDate = LocalDateTime.now();
+                ReflectionTestUtils.setField(user, "lastDiaryDate", lastDiaryDate);
 
-                @Test
-                @DisplayName("일기 생성 가능한 내용의 GetDrawLimitResponse 객체를 반환한다.")
-                void it_returns_available() {
-                    User user = createUser();
-                    LocalDateTime lastDiaryDate = LocalDateTime.now().minusMinutes(10);
-                    user.setLastDiaryDate(lastDiaryDate);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateTicketService.findValidTicket(1L)).willReturn(
+                    Optional.empty());
 
-                    AdReward adReward = new AdReward(user);
-                    LocalDateTime rewardCreatedAt = LocalDateTime.now().minusMinutes(30);
-                    ReflectionTestUtils.setField(adReward, "createdAt", rewardCreatedAt);
+                GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
 
-                    given(validateUserService.validateUserById(1L)).willReturn(user);
-                    given(validateAdRewardService.findValidAdReward(1L)).willReturn(
-                        Optional.of(adReward));
-
-                    GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
-
-                    assertThat(response.isAvailable()).isTrue();
-                    assertThat(response.getLastDiaryCreatedAt()).isEqualTo(lastDiaryDate);
-                    assertThat(response.getRewardCreatedAt()).isEqualTo(rewardCreatedAt);
-                }
-            }
-
-            @Nested
-            @DisplayName("유효한 리워드가 없을 경우")
-            class if_valid_reward_not_exists {
-
-                @Test
-                @DisplayName("일기 생성 불가한 내용의 GetDrawLimitResponse 객체를 반환한다.")
-                void it_returns_unavailable() {
-                    User user = createUserWithId(1L);
-                    LocalDateTime lastDiaryDate = LocalDateTime.now();
-                    ReflectionTestUtils.setField(user, "lastDiaryDate", lastDiaryDate);
-
-                    given(validateUserService.validateUserById(1L)).willReturn(user);
-                    given(validateAdRewardService.findValidAdReward(1L)).willReturn(
-                        Optional.empty());
-
-                    GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
-
-                    assertThat(response.isAvailable()).isFalse();
-                    assertThat(response.getLastDiaryCreatedAt()).isEqualTo(lastDiaryDate);
-                    assertThat(response.getRewardCreatedAt()).isNull();
-                }
+                assertThat(response.isAvailable()).isFalse();
+                assertThat(response.getLastDiaryCreatedAt()).isEqualTo(lastDiaryDate);
+                assertThat(response.getTicketCreatedAt()).isNull();
             }
         }
     }
