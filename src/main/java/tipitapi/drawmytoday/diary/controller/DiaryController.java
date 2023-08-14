@@ -171,12 +171,12 @@ public class DiaryController {
             response = createDiaryService.createTestDiary(tokenInfo.getUserId(),
                 createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate());
+                createDiaryRequest.getDiaryDate(), createDiaryRequest.getUserTime());
         } else {
             response = createDiaryService.createDiary(tokenInfo.getUserId(),
                 createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate());
+                createDiaryRequest.getDiaryDate(), createDiaryRequest.getUserTime());
         }
         return SuccessResponse.of(response).asHttp(HttpStatus.CREATED);
     }
