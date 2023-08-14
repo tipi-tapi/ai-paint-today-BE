@@ -3,9 +3,6 @@ package tipitapi.drawmytoday.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tipitapi.drawmytoday.adreward.service.UseAdRewardService;
-import tipitapi.drawmytoday.common.exception.BusinessException;
-import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.exception.UserAccessDeniedException;
@@ -18,7 +15,6 @@ import tipitapi.drawmytoday.user.repository.UserRepository;
 public class ValidateUserService {
 
     private final UserRepository userRepository;
-    private final UseAdRewardService useAdRewardService;
 
     public User validateUserById(Long userId) {
         return userRepository.findByUserId(userId)
@@ -30,18 +26,6 @@ public class ValidateUserService {
             .filter(user -> user.getSocialCode() == socialCode)
             .findFirst()
             .orElse(null);
-    }
-
-    public User validateUserWithDrawLimit(Long userId) {
-        User user = validateUserById(userId);
-        if (user.checkDrawLimit()) {
-            return user;
-        } else {
-            if (useAdRewardService.useReward(userId)) {
-                return user;
-            }
-            throw new BusinessException(ErrorCode.USER_ALREADY_DRAW_DIARY);
-        }
     }
 
     public User validateAdminUserById(Long userId) {
