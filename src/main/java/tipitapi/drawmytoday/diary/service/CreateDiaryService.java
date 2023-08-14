@@ -64,7 +64,7 @@ public class CreateDiaryService {
         }
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public CreateDiaryResponse createTestDiary(Long userId, Long emotionId, String keyword,
         String notes, LocalDate diaryDate, LocalTime userTime) {
         User user = validateUserService.validateAdminUserById(userId);
