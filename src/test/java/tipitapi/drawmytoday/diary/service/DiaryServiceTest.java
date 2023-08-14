@@ -598,96 +598,52 @@ class DiaryServiceTest {
         }
 
         @Nested
-        @DisplayName("user가 일기를 작성한 적이 없을 경우")
-        class if_user_never_wrote_diary {
-
-            @Test
-            @DisplayName("일기 생성 가능한 내용의 GetDrawLimitResponse 객체를 반환한다.")
-            void it_returns_available() {
-                User user = createUserWithId(1L);
-                given(validateUserService.validateUserById(1L)).willReturn(user);
-
-                GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
-
-                assertThat(response.isAvailable()).isTrue();
-                assertThat(response.getLastDiaryCreatedAt()).isNull();
-                assertThat(response.getTicketCreatedAt()).isNull();
-            }
-        }
-
-        @Nested
-        @DisplayName("user가 오늘 작성한 일기가 없을 경우")
-        class if_user_didnt_write_diary_today {
+        @DisplayName("유효한 티켓이 있을 경우")
+        class if_valid_ticket_exists {
 
             @Test
             @DisplayName("일기 생성 가능한 내용의 GetDrawLimitResponse 객체를 반환한다.")
             void it_returns_available() {
                 User user = createUser();
-                LocalDateTime lastDiaryDate = LocalDateTime.now().minusDays(1);
+                LocalDateTime lastDiaryDate = LocalDateTime.now().minusMinutes(10);
                 user.setLastDiaryDate(lastDiaryDate);
 
+                Ticket ticket = Ticket.of(user, TicketType.AD_REWARD);
+                LocalDateTime ticketCreatedAt = LocalDateTime.now().minusMinutes(30);
+                ReflectionTestUtils.setField(ticket, "createdAt", ticketCreatedAt);
+
                 given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateTicketService.findValidTicket(1L)).willReturn(
+                    Optional.of(ticket));
 
                 GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
 
                 assertThat(response.isAvailable()).isTrue();
                 assertThat(response.getLastDiaryCreatedAt()).isEqualTo(lastDiaryDate);
-                assertThat(response.getTicketCreatedAt()).isNull();
+                assertThat(response.getTicketCreatedAt()).isEqualTo(ticketCreatedAt);
             }
         }
 
         @Nested
-        @DisplayName("user가 오늘 작성한 일기가 있을 경우")
-        class if_user_wrote_diary_today {
+        @DisplayName("유효한 티켓이 없을 경우")
+        class if_valid_ticket_not_exists {
 
-            @Nested
-            @DisplayName("유효한 티켓이 있을 경우")
-            class if_valid_ticket_exists {
+            @Test
+            @DisplayName("일기 생성 불가한 내용의 GetDrawLimitResponse 객체를 반환한다.")
+            void it_returns_unavailable() {
+                User user = createUserWithId(1L);
+                LocalDateTime lastDiaryDate = LocalDateTime.now();
+                ReflectionTestUtils.setField(user, "lastDiaryDate", lastDiaryDate);
 
-                @Test
-                @DisplayName("일기 생성 가능한 내용의 GetDrawLimitResponse 객체를 반환한다.")
-                void it_returns_available() {
-                    User user = createUser();
-                    LocalDateTime lastDiaryDate = LocalDateTime.now().minusMinutes(10);
-                    user.setLastDiaryDate(lastDiaryDate);
+                given(validateUserService.validateUserById(1L)).willReturn(user);
+                given(validateTicketService.findValidTicket(1L)).willReturn(
+                    Optional.empty());
 
-                    Ticket ticket = Ticket.of(user, TicketType.AD_REWARD);
-                    LocalDateTime ticketCreatedAt = LocalDateTime.now().minusMinutes(30);
-                    ReflectionTestUtils.setField(ticket, "createdAt", ticketCreatedAt);
+                GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
 
-                    given(validateUserService.validateUserById(1L)).willReturn(user);
-                    given(validateTicketService.findValidTicket(1L)).willReturn(
-                        Optional.of(ticket));
-
-                    GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
-
-                    assertThat(response.isAvailable()).isTrue();
-                    assertThat(response.getLastDiaryCreatedAt()).isEqualTo(lastDiaryDate);
-                    assertThat(response.getTicketCreatedAt()).isEqualTo(ticketCreatedAt);
-                }
-            }
-
-            @Nested
-            @DisplayName("유효한 티켓이 없을 경우")
-            class if_valid_ticket_not_exists {
-
-                @Test
-                @DisplayName("일기 생성 불가한 내용의 GetDrawLimitResponse 객체를 반환한다.")
-                void it_returns_unavailable() {
-                    User user = createUserWithId(1L);
-                    LocalDateTime lastDiaryDate = LocalDateTime.now();
-                    ReflectionTestUtils.setField(user, "lastDiaryDate", lastDiaryDate);
-
-                    given(validateUserService.validateUserById(1L)).willReturn(user);
-                    given(validateTicketService.findValidTicket(1L)).willReturn(
-                        Optional.empty());
-
-                    GetDiaryLimitResponse response = diaryService.getDrawLimit(1L);
-
-                    assertThat(response.isAvailable()).isFalse();
-                    assertThat(response.getLastDiaryCreatedAt()).isEqualTo(lastDiaryDate);
-                    assertThat(response.getTicketCreatedAt()).isNull();
-                }
+                assertThat(response.isAvailable()).isFalse();
+                assertThat(response.getLastDiaryCreatedAt()).isEqualTo(lastDiaryDate);
+                assertThat(response.getTicketCreatedAt()).isNull();
             }
         }
     }

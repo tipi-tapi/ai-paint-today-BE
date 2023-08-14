@@ -112,14 +112,10 @@ public class DiaryService {
         LocalDateTime lastDiaryDate = user.getLastDiaryDate();
         LocalDateTime ticketCreatedAt = null;
 
-        if (user.checkDrawLimit()) {
+        Optional<Ticket> ticket = validateTicketService.findValidTicket(userId);
+        if (ticket.isPresent()) {
             available = true;
-        } else {
-            Optional<Ticket> ticket = validateTicketService.findValidTicket(userId);
-            if (ticket.isPresent()) {
-                available = true;
-                ticketCreatedAt = ticket.get().getCreatedAt();
-            }
+            ticketCreatedAt = ticket.get().getCreatedAt();
         }
 
         return GetDiaryLimitResponse.of(available, lastDiaryDate, ticketCreatedAt);
