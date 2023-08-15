@@ -151,6 +151,14 @@ public class DiaryController {
             description = "E001 : 감정을 찾을 수 없습니다.",
             content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(
+            responseCode = "409",
+            description = "D001 : 이미 일기를 그린 날짜입니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "T001 : 유효한 티켓이 존재하지 않습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
             responseCode = "500",
             description = "DE001 : DALL-E 이미지 생성에 실패하였습니다.",
             content = @Content(schema = @Schema(hidden = true))),
@@ -171,12 +179,12 @@ public class DiaryController {
             response = createDiaryService.createTestDiary(tokenInfo.getUserId(),
                 createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate());
+                createDiaryRequest.getDiaryDate(), createDiaryRequest.getUserTime());
         } else {
             response = createDiaryService.createDiary(tokenInfo.getUserId(),
                 createDiaryRequest.getEmotionId(),
                 createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate());
+                createDiaryRequest.getDiaryDate(), createDiaryRequest.getUserTime());
         }
         return SuccessResponse.of(response).asHttp(HttpStatus.CREATED);
     }
@@ -229,7 +237,7 @@ public class DiaryController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "일기 생성 가능 여부 조회", description = "유저가 일기를 생성할 수 있는지 여부를 반환한다.")
+    @Operation(summary = "일기 생성 가능 여부 조회", description = "유저가 일기를 생성할 수 있는 티켓이 있는지 여부를 반환한다.")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",

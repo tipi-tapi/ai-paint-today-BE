@@ -1,9 +1,11 @@
 package tipitapi.drawmytoday.diary.service;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.diary.domain.Diary;
+import tipitapi.drawmytoday.diary.exception.DiaryDateAlreadyExistsException;
 import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
@@ -21,6 +23,11 @@ public class ValidateDiaryService {
             .orElseThrow(DiaryNotFoundException::new);
         ownedByUser(diary, user);
         return diary;
+    }
+
+    public void validateExistsByDate(Long userId, LocalDate diaryDate) {
+        diaryRepository.getDiaryExistsByDiaryDate(userId, diaryDate)
+            .orElseThrow(DiaryDateAlreadyExistsException::new);
     }
 
     private void ownedByUser(Diary diary, User user) {

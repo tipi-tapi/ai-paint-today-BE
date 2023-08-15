@@ -1,15 +1,13 @@
 package tipitapi.drawmytoday.diary.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tipitapi.drawmytoday.adreward.domain.AdReward;
-import tipitapi.drawmytoday.adreward.service.ValidateAdRewardService;
 import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
@@ -24,6 +22,8 @@ import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.s3.service.S3PreSignedService;
+import tipitapi.drawmytoday.ticket.domain.Ticket;
+import tipitapi.drawmytoday.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
 
@@ -39,7 +39,7 @@ public class DiaryService {
     private final S3PreSignedService s3PreSignedService;
     private final Encryptor encryptor;
     private final ValidateDiaryService validateDiaryService;
-    private final ValidateAdRewardService validateAdRewardService;
+    private final ValidateTicketService validateTicketService;
 
     public GetDiaryResponse getDiary(Long userId, Long diaryId, Language language) {
         User user = validateUserService.validateUserById(userId);
@@ -70,13 +70,14 @@ public class DiaryService {
     public GetDiaryExistByDateResponse getDiaryExistByDate(Long userId, int year, int month,
         int day) {
         User user = validateUserService.validateUserById(userId);
-        Date date = DateUtils.getDate(year, month, day);
-        List<Diary> diaries = diaryRepository.findByUserIdAndDiaryDate(
-            user.getUserId(), date);
-        if (diaries.isEmpty()) {
+        LocalDate date = DateUtils.getDate(year, month, day);
+
+        Optional<Diary> diary = diaryRepository.getDiaryExistsByDiaryDate(user.getUserId(), date);
+
+        if (diary.isEmpty()) {
             return GetDiaryExistByDateResponse.ofNotExist();
         } else {
-            return GetDiaryExistByDateResponse.ofExist(diaries.get(0).getDiaryId());
+            return GetDiaryExistByDateResponse.ofExist(diary.get().getDiaryId());
         }
     }
 
@@ -109,19 +110,15 @@ public class DiaryService {
 
         boolean available = false;
         LocalDateTime lastDiaryDate = user.getLastDiaryDate();
-        LocalDateTime rewardCreatedAt = null;
+        LocalDateTime ticketCreatedAt = null;
 
-        if (user.checkDrawLimit()) {
+        Optional<Ticket> ticket = validateTicketService.findValidTicket(userId);
+        if (ticket.isPresent()) {
             available = true;
-        } else {
-            Optional<AdReward> adReward = validateAdRewardService.findValidAdReward(userId);
-            if (adReward.isPresent()) {
-                available = true;
-                rewardCreatedAt = adReward.get().getCreatedAt();
-            }
+            ticketCreatedAt = ticket.get().getCreatedAt();
         }
 
-        return GetDiaryLimitResponse.of(available, lastDiaryDate, rewardCreatedAt);
+        return GetDiaryLimitResponse.of(available, lastDiaryDate, ticketCreatedAt);
     }
 
     private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {

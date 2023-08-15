@@ -39,6 +39,7 @@ public enum ErrorCode {
     DIARY_NOT_FOUND(404, "D001", "일기를 찾을 수 없습니다."),
     DIARY_NOT_OWNER(403, "D002", "자신의 일기에만 접근할 수 있습니다."),
     INVALID_CREATE_DIARY_DATE(400, "D003", "일기를 그릴 수 없는 날짜입니다."),
+    DIARY_DATE_ALREADY_EXISTS(409, "D004", "이미 일기를 그린 날짜입니다."),
 
     // Image
     IMAGE_NOT_FOUND(404, "I001", "선택된 이미지를 찾을 수 없습니다."),
@@ -63,7 +64,10 @@ public enum ErrorCode {
     GENERATE_KEY_FAILED(500, "O003", "키 생성에 실패하였습니다."),
 
     // REST
-    REST_CLIENT_FAILED(500, "R001", "외부로의 REST 통신에 실패하였습니다.");
+    REST_CLIENT_FAILED(500, "R001", "외부로의 REST 통신에 실패하였습니다."),
+
+    // Ticket
+    VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다.");
 
 
     private final int status;

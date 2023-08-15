@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -224,6 +225,7 @@ class DiaryControllerTest extends ControllerTestSetup {
         private final String notes = "notes";
         private final LocalDate diaryDate = LocalDate.now();
         private final Long emotionId = 1L;
+        private final LocalTime userTime = LocalTime.now();
 
         @Nested
         @DisplayName("content 값 중")
@@ -247,7 +249,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
+                    any(LocalTime.class));
             }
 
             @Test
@@ -270,7 +273,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
+                    any(LocalTime.class));
             }
 
             @Test
@@ -291,7 +295,8 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isBadRequest());
                 verify(createDiaryService, never()).createDiary(any(Long.class),
-                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class));
+                    any(Long.class), any(String.class), any(String.class), any(LocalDate.class),
+                    any(LocalTime.class));
             }
         }
 
@@ -305,7 +310,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 Long diaryId = 1L;
                 given(createDiaryService.createDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate))
+                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate, userTime))
                     .willReturn(new CreateDiaryResponse(diaryId));
 
                 // when
@@ -331,7 +336,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // given
                 Long testDiaryId = 1L;
                 given(createDiaryService.createTestDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate))
+                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate, userTime))
                     .willReturn(new CreateDiaryResponse(testDiaryId));
 
                 // when
@@ -447,7 +452,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 .andExpect(jsonPath("$.data.available").value(true))
                 .andExpect(jsonPath("$.data.lastDiaryCreatedAt").value(
                     parseLocalDateTime(lastDiaryCreatedDate)))
-                .andExpect(jsonPath("$.data.rewardCreatedAt").value(
+                .andExpect(jsonPath("$.data.ticketCreatedAt").value(
                     parseLocalDateTime(validRewardCreatedDate)));
         }
     }

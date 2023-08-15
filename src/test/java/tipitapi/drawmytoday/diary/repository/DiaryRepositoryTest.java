@@ -5,7 +5,7 @@ import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithCrea
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithDate;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -17,24 +17,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.jdbc.Sql;
+import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
+import tipitapi.drawmytoday.common.config.QuerydslConfig;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestImage;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.dto.DiaryForMonitorQueryResponse;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.user.domain.User;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
+@Import(QuerydslConfig.class)
 class DiaryRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
@@ -227,8 +229,10 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
     }
 
     @Nested
-    @DisplayName("getAllDiariesForMonitorAsPage 메소드 테스트")
-    class GetAllDiariesForMonitorAsPageTest {
+    @DisplayName("getDiariesForMonitorAsPage 메소드 테스트")
+    class GetDiariesForMonitorAsPageTest {
+        // TODO: Diary 도메인의 @SQLDelete에 따른 @Where Clause 적용으로인해, queryDSL 기반 메서드임에도 삭제된 일기가 쿼리에서 제외됨. 그래서 아래 테스트 중 일부가 실패함.
+        //  따라서, diary 관련 레포지토리 메서드를 queryDSL 기반으로 변경한 후 @Where Clause 설정을 삭제해 개선해야함
 
         @Nested
         @DisplayName("삭제된 일기가 있을 경우")
@@ -236,13 +240,12 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
 
             @Test
             @DisplayName("삭제된 일기를 포함한 일기 리스트를 반환한다.")
-            @Sql("GetAllDiariesForMonitorAsPageTest.sql")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
             void return_diary_list_includes_deleted() {
                 int page = 0;
                 int size = 5;
-                Direction direction = Direction.DESC;
-                Page<DiaryForMonitorQueryResponse> response = diaryRepository.getAllDiariesForMonitorAsPage(
-                    PageRequest.of(page, size, Sort.by(direction, "created_at", "diary_id")));
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
 
                 assertThat(response.getTotalElements()).isEqualTo(10);
                 assertThat(response.getContent().size()).isEqualTo(5);
@@ -258,7 +261,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
 
             @Test
             @DisplayName("더미 이미지를 제외한 일기 리스트를 반환한다.")
-            @Sql("GetAllDiariesForMonitorAsPageTest.sql")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
             void return_diary_list_excludes_dummy_image() {
                 User user = userRepository.save(TestUser.createUser());
                 Emotion emotion = emotionRepository.save(TestEmotion.createEmotion());
@@ -267,82 +270,98 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
 
                 int page = 0;
                 int size = 5;
-                Direction direction = Direction.DESC;
-                Page<DiaryForMonitorQueryResponse> response = diaryRepository.getAllDiariesForMonitorAsPage(
-                    PageRequest.of(page, size, Sort.by(direction, "created_at", "diary_id")));
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
 
                 assertThat(response.get()
-                    .filter(diaryResponse -> Objects.equals(diaryResponse.getId(),
-                        diary.getDiaryId()))
+                    .filter(
+                        diaryResponse -> Objects.equals(diaryResponse.getId(), diary.getDiaryId()))
                     .findAny()).isEmpty();
+            }
+        }
+
+        @Nested
+        @DisplayName("감정 ID가 주어졌을 경우")
+        class if_emotion_id_given {
+
+            @Test
+            @DisplayName("해당 감정이 존재한다면, 필터링한다.")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
+            void return_diary_list_with_emotion_filtered() {
+                int page = 0;
+                int size = 5;
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, 1L);
+
+                assertThat(response.getTotalElements()).isEqualTo(5);
+                assertThat(response.getContent().size()).isEqualTo(5);
+                assertThat(response.getTotalPages()).isEqualTo(1);
+                assertThat(response.getSort().isSorted()).isTrue();
+                assertThat(response.getContent().get(0).getId()).isEqualTo(5L);
+            }
+
+            @Test
+            @DisplayName("해당 감정이 존재하지 않는다면, 필터링을 적용하지 않는다.")
+            @Sql("GetDiariesForMonitorAsPageTest.sql")
+            void return_diary_list_without_emotion_filtered() {
+                int page = 0;
+                int size = 5;
+                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
+
+                assertThat(response.getTotalElements()).isEqualTo(10);
+                assertThat(response.getContent().size()).isEqualTo(5);
+                assertThat(response.getTotalPages()).isEqualTo(2);
+                assertThat(response.getSort().isSorted()).isTrue();
+                assertThat(response.getContent().get(0).getId()).isEqualTo(10L);
             }
         }
     }
 
     @Nested
-    @DisplayName("findByUserIdAndDiaryDate")
-    class FindByUserIdAndDiaryDateTest {
+    @DisplayName("getDiaryExistsByDiaryDate 메서드 테스트")
+    class GetDiaryExistsByDiaryDateTest {
 
-        private final LocalDateTime DIARY_DATE_TIME = LocalDateTime.of(2021, 1, 1, 0, 0);
-        private final Date DIARY_DATE = Date.valueOf(DIARY_DATE_TIME.toLocalDate());
+        private final LocalDate DIARY_DATE = LocalDate.of(2021, 1, 1);
 
         @Nested
         @DisplayName("해당 날짜에 일기가 없을 경우")
         class if_diary_not_exist_at_date {
 
             @Test
-            @DisplayName("빈 리스트를 반환한다.")
-            void return_empty_list() {
-                assertThat(
-                    diaryRepository.findByUserIdAndDiaryDate(createUser().getUserId(), DIARY_DATE))
-                    .isEmpty();
+            @DisplayName("null을 반환한다.")
+            void return_null() {
+                assertThat(diaryRepository.getDiaryExistsByDiaryDate(createUser().getUserId(),
+                    DIARY_DATE)).isEmpty();
             }
         }
 
         @Nested
-        @DisplayName("해당 날짜에 일기가 있을 경우")
-        class if_diary_exist_at_date {
+        @DisplayName("존재하지 않는 유저 ID인 경우")
+        class if_user_id_not_exist {
 
-            @Nested
-            @DisplayName("여러개의 일기가 있을 경우")
-            class if_diary_exist_more_than_one {
-
-                @Test
-                @DisplayName("최신순으로 해당 날짜의 일기 리스트를 반환한다.")
-                void return_diaries_order_by_newest() {
-                    User user = createUser();
-                    Emotion emotion = createEmotion();
-                    Diary prevDiary = diaryRepository.save(
-                        createDiaryWithDate(DIARY_DATE_TIME, user, emotion));
-                    Diary lastDiary = diaryRepository.save(
-                        createDiaryWithDate(DIARY_DATE_TIME, user, emotion));
-
-                    List<Diary> diaries = diaryRepository.findByUserIdAndDiaryDate(user.getUserId(),
-                        DIARY_DATE);
-
-                    assertThat(diaries.size()).isEqualTo(2);
-                    assertThat(diaries.get(0).getDiaryId()).isEqualTo(lastDiary.getDiaryId());
-                    assertThat(diaries.get(1).getDiaryId()).isEqualTo(prevDiary.getDiaryId());
-                }
+            @Test
+            @DisplayName("null을 반환한다.")
+            void return_null() {
+                assertThat(diaryRepository.getDiaryExistsByDiaryDate(1L, DIARY_DATE)).isEmpty();
             }
+        }
 
-            @Nested
-            @DisplayName("한개의 일기만 있을 경우")
-            class if_diary_exist_only_one {
+        @Nested
+        @DisplayName("해당 날짜에 주어진 유저의 일기가 있을 경우")
+        class if_diary_exists {
 
-                @Test
-                @DisplayName("해당 날짜의 일기를 반환한다.")
-                void return_diary() {
-                    User user = createUser();
-                    LocalDateTime diaryDate = LocalDateTime.of(2021, 1, 1, 0, 0);
-                    Diary diary = diaryRepository.save(
-                        createDiaryWithDate(diaryDate, user, createEmotion()));
+            @Test
+            @DisplayName("일기를 반환한다.")
+            void return_diary() {
+                User user = createUser();
+                Diary diary = diaryRepository.save(createDiaryWithDate(DIARY_DATE.atTime(9, 0),
+                    user, createEmotion()));
 
-                    List<Diary> diaryList = diaryRepository.findByUserIdAndDiaryDate(
-                        user.getUserId(), DIARY_DATE);
-                    assertThat(diaryList.size()).isEqualTo(1);
-                    assertThat(diaryList.get(0).getDiaryId()).isEqualTo(diary.getDiaryId());
-                }
+                assertThat(diaryRepository.getDiaryExistsByDiaryDate(user.getUserId(), DIARY_DATE))
+                    .isPresent()
+                    .get()
+                    .isEqualTo(diary);
             }
         }
     }

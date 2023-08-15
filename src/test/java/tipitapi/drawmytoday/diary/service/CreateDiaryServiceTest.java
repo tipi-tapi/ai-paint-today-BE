@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
 import tipitapi.drawmytoday.emotion.service.ValidateEmotionService;
+import tipitapi.drawmytoday.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.ValidateUserService;
 
@@ -47,6 +49,10 @@ class CreateDiaryServiceTest {
     private ValidateUserService validateUserService;
     @Mock
     private ValidateEmotionService validateEmotionService;
+    @Mock
+    private ValidateDiaryService validateDiaryService;
+    @Mock
+    private ValidateTicketService validateTicketService;
     @Mock
     private DallEService dallEService;
     @Mock
@@ -65,6 +71,7 @@ class CreateDiaryServiceTest {
         private final String KEYWORD = "키워드";
         private final String NOTES = "노트";
         private final LocalDate DIARY_DATE = LocalDate.now();
+        private final LocalTime USER_TIME = LocalTime.now();
 
         @Nested
         @DisplayName("dallE 요청 시")
@@ -83,7 +90,7 @@ class CreateDiaryServiceTest {
                 Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
                 String prompt = "test prompt";
 
-                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(dallEService.getImageAsUrl(eq(prompt))).willThrow(exceptionClass);
@@ -92,7 +99,7 @@ class CreateDiaryServiceTest {
                 //then
                 assertThatThrownBy(
                     () -> createDiaryService.createDiary(USER_ID, EMOTION_ID, KEYWORD, NOTES,
-                        DIARY_DATE)).isInstanceOf(exceptionClass);
+                        DIARY_DATE, USER_TIME)).isInstanceOf(exceptionClass);
                 assertThat(user.getLastDiaryDate().isEqual(lastDateTime)).isTrue();
 
                 verify(promptService).createPrompt(eq(prompt), eq(false));
@@ -113,7 +120,7 @@ class CreateDiaryServiceTest {
                 Emotion emotion = TestEmotion.createEmotionWithId(EMOTION_ID);
                 Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
 
-                given(validateUserService.validateUserWithDrawLimit(USER_ID)).willReturn(user);
+                given(validateUserService.validateUserById(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
                 given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
                 given(dallEService.getImageAsUrl(prompt)).willReturn(image);
@@ -122,7 +129,7 @@ class CreateDiaryServiceTest {
 
                 //when
                 CreateDiaryResponse createDiaryResponse = createDiaryService.createDiary(
-                    USER_ID, EMOTION_ID, KEYWORD, NOTES, DIARY_DATE);
+                    USER_ID, EMOTION_ID, KEYWORD, NOTES, DIARY_DATE, USER_TIME);
 
                 //then
                 assertThat(createDiaryResponse.getId()).isEqualTo(diaryId);
@@ -145,6 +152,7 @@ class CreateDiaryServiceTest {
             //given
             Long userId = 1L;
             LocalDate diaryDate = LocalDate.now();
+            LocalTime userTime = LocalTime.now();
             Long emotionId = 1L;
             Long diaryId = 1L;
             String prompt = "test prompt";
@@ -157,7 +165,7 @@ class CreateDiaryServiceTest {
             Emotion emotion = TestEmotion.createEmotionWithId(emotionId);
             Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
 
-            given(validateUserService.validateUserWithDrawLimit(userId)).willReturn(user);
+            given(validateUserService.validateAdminUserById(userId)).willReturn(user);
             given(validateEmotionService.validateEmotionById(emotionId)).willReturn(emotion);
             given(encryptor.encrypt(notes)).willReturn("암호화된 노트");
             given(diaryRepository.save(any(Diary.class))).willReturn(diary);
@@ -165,7 +173,7 @@ class CreateDiaryServiceTest {
 
             //when
             CreateDiaryResponse response = createDiaryService.createTestDiary(
-                userId, emotionId, keyword, notes, diaryDate);
+                userId, emotionId, keyword, notes, diaryDate, userTime);
 
             //then
             assertThat(response.getId()).isEqualTo(diaryId);

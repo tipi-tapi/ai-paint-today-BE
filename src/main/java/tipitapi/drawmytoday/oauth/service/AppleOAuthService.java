@@ -31,6 +31,7 @@ import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.oauth.exception.OAuthNotFoundException;
 import tipitapi.drawmytoday.oauth.properties.AppleProperties;
 import tipitapi.drawmytoday.oauth.repository.AuthRepository;
+import tipitapi.drawmytoday.ticket.service.TicketService;
 import tipitapi.drawmytoday.user.domain.SocialCode;
 import tipitapi.drawmytoday.user.domain.User;
 import tipitapi.drawmytoday.user.service.UserService;
@@ -48,6 +49,7 @@ public class AppleOAuthService {
     private final UserService userService;
     private final AuthRepository authRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TicketService ticketService;
 
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request, RequestAppleLogin requestAppleLogin)
@@ -66,6 +68,7 @@ public class AppleOAuthService {
         } else {
             user = userService.registerUser(appleIdToken.getEmail(), SocialCode.APPLE);
             authRepository.save(new Auth(user, oAuthAccessToken.getRefreshToken()));
+            ticketService.createTicketByJoin(user);
         }
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
