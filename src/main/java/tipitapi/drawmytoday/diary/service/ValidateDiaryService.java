@@ -26,8 +26,9 @@ public class ValidateDiaryService {
     }
 
     public void validateExistsByDate(Long userId, LocalDate diaryDate) {
-        diaryRepository.getDiaryExistsByDiaryDate(userId, diaryDate)
-            .orElseThrow(DiaryDateAlreadyExistsException::new);
+        if (diaryRepository.getDiaryExistsByDiaryDate(userId, diaryDate).isPresent()) {
+            throw new DiaryDateAlreadyExistsException();
+        }
     }
 
     private void ownedByUser(Diary diary, User user) {
