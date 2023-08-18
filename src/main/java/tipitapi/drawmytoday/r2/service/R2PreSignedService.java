@@ -2,13 +2,10 @@ package tipitapi.drawmytoday.r2.service;
 
 import static java.time.Duration.ofMinutes;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -19,20 +16,12 @@ import tipitapi.drawmytoday.s3.exception.S3FailedException;
 public class R2PreSignedService {
 
     private final S3Presigner s3Presigner;
+    private final String bucketName;
 
-    @Value("${r2.bucket}")
-    private String bucketName;
-
-    public R2PreSignedService(@Value("${r2.credentials.access-key}") String accessKey,
-        @Value("${r2.credentials.secret-key}") String secretKey,
-        @Value("${r2.account-id}") String accountId) throws URISyntaxException {
-
-        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
-        this.s3Presigner = S3Presigner.builder()
-            .credentialsProvider(() -> credentials)
-            .region(Region.of("auto"))
-            .endpointOverride(new URI("https://" + accountId + ".r2.cloudflarestorage.com"))
-            .build();
+    public R2PreSignedService(@Qualifier("r2Presigner") S3Presigner s3Presigner,
+        @Value("${r2.bucket}") String bucketName) {
+        this.s3Presigner = s3Presigner;
+        this.bucketName = bucketName;
     }
 
     /*

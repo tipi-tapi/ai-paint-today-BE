@@ -2,7 +2,7 @@ package tipitapi.drawmytoday.s3.service;
 
 import static software.amazon.awssdk.services.s3.model.ObjectCannedACL.PRIVATE;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -13,13 +13,16 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import tipitapi.drawmytoday.s3.exception.S3FailedException;
 
 @Service
-@RequiredArgsConstructor
 public class S3Service {
 
     private final S3Client s3Client;
+    private final String bucketName;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
+    public S3Service(@Qualifier("awsS3Client") S3Client s3Client,
+        @Value("${cloud.aws.s3.bucket}") String bucketName) {
+        this.s3Client = s3Client;
+        this.bucketName = bucketName;
+    }
 
     public void uploadImage(byte[] imageBytes, String filePath) {
         try {

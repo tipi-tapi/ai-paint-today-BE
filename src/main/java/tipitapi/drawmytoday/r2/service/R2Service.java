@@ -2,14 +2,11 @@ package tipitapi.drawmytoday.r2.service;
 
 import static software.amazon.awssdk.services.s3.model.ObjectCannedACL.PRIVATE;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
@@ -20,19 +17,13 @@ public class R2Service {
 
     private final S3Client s3Client;
 
-    @Value("${r2.bucket}")
-    private String bucketName;
 
-    public R2Service(@Value("${r2.credentials.access-key}") String accessKey,
-        @Value("${r2.credentials.secret-key}") String secretKey,
-        @Value("${r2.account-id}") String accountId) throws URISyntaxException {
+    private final String bucketName;
 
-        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
-        this.s3Client = S3Client.builder()
-            .credentialsProvider(() -> credentials)
-            .region(Region.of("auto"))
-            .endpointOverride(new URI("https://" + accountId + ".r2.cloudflarestorage.com"))
-            .build();
+    public R2Service(@Qualifier("r2Client") S3Client s3Client,
+        @Value("${r2.bucket}") String bucketName) {
+        this.s3Client = s3Client;
+        this.bucketName = bucketName;
     }
 
     public void uploadImage(byte[] imageBytes, String filePath) {
