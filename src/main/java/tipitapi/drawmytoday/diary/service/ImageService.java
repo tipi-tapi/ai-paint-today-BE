@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.diary.service;
 
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.diary.domain.Diary;
@@ -20,6 +21,9 @@ public class ImageService {
     private final S3Service s3Service;
     private final R2Service r2Service;
 
+    @Value("${spring.profiles.active:Unknown}")
+    private String profile;
+
     public Image getImage(Diary diary) {
         return imageRepository.findByIsSelectedTrueAndDiary(diary)
             .orElseThrow(ImageNotFoundException::new);
@@ -30,7 +34,7 @@ public class ImageService {
     }
 
     public Image uploadAndCreateImage(Diary diary, byte[] dallEImage, boolean isSelected) {
-        String imagePath = String.format("post/%d/%s_%d.png", diary.getDiaryId(),
+        String imagePath = String.format(profile + "/post/%d/%s_%d.png", diary.getDiaryId(),
             new Date().getTime(), 1);
         s3Service.uploadImage(dallEImage, imagePath);
         r2Service.uploadImage(dallEImage, imagePath);
