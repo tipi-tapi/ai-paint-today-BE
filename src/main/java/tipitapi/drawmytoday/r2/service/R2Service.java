@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.s3.service;
+package tipitapi.drawmytoday.r2.service;
 
 import static software.amazon.awssdk.services.s3.model.ObjectCannedACL.PRIVATE;
 
@@ -13,13 +13,15 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import tipitapi.drawmytoday.s3.exception.S3FailedException;
 
 @Service
-public class S3Service {
+public class R2Service {
 
     private final S3Client s3Client;
+
+
     private final String bucketName;
 
-    public S3Service(@Qualifier("awsS3Client") S3Client s3Client,
-        @Value("${cloud.aws.s3.bucket}") String bucketName) {
+    public R2Service(@Qualifier("r2Client") S3Client s3Client,
+        @Value("${r2.bucket}") String bucketName) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
     }

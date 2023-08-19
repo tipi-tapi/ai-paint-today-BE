@@ -1,0 +1,6 @@
+r2:
+    credentials:
+        secret-key: ${R2_SECRET_ACCESS_KEY}
+        access-key: ${R2_ACCESS_KEY_ID}
+    bucket: ${R2_BUCKET_NAME}
+    account-id: ${R2_ACCOUNT_ID}

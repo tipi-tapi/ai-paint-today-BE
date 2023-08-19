@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.s3.service;
+package tipitapi.drawmytoday.r2.service;
 
 import static java.time.Duration.ofMinutes;
 
@@ -13,13 +13,13 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import tipitapi.drawmytoday.s3.exception.S3FailedException;
 
 @Service
-public class S3PreSignedService {
+public class R2PreSignedService {
 
     private final S3Presigner s3Presigner;
     private final String bucketName;
 
-    public S3PreSignedService(@Qualifier("awsS3Presigner") S3Presigner s3Presigner,
-        @Value("${cloud.aws.s3.bucket}") String bucketName) {
+    public R2PreSignedService(@Qualifier("r2Presigner") S3Presigner s3Presigner,
+        @Value("${r2.bucket}") String bucketName) {
         this.s3Presigner = s3Presigner;
         this.bucketName = bucketName;
     }
