@@ -1,113 +1,124 @@
 name: main branch cd
 
 on:
-  push:
-    branches: [ "main" ]
+    push:
+        branches: [ "main" ]
 
 env:
-  APPLICATION_PATH: ./src/main/resources/application.yml
-  PROD_PATH: ./src/main/resources/application-prod.yml
-  OAUTH_PATH: ./src/main/resources/application-oauth.yml
-  AWS_PATH: ./src/main/resources/application-aws.yml
-  OPENAI_PATH: ./src/main/resources/application-openai.yml
+    APPLICATION_PATH: ./src/main/resources/application.yml
+    PROD_PATH: ./src/main/resources/application-prod.yml
+    OAUTH_PATH: ./src/main/resources/application-oauth.yml
+    AWS_PATH: ./src/main/resources/application-aws.yml
+    OPENAI_PATH: ./src/main/resources/application-openai.yml
+    R2_PATH: ./src/main/resources/application-r2.yml
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment: prod
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
+    deploy:
+        runs-on: ubuntu-latest
+        environment: prod
+        steps:
+            -   name: checkout
+                uses: actions/checkout@v3
 
-      - name: application.yml setting
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ${{ env.APPLICATION_PATH }}
-        env:
-          encryptor.secret.key: ${{ secrets.ENCRYPTOR_SECRET_KEY }}
-          presigned-image.expiration.admin-diaries: ${{ secrets.PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES }}
+            -   name: application.yml setting
+                uses: microsoft/variable-substitution@v1
+                with:
+                    files: ${{ env.APPLICATION_PATH }}
+                env:
+                    encryptor.secret.key: ${{ secrets.ENCRYPTOR_SECRET_KEY }}
+                    presigned-image.expiration.admin-diaries: ${{ secrets.PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES }}
 
-      - name: application-prod.yml setting
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ${{ env.PROD_PATH }}
-        env:
-          spring.datasource.url: ${{ secrets.RDS_URL }}
-          spring.datasource.username: ${{ secrets.RDS_USERNAME }}
-          spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
+            -   name: application-prod.yml setting
+                uses: microsoft/variable-substitution@v1
+                with:
+                    files: ${{ env.PROD_PATH }}
+                env:
+                    spring.datasource.url: ${{ secrets.RDS_URL }}
+                    spring.datasource.username: ${{ secrets.RDS_USERNAME }}
+                    spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
 
-      - name: application-oauth.yml setting
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ${{ env.OAUTH_PATH }}
-        env:
-          oauth2.google.client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
-          oauth2.google.client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          oauth2.google.token-url: ${{ secrets.GOOGLE_TOKEN_URL }}
-          oauth2.google.user-info-url: ${{ secrets.GOOGLE_USER_INFO_URL }}
-          oauth2.google.redirect-uri: ${{ secrets.GOOGLE_REDIRECT_URI }}
-          oauth2.google.delete-account-url: ${{ secrets.GOOGLE_DELETE_ACCOUNT_URL }}
-          oauth2.apple.ios.client-id: ${{ secrets.APPLE_IOS_CLIENT_ID }}
-          oauth2.apple.ios.team-id: ${{ secrets.APPLE_IOS_TEAM_ID }}
-          oauth2.apple.ios.key-id: ${{ secrets.APPLE_IOS_KEY_ID }}
-          oauth2.apple.ios.private-key: ${{ secrets.APPLE_IOS_PRIVATE_KEY }}
-          oauth2.apple.ios.token-url: ${{ secrets.APPLE_IOS_TOKEN_URL }}
-          oauth2.apple.ios.delete-account-url: ${{ secrets.APPLE_IOS_DELETE_ACCOUNT_URL }}
-          jwt.secret: ${{ secrets.JWT_SECRET }}
+            -   name: application-oauth.yml setting
+                uses: microsoft/variable-substitution@v1
+                with:
+                    files: ${{ env.OAUTH_PATH }}
+                env:
+                    oauth2.google.client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
+                    oauth2.google.client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+                    oauth2.google.token-url: ${{ secrets.GOOGLE_TOKEN_URL }}
+                    oauth2.google.user-info-url: ${{ secrets.GOOGLE_USER_INFO_URL }}
+                    oauth2.google.redirect-uri: ${{ secrets.GOOGLE_REDIRECT_URI }}
+                    oauth2.google.delete-account-url: ${{ secrets.GOOGLE_DELETE_ACCOUNT_URL }}
+                    oauth2.apple.ios.client-id: ${{ secrets.APPLE_IOS_CLIENT_ID }}
+                    oauth2.apple.ios.team-id: ${{ secrets.APPLE_IOS_TEAM_ID }}
+                    oauth2.apple.ios.key-id: ${{ secrets.APPLE_IOS_KEY_ID }}
+                    oauth2.apple.ios.private-key: ${{ secrets.APPLE_IOS_PRIVATE_KEY }}
+                    oauth2.apple.ios.token-url: ${{ secrets.APPLE_IOS_TOKEN_URL }}
+                    oauth2.apple.ios.delete-account-url: ${{ secrets.APPLE_IOS_DELETE_ACCOUNT_URL }}
+                    jwt.secret: ${{ secrets.JWT_SECRET }}
 
-      - name: application-aws.yml setting
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ${{ env.AWS_PATH }}
-        env:
-          cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          cloud.aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
+            -   name: application-aws.yml setting
+                uses: microsoft/variable-substitution@v1
+                with:
+                    files: ${{ env.AWS_PATH }}
+                env:
+                    cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                    cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                    cloud.aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
 
-      - name: application-openai.yml setting
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ${{ env.OPENAI_PATH }}
-        env:
-          openai.api.key: ${{ secrets.OPENAI_API_KEY }}
-          openai.dalle.url: ${{ secrets.DALLE_API_URL }}
+            -   name: application-openai.yml setting
+                uses: microsoft/variable-substitution@v1
+                with:
+                    files: ${{ env.OPENAI_PATH }}
+                env:
+                    openai.api.key: ${{ secrets.OPENAI_API_KEY }}
+                    openai.dalle.url: ${{ secrets.DALLE_API_URL }}
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'temurin'
+            -   name: application-r2.yml setting
+                uses: microsoft/variable-substitution@v1
+                with:
+                    files: ${{ env.R2_PATH }}
+                env:
+                    r2.credentials.secret-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+                    r2.credentials.access-key: ${{ secrets.R2_ACCESS_KEY_ID }}
+                    r2.bucket: ${{ secrets.R2_BUCKET_NAME }}
+                    r2.account-id: ${{ secrets.R2_ACCOUNT_ID }}
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+            -   name: Set up JDK 11
+                uses: actions/setup-java@v3
+                with:
+                    java-version: '11'
+                    distribution: 'temurin'
 
-      - name: Clean and Build with Gradle
-        run: ./gradlew clean build
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
+            -   name: Clean and Build with Gradle
+                run: ./gradlew clean build
 
-      - name: Copy JAR file to EC2
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          port: 22
-          source: build/libs/draw-my-today-0.0.1-SNAPSHOT.jar
-          target: /home/ubuntu/SpringServer
+            -   name: Cache Gradle packages
+                uses: actions/cache@v1
+                with:
+                    path: ~/.gradle/caches
+                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+                    restore-keys: ${{ runner.os }}-gradle
 
-      - name: Deploy EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            cd SpringServer
-            ./start.sh
+            -   name: Copy JAR file to EC2
+                uses: appleboy/scp-action@master
+                with:
+                    host: ${{ secrets.EC2_HOST }}
+                    username: ${{ secrets.EC2_USERNAME }}
+                    key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+                    port: 22
+                    source: build/libs/draw-my-today-0.0.1-SNAPSHOT.jar
+                    target: /home/ubuntu/SpringServer
+
+            -   name: Deploy EC2
+                uses: appleboy/ssh-action@master
+                with:
+                    host: ${{ secrets.EC2_HOST }}
+                    username: ${{ secrets.EC2_USERNAME }}
+                    key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+                    port: 22
+                    script: |
+                        cd SpringServer
+                        ./start.sh
