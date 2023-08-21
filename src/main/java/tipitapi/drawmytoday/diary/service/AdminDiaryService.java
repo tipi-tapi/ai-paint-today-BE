@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.s3.service.S3PreSignedService;
+import tipitapi.drawmytoday.r2.service.R2PreSignedService;
 
 @Service
 @Transactional(readOnly = true)
@@ -17,7 +17,7 @@ import tipitapi.drawmytoday.s3.service.S3PreSignedService;
 public class AdminDiaryService {
 
     private final DiaryRepository diaryRepository;
-    private final S3PreSignedService s3PreSignedService;
+    private final R2PreSignedService r2PreSignedService;
     @Value("${presigned-image.expiration.admin-diaries}")
     private int imageExpiration;
 
@@ -30,7 +30,7 @@ public class AdminDiaryService {
 
     private GetDiaryAdminResponse generatePresignedURL(GetDiaryAdminResponse response) {
         response.updateImageUrl(
-            s3PreSignedService.getPreSignedUrlForShare(response.getImageURL(), imageExpiration));
+            r2PreSignedService.getPreSignedUrlForShare(response.getImageURL(), imageExpiration));
         return response;
     }
 }

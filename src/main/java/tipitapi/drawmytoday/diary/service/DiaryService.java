@@ -21,7 +21,7 @@ import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.s3.service.S3PreSignedService;
+import tipitapi.drawmytoday.r2.service.R2PreSignedService;
 import tipitapi.drawmytoday.ticket.domain.Ticket;
 import tipitapi.drawmytoday.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.user.domain.User;
@@ -36,7 +36,7 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final ImageService imageService;
     private final ValidateUserService validateUserService;
-    private final S3PreSignedService s3PreSignedService;
+    private final R2PreSignedService r2PreSignedService;
     private final Encryptor encryptor;
     private final ValidateDiaryService validateDiaryService;
     private final ValidateTicketService validateTicketService;
@@ -47,7 +47,7 @@ public class DiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         diary.setNotes(encryptor.decrypt(diary.getNotes()));
 
-        String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
+        String imageUrl = r2PreSignedService.getPreSignedUrlForShare(
             imageService.getImage(diary).getImageUrl(), 30);
 
         String emotionText = diary.getEmotion().getEmotionText(language);
@@ -130,7 +130,7 @@ public class DiaryService {
                 return true;
             })
             .map(diary -> {
-                String imageUrl = s3PreSignedService.getPreSignedUrlForShare(
+                String imageUrl = r2PreSignedService.getPreSignedUrlForShare(
                     diary.getImageList().get(0).getImageUrl(), 30);
                 return GetMonthlyDiariesResponse.of(diary.getDiaryId(), imageUrl,
                     diary.getDiaryDate());
