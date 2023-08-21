@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiary;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithId;
 import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotion;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
@@ -121,7 +122,7 @@ class ValidateDiaryServiceTest {
             @DisplayName("DiaryDateAlreadyExistsException 예외를 발생시킨다.")
             void it_throws_DiaryNotFoundException() {
                 given(diaryRepository.getDiaryExistsByDiaryDate(anyLong(), any(LocalDate.class)))
-                    .willReturn(Optional.empty());
+                    .willReturn(Optional.of(createDiary(createUser(), createEmotion())));
 
                 assertThatThrownBy(
                     () -> validateDiaryService.validateExistsByDate(1L, LocalDate.now()))
