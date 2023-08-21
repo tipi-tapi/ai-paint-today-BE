@@ -24,7 +24,7 @@ import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.domain.Image;
 import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.repository.ImageRepository;
-import tipitapi.drawmytoday.s3.service.S3Service;
+import tipitapi.drawmytoday.r2.service.R2Service;
 
 @ExtendWith(MockitoExtension.class)
 class ImageServiceTest {
@@ -32,7 +32,7 @@ class ImageServiceTest {
     @Mock
     ImageRepository imageRepository;
     @Mock
-    S3Service s3Service;
+    R2Service r2Service;
     @InjectMocks
     ImageService imageService;
 
@@ -120,7 +120,7 @@ class ImageServiceTest {
 
             // then
             assertThat(createdImage).isEqualTo(image);
-            verify(s3Service).uploadImage(any(byte[].class), matches(imagePathRegex));
+            verify(r2Service).uploadImage(any(byte[].class), matches(imagePathRegex));
             verify(imageRepository).save(any(Image.class));
         }
     }

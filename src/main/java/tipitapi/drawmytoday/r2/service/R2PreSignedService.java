@@ -2,7 +2,7 @@ package tipitapi.drawmytoday.r2.service;
 
 import static java.time.Duration.ofMinutes;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -13,16 +13,12 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import tipitapi.drawmytoday.r2.exception.R2FailedException;
 
 @Service
+@RequiredArgsConstructor
 public class R2PreSignedService {
 
     private final S3Presigner s3Presigner;
-    private final String bucketName;
-
-    public R2PreSignedService(@Qualifier("r2Presigner") S3Presigner s3Presigner,
-        @Value("${r2.bucket}") String bucketName) {
-        this.s3Presigner = s3Presigner;
-        this.bucketName = bucketName;
-    }
+    @Value("${r2.bucket}")
+    private String bucketName;
 
     /*
      * S3 이미지 조회용 pre-signed URL 발급 메서드
