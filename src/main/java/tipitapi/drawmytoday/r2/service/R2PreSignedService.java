@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import tipitapi.drawmytoday.s3.exception.S3FailedException;
+import tipitapi.drawmytoday.r2.exception.R2FailedException;
 
 @Service
 public class R2PreSignedService {
@@ -42,7 +42,7 @@ public class R2PreSignedService {
         } catch (SdkClientException | S3Exception e) {
             throw e;
         } catch (Exception e) {
-            throw new S3FailedException(e);
+            throw new R2FailedException(e);
         }
     }
 }

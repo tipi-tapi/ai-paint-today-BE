@@ -10,7 +10,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
-import tipitapi.drawmytoday.s3.exception.S3FailedException;
+import tipitapi.drawmytoday.r2.exception.R2FailedException;
 
 @Service
 public class R2Service {
@@ -33,7 +33,7 @@ public class R2Service {
         } catch (SdkClientException | S3Exception e) {
             throw e;
         } catch (Exception e) {
-            throw new S3FailedException(e);
+            throw new R2FailedException(e);
         }
     }
 
