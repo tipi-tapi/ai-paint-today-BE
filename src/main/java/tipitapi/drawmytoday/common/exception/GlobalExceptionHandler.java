@@ -20,7 +20,7 @@ import tipitapi.drawmytoday.common.response.ErrorResponse;
 import tipitapi.drawmytoday.common.response.ErrorResponse.ValidationError;
 import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
-import tipitapi.drawmytoday.s3.exception.S3FailedException;
+import tipitapi.drawmytoday.r2.exception.R2FailedException;
 
 @RestControllerAdvice
 @Slf4j
@@ -71,21 +71,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(SdkClientException.class)
-    public ResponseEntity<Object> handleS3SdkClientException(SdkClientException e) {
-        log.error("S3SdkClientException", e);
-        return handleExceptionInternal(ErrorCode.S3_SDK_ERROR);
+    public ResponseEntity<Object> handleR2SdkClientException(SdkClientException e) {
+        log.error("R2SdkClientException", e);
+        return handleExceptionInternal(ErrorCode.R2_SDK_ERROR);
     }
 
     @ExceptionHandler(S3Exception.class)
-    public ResponseEntity<Object> handleS3Exception(S3Exception e) {
-        log.error("S3Exception", e);
-        return handleExceptionInternal(ErrorCode.S3_SERVICE_ERROR);
+    public ResponseEntity<Object> handleR2Exception(S3Exception e) {
+        log.error("R2Exception", e);
+        return handleExceptionInternal(ErrorCode.R2_SERVICE_ERROR);
     }
 
-    @ExceptionHandler(S3FailedException.class)
-    public ResponseEntity<Object> handleS3FailedException(S3FailedException e) {
-        log.error("S3FailedException", e);
-        return handleExceptionInternal(ErrorCode.S3_FAILED);
+    @ExceptionHandler(R2FailedException.class)
+    public ResponseEntity<Object> handleR2FailedException(R2FailedException e) {
+        log.error("R2FailedException", e);
+        return handleExceptionInternal(ErrorCode.R2_FAILED);
     }
 
     @ExceptionHandler(DallERequestFailException.class)

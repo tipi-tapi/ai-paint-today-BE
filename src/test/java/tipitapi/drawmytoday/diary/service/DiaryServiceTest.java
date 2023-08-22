@@ -42,7 +42,7 @@ import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.s3.service.S3PreSignedService;
+import tipitapi.drawmytoday.r2.service.R2PreSignedService;
 import tipitapi.drawmytoday.ticket.domain.Ticket;
 import tipitapi.drawmytoday.ticket.domain.TicketType;
 import tipitapi.drawmytoday.ticket.service.ValidateTicketService;
@@ -60,7 +60,7 @@ class DiaryServiceTest {
     @Mock
     ValidateUserService validateUserService;
     @Mock
-    S3PreSignedService s3PreSignedService;
+    R2PreSignedService r2PreSignedService;
     @Mock
     ValidateDiaryService validateDiaryService;
     @Mock
@@ -92,7 +92,7 @@ class DiaryServiceTest {
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
                 given(imageService.getImage(diary)).willReturn(image);
                 given(
-                    s3PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
+                    r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
@@ -116,7 +116,7 @@ class DiaryServiceTest {
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
                 given(imageService.getImage(diary)).willReturn(image);
                 given(
-                    s3PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
+                    r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
@@ -140,7 +140,7 @@ class DiaryServiceTest {
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
                 given(imageService.getImage(diary)).willReturn(image);
                 given(
-                    s3PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
+                    r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());

@@ -2,7 +2,6 @@ package tipitapi.drawmytoday.common.config;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,6 @@ public class R2Config {
     private String accountId;
 
     @Bean
-    @Qualifier("r2Client")
     public S3Client r2Client() throws URISyntaxException {
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
         return S3Client.builder()
@@ -35,7 +33,6 @@ public class R2Config {
     }
 
     @Bean
-    @Qualifier("r2Presigner")
     public S3Presigner r2Presigner() throws URISyntaxException {
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
         return S3Presigner.builder()
