@@ -1,9 +1,9 @@
 package tipitapi.drawmytoday.domain.diary.repository;
 
-import static tipitapi.drawmytoday.diary.domain.QDiary.diary;
-import static tipitapi.drawmytoday.diary.domain.QImage.image;
-import static tipitapi.drawmytoday.diary.domain.QPrompt.prompt;
-import static tipitapi.drawmytoday.emotion.domain.QEmotion.emotion;
+import static tipitapi.drawmytoday.domain.diary.domain.QDiary.diary;
+import static tipitapi.drawmytoday.domain.diary.domain.QImage.image;
+import static tipitapi.drawmytoday.domain.diary.domain.QPrompt.prompt;
+import static tipitapi.drawmytoday.domain.emotion.domain.QEmotion.emotion;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -17,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.support.PageableExecutionUtils;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
-import tipitapi.drawmytoday.admin.dto.QGetDiaryAdminResponse;
+import tipitapi.drawmytoday.domain.admin.dto.QGetDiaryAdminResponse;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 

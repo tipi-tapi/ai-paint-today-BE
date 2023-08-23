@@ -12,10 +12,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.ResultActions;
-import tipitapi.drawmytoday.domain.adreward.controller.AdRewardController;
-import tipitapi.drawmytoday.domain.adreward.service.AdRewardService;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
+import tipitapi.drawmytoday.domain.adreward.controller.AdRewardController;
+import tipitapi.drawmytoday.domain.adreward.service.AdRewardService;
 
 @WebMvcTest(AdRewardController.class)
 @WithCustomUser

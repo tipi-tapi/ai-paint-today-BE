@@ -22,11 +22,10 @@ import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.TokenNotFoundException;
-import tipitapi.drawmytoday.domain.oauth.dto.ResponseJwtToken;
-import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 import tipitapi.drawmytoday.domain.oauth.domain.Auth;
 import tipitapi.drawmytoday.domain.oauth.dto.OAuthAccessToken;
 import tipitapi.drawmytoday.domain.oauth.dto.OAuthUserProfile;
+import tipitapi.drawmytoday.domain.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.domain.oauth.exception.OAuthNotFoundException;
 import tipitapi.drawmytoday.domain.oauth.properties.GoogleProperties;
 import tipitapi.drawmytoday.domain.oauth.repository.AuthRepository;
@@ -34,6 +33,7 @@ import tipitapi.drawmytoday.domain.ticket.service.TicketService;
 import tipitapi.drawmytoday.domain.user.domain.SocialCode;
 import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.UserService;
+import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
 @Service
 @Transactional(readOnly = true)

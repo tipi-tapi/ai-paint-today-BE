@@ -5,10 +5,10 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.ticket.domain.Ticket;
 import tipitapi.drawmytoday.domain.ticket.domain.TicketType;
 import tipitapi.drawmytoday.domain.ticket.repository.TicketRepository;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @Service
 @Transactional(readOnly = true)

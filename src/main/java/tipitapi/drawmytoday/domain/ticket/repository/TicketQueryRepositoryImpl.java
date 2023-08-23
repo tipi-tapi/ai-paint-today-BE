@@ -1,6 +1,6 @@
 package tipitapi.drawmytoday.domain.ticket.repository;
 
-import static tipitapi.drawmytoday.ticket.domain.QTicket.ticket;
+import static tipitapi.drawmytoday.domain.ticket.domain.QTicket.ticket;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.Optional;

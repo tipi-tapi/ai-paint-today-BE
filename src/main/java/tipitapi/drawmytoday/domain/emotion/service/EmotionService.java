@@ -5,11 +5,11 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionRequest;
 import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionResponse;
 import tipitapi.drawmytoday.domain.emotion.dto.GetActiveEmotionsResponse;
 import tipitapi.drawmytoday.domain.emotion.repository.EmotionRepository;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
-import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionRequest;
 
 @Service
 @Transactional(readOnly = true)

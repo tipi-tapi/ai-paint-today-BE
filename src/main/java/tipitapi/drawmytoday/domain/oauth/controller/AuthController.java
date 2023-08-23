@@ -28,9 +28,9 @@ import tipitapi.drawmytoday.common.utils.HeaderUtils;
 import tipitapi.drawmytoday.domain.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.domain.oauth.dto.ResponseAccessToken;
 import tipitapi.drawmytoday.domain.oauth.dto.ResponseJwtToken;
+import tipitapi.drawmytoday.domain.oauth.service.AppleOAuthService;
 import tipitapi.drawmytoday.domain.oauth.service.GoogleOAuthService;
 import tipitapi.drawmytoday.domain.oauth.service.OAuthService;
-import tipitapi.drawmytoday.domain.oauth.service.AppleOAuthService;
 
 @RestController
 @RequestMapping("/oauth2")
