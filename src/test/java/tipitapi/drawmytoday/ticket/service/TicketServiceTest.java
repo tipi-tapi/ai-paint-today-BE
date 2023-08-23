@@ -2,8 +2,6 @@ package tipitapi.drawmytoday.ticket.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
