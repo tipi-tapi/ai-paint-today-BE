@@ -33,9 +33,10 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
-import tipitapi.drawmytoday.emotion.dto.CreateEmotionResponse;
-import tipitapi.drawmytoday.emotion.dto.GetActiveEmotionsResponse;
-import tipitapi.drawmytoday.emotion.service.EmotionService;
+import tipitapi.drawmytoday.domain.emotion.controller.EmotionController;
+import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionResponse;
+import tipitapi.drawmytoday.domain.emotion.dto.GetActiveEmotionsResponse;
+import tipitapi.drawmytoday.domain.emotion.service.EmotionService;
 
 @WebMvcTest(EmotionController.class)
 @WithCustomUser

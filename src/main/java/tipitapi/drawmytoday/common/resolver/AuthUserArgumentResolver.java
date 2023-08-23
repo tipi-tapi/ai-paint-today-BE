@@ -11,7 +11,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import tipitapi.drawmytoday.common.security.jwt.JwtProperties;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
-import tipitapi.drawmytoday.user.domain.UserRole;
+import tipitapi.drawmytoday.domain.user.domain.UserRole;
 
 @Component
 public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {

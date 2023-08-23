@@ -15,10 +15,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tipitapi.drawmytoday.ticket.domain.Ticket;
-import tipitapi.drawmytoday.ticket.domain.TicketType;
-import tipitapi.drawmytoday.ticket.repository.TicketRepository;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.ticket.domain.Ticket;
+import tipitapi.drawmytoday.domain.ticket.domain.TicketType;
+import tipitapi.drawmytoday.domain.ticket.repository.TicketRepository;
+import tipitapi.drawmytoday.domain.ticket.service.TicketService;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @ExtendWith(MockitoExtension.class)
 public class TicketServiceTest {

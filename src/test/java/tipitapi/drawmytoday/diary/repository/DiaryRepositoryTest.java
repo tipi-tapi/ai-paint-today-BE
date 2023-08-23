@@ -22,7 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.jdbc.Sql;
-import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
+import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.common.config.QuerydslConfig;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
@@ -30,9 +30,10 @@ import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestImage;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.common.utils.DateUtils;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
+import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)

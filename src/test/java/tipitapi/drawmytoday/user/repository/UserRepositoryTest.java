@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Import;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.common.config.QuerydslConfig;
 import tipitapi.drawmytoday.common.testdata.TestUser;
-import tipitapi.drawmytoday.user.domain.SocialCode;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.user.domain.SocialCode;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)

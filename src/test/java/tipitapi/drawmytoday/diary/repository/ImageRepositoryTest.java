@@ -13,9 +13,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.common.config.QuerydslConfig;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.domain.Image;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.Image;
+import tipitapi.drawmytoday.domain.diary.repository.ImageRepository;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)

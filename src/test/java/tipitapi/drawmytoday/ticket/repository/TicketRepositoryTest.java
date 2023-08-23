@@ -16,9 +16,10 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.common.config.QuerydslConfig;
-import tipitapi.drawmytoday.ticket.domain.Ticket;
-import tipitapi.drawmytoday.ticket.domain.TicketType;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.ticket.domain.Ticket;
+import tipitapi.drawmytoday.domain.ticket.domain.TicketType;
+import tipitapi.drawmytoday.domain.ticket.repository.TicketRepository;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)

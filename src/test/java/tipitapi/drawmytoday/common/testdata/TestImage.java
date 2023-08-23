@@ -1,8 +1,8 @@
 package tipitapi.drawmytoday.common.testdata;
 
 import org.springframework.test.util.ReflectionTestUtils;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.domain.Image;
+import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.Image;
 
 public class TestImage {
 

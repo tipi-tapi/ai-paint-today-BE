@@ -14,11 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tipitapi.drawmytoday.ticket.domain.Ticket;
-import tipitapi.drawmytoday.ticket.domain.TicketType;
-import tipitapi.drawmytoday.ticket.exception.ValidTicketNotExistsException;
-import tipitapi.drawmytoday.ticket.repository.TicketRepository;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.ticket.domain.Ticket;
+import tipitapi.drawmytoday.domain.ticket.domain.TicketType;
+import tipitapi.drawmytoday.domain.ticket.exception.ValidTicketNotExistsException;
+import tipitapi.drawmytoday.domain.ticket.repository.TicketRepository;
+import tipitapi.drawmytoday.domain.ticket.service.ValidateTicketService;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @ExtendWith(MockitoExtension.class)
 public class ValidateTicketServiceTest {

@@ -21,9 +21,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
-import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
-import tipitapi.drawmytoday.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.r2.service.R2PreSignedService;
+import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
+import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
+import tipitapi.drawmytoday.domain.diary.service.AdminDiaryService;
+import tipitapi.drawmytoday.domain.r2.service.R2PreSignedService;
 
 @ExtendWith(MockitoExtension.class)
 class AdminDiaryServiceTest {

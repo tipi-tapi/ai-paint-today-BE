@@ -24,11 +24,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
-import tipitapi.drawmytoday.oauth.dto.RequestAppleLogin;
-import tipitapi.drawmytoday.oauth.dto.ResponseJwtToken;
-import tipitapi.drawmytoday.oauth.service.AppleOAuthService;
-import tipitapi.drawmytoday.oauth.service.GoogleOAuthService;
-import tipitapi.drawmytoday.oauth.service.OAuthService;
+import tipitapi.drawmytoday.domain.oauth.controller.AuthController;
+import tipitapi.drawmytoday.domain.oauth.dto.RequestAppleLogin;
+import tipitapi.drawmytoday.domain.oauth.dto.ResponseJwtToken;
+import tipitapi.drawmytoday.domain.oauth.service.AppleOAuthService;
+import tipitapi.drawmytoday.domain.oauth.service.GoogleOAuthService;
+import tipitapi.drawmytoday.domain.oauth.service.OAuthService;
 
 @WebMvcTest(AuthController.class)
 class AuthControllerTest extends ControllerTestSetup {

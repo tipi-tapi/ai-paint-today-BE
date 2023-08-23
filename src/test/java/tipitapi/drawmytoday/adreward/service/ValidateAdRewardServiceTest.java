@@ -16,9 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tipitapi.drawmytoday.adreward.domain.AdReward;
-import tipitapi.drawmytoday.adreward.repository.AdRewardRepository;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.adreward.domain.AdReward;
+import tipitapi.drawmytoday.domain.adreward.repository.AdRewardRepository;
+import tipitapi.drawmytoday.domain.adreward.service.ValidateAdRewardService;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @ExtendWith(MockitoExtension.class)
 class ValidateAdRewardServiceTest {

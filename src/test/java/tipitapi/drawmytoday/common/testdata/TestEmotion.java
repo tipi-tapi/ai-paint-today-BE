@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.common.testdata;
 
 import org.springframework.test.util.ReflectionTestUtils;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 
 public class TestEmotion {
 
