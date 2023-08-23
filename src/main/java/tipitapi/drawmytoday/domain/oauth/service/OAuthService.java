@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.exception.BusinessException;
-import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 import tipitapi.drawmytoday.domain.user.domain.SocialCode;
 import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
 @Service
 @Transactional(readOnly = true)

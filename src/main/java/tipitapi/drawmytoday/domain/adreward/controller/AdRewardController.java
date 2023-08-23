@@ -10,9 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tipitapi.drawmytoday.domain.adreward.service.AdRewardService;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
+import tipitapi.drawmytoday.domain.adreward.service.AdRewardService;
 
 @RestController
 @RequestMapping("/ad")
