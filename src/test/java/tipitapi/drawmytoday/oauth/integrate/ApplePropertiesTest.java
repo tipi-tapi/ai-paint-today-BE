@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
-import tipitapi.drawmytoday.oauth.properties.AppleClientSecret;
-import tipitapi.drawmytoday.oauth.properties.AppleProperties;
+import tipitapi.drawmytoday.domain.oauth.properties.AppleClientSecret;
+import tipitapi.drawmytoday.domain.oauth.properties.AppleProperties;
 
 @SpringBootTest
 public class ApplePropertiesTest {

@@ -8,14 +8,14 @@ import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestImage;
 import tipitapi.drawmytoday.common.testdata.TestUser;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.domain.Image;
-import tipitapi.drawmytoday.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.diary.repository.ImageRepository;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.emotion.repository.EmotionRepository;
-import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.repository.UserRepository;
+import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.Image;
+import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
+import tipitapi.drawmytoday.domain.diary.repository.ImageRepository;
+import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.emotion.repository.EmotionRepository;
+import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.repository.UserRepository;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)

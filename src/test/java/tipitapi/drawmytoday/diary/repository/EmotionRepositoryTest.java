@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Import;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.common.config.QuerydslConfig;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.emotion.repository.EmotionRepository;
+import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.emotion.repository.EmotionRepository;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)

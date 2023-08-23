@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
+import tipitapi.drawmytoday.domain.health.controller.HealthCheckController;
 
 @WebMvcTest(HealthCheckController.class)
 class HealthCheckControllerTest extends ControllerTestSetup {

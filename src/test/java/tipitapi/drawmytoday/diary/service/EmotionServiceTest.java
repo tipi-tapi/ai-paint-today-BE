@@ -19,15 +19,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.emotion.dto.CreateEmotionRequest;
-import tipitapi.drawmytoday.emotion.dto.CreateEmotionResponse;
-import tipitapi.drawmytoday.emotion.dto.GetActiveEmotionsResponse;
-import tipitapi.drawmytoday.emotion.repository.EmotionRepository;
-import tipitapi.drawmytoday.emotion.service.EmotionService;
-import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.exception.UserNotFoundException;
-import tipitapi.drawmytoday.user.service.ValidateUserService;
+import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionRequest;
+import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionResponse;
+import tipitapi.drawmytoday.domain.emotion.dto.GetActiveEmotionsResponse;
+import tipitapi.drawmytoday.domain.emotion.repository.EmotionRepository;
+import tipitapi.drawmytoday.domain.emotion.service.EmotionService;
+import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.exception.UserNotFoundException;
+import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
 @ExtendWith(MockitoExtension.class)
 public class EmotionServiceTest {

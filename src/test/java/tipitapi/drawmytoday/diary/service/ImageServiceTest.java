@@ -20,11 +20,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.domain.Image;
-import tipitapi.drawmytoday.diary.exception.ImageNotFoundException;
-import tipitapi.drawmytoday.diary.repository.ImageRepository;
-import tipitapi.drawmytoday.r2.service.R2Service;
+import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.Image;
+import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
+import tipitapi.drawmytoday.domain.diary.repository.ImageRepository;
+import tipitapi.drawmytoday.domain.diary.service.ImageService;
+import tipitapi.drawmytoday.domain.r2.service.R2Service;
 
 @ExtendWith(MockitoExtension.class)
 class ImageServiceTest {

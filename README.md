@@ -39,16 +39,16 @@
 ## 4. 패키지 구조
 
 - `draw_my_today`
-  - `도메인명`
-    - `controller`
-    - `domain`
-    - `repository`
-    - `service`
-  - `common`
-    - `config`
-    - `entity`
-    - `exception`
-    - `util`
+    - `도메인명`
+        - `controller`
+        - `domain`
+        - `repository`
+        - `service`
+    - `common`
+        - `config`
+        - `entity`
+        - `exception`
+        - `util`
 
 ## 5. 인텔리제이 자동 재시작 설정
 

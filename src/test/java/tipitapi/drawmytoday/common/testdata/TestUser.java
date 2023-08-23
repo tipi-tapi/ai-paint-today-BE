@@ -1,9 +1,9 @@
 package tipitapi.drawmytoday.common.testdata;
 
 import org.springframework.test.util.ReflectionTestUtils;
-import tipitapi.drawmytoday.user.domain.SocialCode;
-import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.domain.UserRole;
+import tipitapi.drawmytoday.domain.user.domain.SocialCode;
+import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.domain.UserRole;
 
 public class TestUser {
 

@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
+import tipitapi.drawmytoday.domain.dev.controller.DevelopController;
 
 @WebMvcTest(DevelopController.class)
 class DevelopControllerTest extends ControllerTestSetup {

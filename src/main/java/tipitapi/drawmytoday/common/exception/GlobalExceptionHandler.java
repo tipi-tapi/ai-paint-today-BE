@@ -18,9 +18,9 @@ import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import tipitapi.drawmytoday.common.response.ErrorResponse;
 import tipitapi.drawmytoday.common.response.ErrorResponse.ValidationError;
-import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
-import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
-import tipitapi.drawmytoday.r2.exception.R2FailedException;
+import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
+import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
+import tipitapi.drawmytoday.domain.r2.exception.R2FailedException;
 
 @RestControllerAdvice
 @Slf4j

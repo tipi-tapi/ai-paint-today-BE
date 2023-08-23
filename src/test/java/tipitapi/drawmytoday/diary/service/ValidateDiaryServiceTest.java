@@ -22,12 +22,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.exception.DiaryDateAlreadyExistsException;
-import tipitapi.drawmytoday.diary.exception.DiaryNotFoundException;
-import tipitapi.drawmytoday.diary.exception.NotOwnerOfDiaryException;
-import tipitapi.drawmytoday.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.exception.DiaryDateAlreadyExistsException;
+import tipitapi.drawmytoday.domain.diary.exception.DiaryNotFoundException;
+import tipitapi.drawmytoday.domain.diary.exception.NotOwnerOfDiaryException;
+import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
+import tipitapi.drawmytoday.domain.diary.service.ValidateDiaryService;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @ExtendWith(MockitoExtension.class)
 class ValidateDiaryServiceTest {

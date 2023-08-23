@@ -2,9 +2,9 @@ package tipitapi.drawmytoday.common.testdata;
 
 import java.time.LocalDateTime;
 import org.springframework.test.util.ReflectionTestUtils;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 public class TestDiary {
 

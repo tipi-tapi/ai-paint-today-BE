@@ -20,11 +20,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort.Direction;
-import tipitapi.drawmytoday.admin.dto.GetDiaryAdminResponse;
-import tipitapi.drawmytoday.diary.service.AdminDiaryService;
-import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.exception.UserAccessDeniedException;
-import tipitapi.drawmytoday.user.service.ValidateUserService;
+import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
+import tipitapi.drawmytoday.domain.admin.service.AdminService;
+import tipitapi.drawmytoday.domain.diary.service.AdminDiaryService;
+import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.exception.UserAccessDeniedException;
+import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
 @ExtendWith(MockitoExtension.class)
 class AdminServiceTest {

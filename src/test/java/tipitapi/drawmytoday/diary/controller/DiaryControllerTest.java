@@ -34,17 +34,18 @@ import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
-import tipitapi.drawmytoday.diary.dto.GetDiaryExistByDateResponse;
-import tipitapi.drawmytoday.diary.dto.GetDiaryLimitResponse;
-import tipitapi.drawmytoday.diary.dto.GetDiaryResponse;
-import tipitapi.drawmytoday.diary.dto.GetLastCreationResponse;
-import tipitapi.drawmytoday.diary.dto.GetMonthlyDiariesResponse;
-import tipitapi.drawmytoday.diary.service.CreateDiaryService;
-import tipitapi.drawmytoday.diary.service.DiaryService;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.user.domain.User;
+import tipitapi.drawmytoday.domain.diary.controller.DiaryController;
+import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
+import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
+import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
+import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
+import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
+import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
+import tipitapi.drawmytoday.domain.diary.service.DiaryService;
+import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @WebMvcTest(DiaryController.class)
 @WithCustomUser

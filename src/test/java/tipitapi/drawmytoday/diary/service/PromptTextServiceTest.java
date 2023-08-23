@@ -11,7 +11,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.diary.service.PromptTextService;
+import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 
 @ExtendWith(MockitoExtension.class)
 class PromptTextServiceTest {
