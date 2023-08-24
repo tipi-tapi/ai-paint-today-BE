@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.utils.Encryptor;
+import tipitapi.drawmytoday.dalle.dto.GeneratedImageAndPrompt;
 import tipitapi.drawmytoday.dalle.exception.DallEException;
 import tipitapi.drawmytoday.dalle.service.DallEService;
 import tipitapi.drawmytoday.diary.domain.Diary;
@@ -43,21 +44,17 @@ public class CreateDiaryService {
         validateDiaryService.validateExistsByDate(userId, diaryDate);
         validateTicketService.findAndUseTicket(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
-        String prompt = promptTextService.createPromptText(emotion, keyword);
         LocalDateTime diaryDateTime = diaryDate.atTime(userTime);
 
-        try {
-            byte[] dallEImage = dallEService.getImageAsUrl(prompt);
+        GeneratedImageAndPrompt generated = dallEService.generateImage(emotion, keyword);
+        String prompt = generated.getPrompt();
+        byte[] dallEImage = generated.getImage();
 
-            Diary diary = saveDiary(notes, user, emotion, diaryDateTime, false);
-            promptService.createPrompt(diary, prompt, true);
-            imageService.uploadAndCreateImage(diary, dallEImage, true);
+        Diary diary = saveDiary(notes, user, emotion, diaryDateTime, false);
+        promptService.createPrompt(diary, prompt, true);
+        imageService.uploadAndCreateImage(diary, dallEImage, true);
 
-            return new CreateDiaryResponse(diary.getDiaryId());
-        } catch (DallERequestFailException | ImageInputStreamFailException e) {
-            promptService.createPrompt(prompt, false);
-            throw e;
-        }
+        return new CreateDiaryResponse(diary.getDiaryId());
     }
 
     @Transactional
