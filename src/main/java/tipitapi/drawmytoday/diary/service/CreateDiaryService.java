@@ -7,8 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.utils.Encryptor;
-import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
-import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
+import tipitapi.drawmytoday.dalle.exception.DallEException;
 import tipitapi.drawmytoday.dalle.service.DallEService;
 import tipitapi.drawmytoday.diary.domain.Diary;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
@@ -36,13 +35,10 @@ public class CreateDiaryService {
     private final Encryptor encryptor;
     private final String DUMMY_IMAGE_PATH = "test/dummy.png";
 
-    @Transactional(
-        noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
-            ImageInputStreamFailException.class})
+    @Transactional(noRollbackFor = {DallEException.class})
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
-        String notes, LocalDate diaryDate, LocalTime userTime)
-        throws DallERequestFailException, ImageInputStreamFailException {
-        // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
+        String notes, LocalDate diaryDate, LocalTime userTime) throws DallEException {
+
         User user = validateUserService.validateUserById(userId);
         validateDiaryService.validateExistsByDate(userId, diaryDate);
         validateTicketService.findAndUseTicket(userId);
