@@ -173,7 +173,7 @@ public class DiaryController {
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo,
         @Parameter(description = "테스트 여부", in = ParameterIn.QUERY)
         @RequestParam(value = "test", required = false, defaultValue = "false") boolean test
-    ) throws DallERequestFailException, ImageInputStreamFailException {
+    ) throws DallEException {
         CreateDiaryResponse response;
         if (test) {
             response = createDiaryService.createTestDiary(tokenInfo.getUserId(),

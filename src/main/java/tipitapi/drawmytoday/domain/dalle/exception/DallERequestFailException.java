@@ -2,7 +2,7 @@ package tipitapi.drawmytoday.domain.dalle.exception;
 
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 
-public class DallERequestFailException extends Exception {
+public class DallERequestFailException extends DallEException {
 
     public DallERequestFailException() {
         super(ErrorCode.DALLE_REQUEST_FAIL.getMessage());
