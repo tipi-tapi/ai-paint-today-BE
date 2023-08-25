@@ -50,7 +50,7 @@ public class DallEService {
         this.promptService = promptService;
     }
 
-    @Transactional(rollbackFor = DallEException.class)
+    @Transactional(noRollbackFor = DallEException.class)
     public GeneratedImageAndPrompt generateImage(Emotion emotion, String keyword)
         throws DallEException {
         // 1. prompt 생성
