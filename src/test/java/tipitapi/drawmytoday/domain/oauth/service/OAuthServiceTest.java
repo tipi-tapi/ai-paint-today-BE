@@ -44,6 +44,19 @@ class OAuthServiceTest {
             // then
             verify(googleOAuthService).deleteAccount(any(User.class));
         }
+
+        @Test
+        @DisplayName("유저의 소셜 코드가 애플일 경우 애플 OAuth 서비스의 deleteAccount 메소드를 호출한다.")
+        void apple_user_calls_apple_oauth_service() {
+            // given
+            Long userId = 1L;
+            given(validateUserService.validateUserById(userId))
+                .willReturn(TestUser.createUserWithSocialCode(SocialCode.APPLE));
+            // when
+            oAuthService.deleteAccount(userId);
+            // then
+            verify(appleOAuthService).deleteAccount(any(User.class));
+        }
     }
 
 }
