@@ -5,10 +5,9 @@ import static tipitapi.drawmytoday.common.exception.ErrorCode.OBJECT_MAPPING_ERR
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
@@ -32,6 +33,7 @@ import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.UserService;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -49,6 +51,7 @@ public class GoogleOAuthService {
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request) {
         OAuthAccessToken accessToken = getAccessToken(request);
+        log.info("accessToken: {}", accessToken.getRefreshToken());
         OAuthUserProfile oAuthUserProfile = getUserProfile(accessToken);
 
         User user = validateUserService.validateRegisteredUserByEmail(
@@ -79,10 +82,10 @@ public class GoogleOAuthService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        Map<String, String> body = new LinkedHashMap<>();
-        body.put("token", auth.getRefreshToken());
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("token", auth.getRefreshToken());
 
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
         String url = properties.getDeleteAccountUrl();
         String response = restTemplate.postForObject(url, request, String.class);
@@ -96,22 +99,24 @@ public class GoogleOAuthService {
 
     private OAuthAccessToken getAccessToken(HttpServletRequest request) {
         String authorizationCode = HeaderUtils.getAuthorizationHeader(request);
-
+        log.info("authorizationCode: {}", authorizationCode);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/x-www-form-urlencoded");
-        Map<String, String> httpBody = new LinkedHashMap<>();
-        httpBody.put("code", authorizationCode);
-        httpBody.put("client_id", properties.getClientId());
-        httpBody.put("client_secret", properties.getClientSecret());
-        httpBody.put("redirect_uri", properties.getRedirectUri());
-        httpBody.put("grant_type", "authorization_code");
+        MultiValueMap<String, String> httpBody = new LinkedMultiValueMap<>();
+        httpBody.add("code", authorizationCode);
+        httpBody.add("client_id", properties.getClientId());
+        httpBody.add("client_secret", properties.getClientSecret());
+        httpBody.add("redirect_uri", properties.getRedirectUri());
+        httpBody.add("grant_type", "authorization_code");
 
-        HttpEntity<Map<String, String>> requestToken = new HttpEntity<>(httpBody, httpHeaders);
+        HttpEntity<MultiValueMap<String, String>> requestToken = new HttpEntity<>(httpBody,
+            httpHeaders);
 
         ResponseEntity<String> response = restTemplate.postForEntity(
             properties.getTokenUrl(), requestToken, String.class);
 
         try {
+            log.info("response: {}", response.getBody());
             return objectMapper.readValue(response.getBody(), OAuthAccessToken.class);
         } catch (JsonProcessingException e) {
             throw new BusinessException(OBJECT_MAPPING_ERROR, e);
@@ -124,7 +129,6 @@ public class GoogleOAuthService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken.getAccessToken());
-
         HttpEntity<?> httpEntity = new HttpEntity<>(headers);
 
         ResponseEntity<String> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET,
