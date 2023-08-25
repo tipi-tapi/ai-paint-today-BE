@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.diary.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
@@ -24,6 +25,7 @@ import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.common.utils.Encryptor;
+import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
 import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.domain.dalle.service.DallEService;
@@ -85,9 +87,8 @@ class CreateDiaryServiceTest {
             @ParameterizedTest
             @ValueSource(classes = {DallERequestFailException.class,
                 ImageInputStreamFailException.class})
-            @DisplayName("에러가 발생하면 일기를 생성하지 않고, 실패 프롬프트를 생성한다.")
-            void exception_throw_then_create_fail_prompt(Class<? extends Throwable> exceptionClass)
-                throws Exception {
+            @DisplayName("에러가 발생하면 그대로 던진다.")
+            void throw_exception(Class<? extends Throwable> exceptionClass) throws Exception {
                 //given
                 User user = TestUser.createUserWithId(USER_ID);
                 LocalDateTime lastDateTime = DIARY_DATE.minusDays(1L).atTime(1, 1);
@@ -97,8 +98,8 @@ class CreateDiaryServiceTest {
 
                 given(validateUserService.validateUserById(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
-                given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
-                given(dallEService.getImageAsUrl(eq(prompt))).willThrow(exceptionClass);
+                given(dallEService.generateImage(eq(emotion), eq(KEYWORD))).willThrow(
+                    exceptionClass);
 
                 //when
                 //then
@@ -107,8 +108,8 @@ class CreateDiaryServiceTest {
                         DIARY_DATE, USER_TIME)).isInstanceOf(exceptionClass);
                 assertThat(user.getLastDiaryDate().isEqual(lastDateTime)).isTrue();
 
-                verify(promptService).createPrompt(eq(prompt), eq(false));
-                verify(promptService, never()).createPrompt(any(Diary.class), eq(prompt), eq(true));
+                verify(promptService, never()).createPrompt(any(Diary.class), anyString(),
+                    eq(true));
             }
 
             @Test
@@ -127,8 +128,8 @@ class CreateDiaryServiceTest {
 
                 given(validateUserService.validateUserById(USER_ID)).willReturn(user);
                 given(validateEmotionService.validateEmotionById(EMOTION_ID)).willReturn(emotion);
-                given(promptTextService.createPromptText(emotion, KEYWORD)).willReturn(prompt);
-                given(dallEService.getImageAsUrl(prompt)).willReturn(image);
+                given(dallEService.generateImage(emotion, KEYWORD)).willReturn(
+                    new GeneratedImageAndPrompt(prompt, image));
                 given(encryptor.encrypt(NOTES)).willReturn("암호화된 노트");
                 given(diaryRepository.save(any(Diary.class))).willReturn(diary);
 
@@ -140,7 +141,7 @@ class CreateDiaryServiceTest {
                 assertThat(createDiaryResponse.getId()).isEqualTo(diaryId);
                 assertThat(user.getLastDiaryDate().isAfter(lastDateTime)).isTrue();
 
-                verify(dallEService).getImageAsUrl(any(String.class));
+                verify(dallEService).generateImage(eq(emotion), eq(KEYWORD));
                 verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
                 verify(imageService).uploadAndCreateImage(eq(diary), any(byte[].class), eq(true));
             }
@@ -184,7 +185,7 @@ class CreateDiaryServiceTest {
             assertThat(response.getId()).isEqualTo(diaryId);
             assertThat(user.getLastDiaryDate().isAfter(lastDateTime)).isTrue();
 
-            verify(dallEService, never()).getImageAsUrl(any(String.class));
+            verify(dallEService, never()).generateImage(any(Emotion.class), any(String.class));
             verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
             verify(imageService).createImage(eq(diary), any(String.class), eq(true));
         }
