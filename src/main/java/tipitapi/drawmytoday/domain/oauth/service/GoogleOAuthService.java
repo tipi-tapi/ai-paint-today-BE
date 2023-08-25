@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,7 +32,6 @@ import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.UserService;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
-@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -51,7 +49,7 @@ public class GoogleOAuthService {
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request) {
         OAuthAccessToken accessToken = getAccessToken(request);
-        log.info("accessToken: {}", accessToken.getRefreshToken());
+
         OAuthUserProfile oAuthUserProfile = getUserProfile(accessToken);
 
         User user = validateUserService.validateRegisteredUserByEmail(
@@ -99,7 +97,7 @@ public class GoogleOAuthService {
 
     private OAuthAccessToken getAccessToken(HttpServletRequest request) {
         String authorizationCode = HeaderUtils.getAuthorizationHeader(request);
-        log.info("authorizationCode: {}", authorizationCode);
+
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/x-www-form-urlencoded");
         MultiValueMap<String, String> httpBody = new LinkedMultiValueMap<>();
@@ -116,7 +114,6 @@ public class GoogleOAuthService {
             properties.getTokenUrl(), requestToken, String.class);
 
         try {
-            log.info("response: {}", response.getBody());
             return objectMapper.readValue(response.getBody(), OAuthAccessToken.class);
         } catch (JsonProcessingException e) {
             throw new BusinessException(OBJECT_MAPPING_ERROR, e);
