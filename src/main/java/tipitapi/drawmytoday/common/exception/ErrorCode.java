@@ -16,6 +16,7 @@ public enum ErrorCode {
     HANDLE_ACCESS_DENIED(403, "C006", "접근이 거부됐습니다."),
     ENCRYPTION_ERROR(500, "C007", "암호화에 실패했습니다."),
     DECRYPTION_ERROR(500, "C008", "복호화에 실패했습니다."),
+    OBJECT_MAPPING_ERROR(500, "C009", "객체 매핑에 실패했습니다."),
 
     // Security
     AUTHORITY_NOT_FOUND(404, "S001", "유저 권한이 없습니다."),
@@ -54,6 +55,7 @@ public enum ErrorCode {
 
     // DALL-E
     DALLE_REQUEST_FAIL(500, "DE001", "DALL-E 요청에 실패하였습니다."),
+    DALLE_CONTENT_POLICY_VIOLATION(500, "DE002", "DALL-E의 컨텐츠 정책에 위배되었습니다."),
 
     // Image InputStream
     IMAGE_INPUT_STREAM_FAIL(500, "IIS001", "이미지 스트림을 가져오는데 실패하였습니다."),

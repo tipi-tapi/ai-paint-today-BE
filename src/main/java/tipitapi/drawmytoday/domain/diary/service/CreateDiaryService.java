@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.utils.Encryptor;
-import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
-import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
+import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
+import tipitapi.drawmytoday.domain.dalle.exception.DallEException;
 import tipitapi.drawmytoday.domain.dalle.service.DallEService;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
@@ -36,32 +36,25 @@ public class CreateDiaryService {
     private final Encryptor encryptor;
     private final String DUMMY_IMAGE_PATH = "test/dummy.png";
 
-    @Transactional(
-        noRollbackFor = {DallERequestFailException.class, DallERequestFailException.class,
-            ImageInputStreamFailException.class})
+    @Transactional(noRollbackFor = {DallEException.class})
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
-        String notes, LocalDate diaryDate, LocalTime userTime)
-        throws DallERequestFailException, ImageInputStreamFailException {
-        // TODO: 이미지 여러 개로 요청할 경우의 핸들링 필요
+        String notes, LocalDate diaryDate, LocalTime userTime) throws DallEException {
+
         User user = validateUserService.validateUserById(userId);
         validateDiaryService.validateExistsByDate(userId, diaryDate);
         validateTicketService.findAndUseTicket(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
-        String prompt = promptTextService.createPromptText(emotion, keyword);
         LocalDateTime diaryDateTime = diaryDate.atTime(userTime);
 
-        try {
-            byte[] dallEImage = dallEService.getImageAsUrl(prompt);
+        GeneratedImageAndPrompt generated = dallEService.generateImage(emotion, keyword);
+        String prompt = generated.getPrompt();
+        byte[] dallEImage = generated.getImage();
 
-            Diary diary = saveDiary(notes, user, emotion, diaryDateTime, false);
-            promptService.createPrompt(diary, prompt, true);
-            imageService.uploadAndCreateImage(diary, dallEImage, true);
+        Diary diary = saveDiary(notes, user, emotion, diaryDateTime, false);
+        promptService.createPrompt(diary, prompt, true);
+        imageService.uploadAndCreateImage(diary, dallEImage, true);
 
-            return new CreateDiaryResponse(diary.getDiaryId());
-        } catch (DallERequestFailException | ImageInputStreamFailException e) {
-            promptService.createPrompt(prompt, false);
-            throw e;
-        }
+        return new CreateDiaryResponse(diary.getDiaryId());
     }
 
     @Transactional
