@@ -27,6 +27,8 @@ public class User extends BaseEntityWithUpdate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @NotNull
+    @Column(nullable = false)
     private String email;
 
     @NotNull
