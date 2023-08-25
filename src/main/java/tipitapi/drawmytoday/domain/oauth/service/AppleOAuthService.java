@@ -66,9 +66,8 @@ public class AppleOAuthService {
             Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
             auth.setRefreshToken(oAuthAccessToken.getRefreshToken());
         } else {
-            user = userService.registerUser(appleIdToken.getEmail(), SocialCode.APPLE);
-            authRepository.save(new Auth(user, oAuthAccessToken.getRefreshToken()));
-            ticketService.createTicketByJoin(user);
+            user = userService.registerUser(
+                appleIdToken.getEmail(), SocialCode.APPLE, oAuthAccessToken.getRefreshToken());
         }
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),

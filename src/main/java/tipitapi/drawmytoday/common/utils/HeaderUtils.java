@@ -38,4 +38,17 @@ public class HeaderUtils {
 
         return tokens[1];
     }
+
+    public static String getAuthorizationHeader(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (!StringUtils.hasText(authorization)) {
+            throw new TokenNotFoundException(ErrorCode.AUTH_CODE_NOT_FOUND);
+        }
+
+        String[] tokens = StringUtils.delimitedListToStringArray(authorization, " ");
+        if (tokens.length != 2 || !"Bearer".equals(tokens[0])) {
+            throw new InvalidTokenException();
+        }
+        return tokens[1];
+    }
 }
