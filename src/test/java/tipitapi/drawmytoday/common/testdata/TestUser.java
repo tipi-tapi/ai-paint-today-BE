@@ -22,4 +22,8 @@ public class TestUser {
         ReflectionTestUtils.setField(user, "userRole", UserRole.ADMIN);
         return user;
     }
+
+    public static User createUserWithSocialCode(SocialCode socialCode) {
+        return User.create(socialCode);
+    }
 }
