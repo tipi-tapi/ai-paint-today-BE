@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.diary.service;
+package tipitapi.drawmytoday.domain.diary.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,7 +44,6 @@ public class CreateDiaryService {
         validateDiaryService.validateExistsByDate(userId, diaryDate);
         validateTicketService.findAndUseTicket(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
-        String prompt = promptTextService.createPromptText(emotion, keyword);
         LocalDateTime diaryDateTime = diaryDate.atTime(userTime);
 
         GeneratedImageAndPrompt generated = dallEService.generateImage(emotion, keyword);

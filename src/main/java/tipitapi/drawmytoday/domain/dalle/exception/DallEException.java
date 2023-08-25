@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.dalle.exception;
+package tipitapi.drawmytoday.domain.dalle.exception;
 
 public abstract class DallEException extends Exception {
 
