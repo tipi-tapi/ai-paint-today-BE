@@ -26,8 +26,7 @@ import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
-import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
-import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
+import tipitapi.drawmytoday.dalle.exception.DallEException;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.diary.dto.GetDiaryExistByDateResponse;
@@ -173,7 +172,7 @@ public class DiaryController {
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo,
         @Parameter(description = "테스트 여부", in = ParameterIn.QUERY)
         @RequestParam(value = "test", required = false, defaultValue = "false") boolean test
-    ) throws DallERequestFailException, ImageInputStreamFailException {
+    ) throws DallEException {
         CreateDiaryResponse response;
         if (test) {
             response = createDiaryService.createTestDiary(tokenInfo.getUserId(),
