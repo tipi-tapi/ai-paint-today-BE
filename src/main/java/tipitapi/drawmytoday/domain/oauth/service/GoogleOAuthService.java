@@ -3,7 +3,10 @@ package tipitapi.drawmytoday.domain.oauth.service;
 import static tipitapi.drawmytoday.common.exception.ErrorCode.OAUTH_SERVER_FAILED;
 import static tipitapi.drawmytoday.common.exception.ErrorCode.PARSING_ERROR;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -14,9 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.utils.HeaderUtils;
@@ -88,7 +88,7 @@ public class GoogleOAuthService {
         String url = properties.getDeleteAccountUrl();
         String response = restTemplate.postForObject(url, request, String.class);
 
-        if (response != null && response.contains("error")) {
+        if (response.contains("error")) {
             throw new BusinessException(OAUTH_SERVER_FAILED);
         }
 
