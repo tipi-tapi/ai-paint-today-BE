@@ -26,7 +26,7 @@ import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.common.security.jwt.exception.ExpiredAccessTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.ExpiredRefreshTokenException;
 import tipitapi.drawmytoday.common.security.jwt.exception.InvalidTokenException;
-import tipitapi.drawmytoday.user.domain.UserRole;
+import tipitapi.drawmytoday.domain.user.domain.UserRole;
 
 @Slf4j
 @Component

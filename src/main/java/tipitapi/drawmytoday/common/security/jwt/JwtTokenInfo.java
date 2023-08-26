@@ -2,7 +2,7 @@ package tipitapi.drawmytoday.common.security.jwt;
 
 import lombok.Builder;
 import lombok.Getter;
-import tipitapi.drawmytoday.user.domain.UserRole;
+import tipitapi.drawmytoday.domain.user.domain.UserRole;
 
 @Getter
 public class JwtTokenInfo {

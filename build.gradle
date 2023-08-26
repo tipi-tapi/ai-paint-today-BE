@@ -90,13 +90,18 @@ jacocoTestReport {
         xml.enabled false
         csv.enabled false
     }
+    def Qdomains = []
+    for (qPattern in "**/QA".."**/QZ") {
+        Qdomains.add(qPattern + "*")
+    }
 
     afterEvaluate {
+
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it,
                 exclude: [
                     'tipitapi/drawmytoday/common/**'
-                ])
+                ] + Qdomains)
         }))
     }
 
@@ -104,6 +109,11 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+
+    def Qdomains = []
+    for (qPattern in "*.QA".."*.QZ") {
+        Qdomains.add(qPattern + "*")
+    }
 
     violationRules {
         rule {
@@ -117,7 +127,7 @@ jacocoTestCoverageVerification {
 
             excludes = [
                 'tipitapi/drawmytoday/common/**'
-            ]
+            ] + Qdomains
         }
     }
 }

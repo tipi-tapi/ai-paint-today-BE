@@ -1,15 +1,15 @@
 management:
-  endpoints:
-    web:
-      exposure:
-        include: "prometheus"
-  endpoint:
-    prometheus:
-      enabled: true
-  server:
-    port: 9292
+    endpoints:
+        web:
+            exposure:
+                include: "prometheus"
+    endpoint:
+        prometheus:
+            enabled: true
+    server:
+        port: 9292
 
 server:
-  tomcat:
-    mbeanregistry:
-      enabled: true
+    tomcat:
+        mbeanregistry:
+            enabled: true
