@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.domain.oauth.service;
 
 import static tipitapi.drawmytoday.common.exception.ErrorCode.OAUTH_SERVER_FAILED;
-import static tipitapi.drawmytoday.common.exception.ErrorCode.OBJECT_MAPPING_ERROR;
+import static tipitapi.drawmytoday.common.exception.ErrorCode.PARSING_ERROR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -111,7 +111,7 @@ public class AppleOAuthService {
         try {
             return objectMapper.readValue(response.getBody(), OAuthAccessToken.class);
         } catch (JsonProcessingException e) {
-            throw new BusinessException(OBJECT_MAPPING_ERROR, e);
+            throw new BusinessException(PARSING_ERROR, e);
         }
     }
 
@@ -121,7 +121,7 @@ public class AppleOAuthService {
         try {
             return objectMapper.readValue(bytes, AppleIdToken.class);
         } catch (IOException e) {
-            throw new BusinessException(OBJECT_MAPPING_ERROR, e);
+            throw new BusinessException(PARSING_ERROR, e);
         }
     }
 
