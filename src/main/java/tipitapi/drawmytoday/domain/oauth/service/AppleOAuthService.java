@@ -49,7 +49,7 @@ public class AppleOAuthService {
 
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request, RequestAppleLogin requestAppleLogin) {
-        OAuthAccessToken oAuthAccessToken = getRefreshToken(request);
+        OAuthAccessToken oAuthAccessToken = getAccessToken(request);
         AppleIdToken appleIdToken = getAppleIdToken(requestAppleLogin.getIdToken());
 
         User user = validateUserService.validateRegisteredUserByEmail(
@@ -92,7 +92,7 @@ public class AppleOAuthService {
         user.deleteUser();
     }
 
-    private OAuthAccessToken getRefreshToken(HttpServletRequest request) {
+    private OAuthAccessToken getAccessToken(HttpServletRequest request) {
         String authorizationCode = HeaderUtils.getAuthorizationHeader(request);
 
         HttpHeaders headers = new HttpHeaders();
