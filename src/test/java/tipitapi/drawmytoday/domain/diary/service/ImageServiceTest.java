@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.diary.service;
+package tipitapi.drawmytoday.domain.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,7 +24,6 @@ import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
 import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.domain.diary.repository.ImageRepository;
-import tipitapi.drawmytoday.domain.diary.service.ImageService;
 import tipitapi.drawmytoday.domain.r2.service.R2Service;
 
 @ExtendWith(MockitoExtension.class)

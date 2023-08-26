@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.diary.service;
+package tipitapi.drawmytoday.domain.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,20 +25,6 @@ import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.common.utils.Encryptor;
-<<<<<<< HEAD
-import tipitapi.drawmytoday.dalle.dto.GeneratedImageAndPrompt;
-import tipitapi.drawmytoday.dalle.exception.DallERequestFailException;
-import tipitapi.drawmytoday.dalle.exception.ImageInputStreamFailException;
-import tipitapi.drawmytoday.dalle.service.DallEService;
-import tipitapi.drawmytoday.diary.domain.Diary;
-import tipitapi.drawmytoday.diary.dto.CreateDiaryResponse;
-import tipitapi.drawmytoday.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.emotion.domain.Emotion;
-import tipitapi.drawmytoday.emotion.service.ValidateEmotionService;
-import tipitapi.drawmytoday.ticket.service.ValidateTicketService;
-import tipitapi.drawmytoday.user.domain.User;
-import tipitapi.drawmytoday.user.service.ValidateUserService;
-=======
 import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
 import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
@@ -46,17 +32,11 @@ import tipitapi.drawmytoday.domain.dalle.service.DallEService;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
-import tipitapi.drawmytoday.domain.diary.service.ImageService;
-import tipitapi.drawmytoday.domain.diary.service.PromptService;
-import tipitapi.drawmytoday.domain.diary.service.PromptTextService;
-import tipitapi.drawmytoday.domain.diary.service.ValidateDiaryService;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.service.ValidateEmotionService;
 import tipitapi.drawmytoday.domain.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
->>>>>>> develop
 
 @ExtendWith(MockitoExtension.class)
 class CreateDiaryServiceTest {

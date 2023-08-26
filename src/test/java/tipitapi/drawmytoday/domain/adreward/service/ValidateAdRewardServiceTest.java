@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.adreward.service;
+package tipitapi.drawmytoday.domain.adreward.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.domain.adreward.domain.AdReward;
 import tipitapi.drawmytoday.domain.adreward.repository.AdRewardRepository;
-import tipitapi.drawmytoday.domain.adreward.service.ValidateAdRewardService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 
 @ExtendWith(MockitoExtension.class)

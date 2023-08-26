@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.diary.service;
+package tipitapi.drawmytoday.domain.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -41,10 +41,6 @@ import tipitapi.drawmytoday.domain.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.domain.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.domain.diary.service.DiaryService;
-import tipitapi.drawmytoday.domain.diary.service.ImageService;
-import tipitapi.drawmytoday.domain.diary.service.PromptService;
-import tipitapi.drawmytoday.domain.diary.service.ValidateDiaryService;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.r2.service.R2PreSignedService;
 import tipitapi.drawmytoday.domain.ticket.domain.Ticket;

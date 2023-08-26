@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.adreward.repository;
+package tipitapi.drawmytoday.domain.adreward.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,7 +16,6 @@ import org.springframework.test.context.jdbc.Sql;
 import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.common.config.QuerydslConfig;
 import tipitapi.drawmytoday.domain.adreward.domain.AdReward;
-import tipitapi.drawmytoday.domain.adreward.repository.AdRewardRepository;
 import tipitapi.drawmytoday.domain.user.domain.User;
 
 @DataJpaTest

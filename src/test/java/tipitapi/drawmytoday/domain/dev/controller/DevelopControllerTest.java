@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.dev.controller;
+package tipitapi.drawmytoday.domain.dev.controller;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
-import tipitapi.drawmytoday.domain.dev.controller.DevelopController;
 
 @WebMvcTest(DevelopController.class)
 class DevelopControllerTest extends ControllerTestSetup {

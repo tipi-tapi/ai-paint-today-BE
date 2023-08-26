@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.health.controller;
+package tipitapi.drawmytoday.domain.health.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
-import tipitapi.drawmytoday.domain.health.controller.HealthCheckController;
 
 @WebMvcTest(HealthCheckController.class)
 class HealthCheckControllerTest extends ControllerTestSetup {

@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.diary.service;
+package tipitapi.drawmytoday.domain.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.domain.diary.service.AdminDiaryService;
 import tipitapi.drawmytoday.domain.r2.service.R2PreSignedService;
 
 @ExtendWith(MockitoExtension.class)

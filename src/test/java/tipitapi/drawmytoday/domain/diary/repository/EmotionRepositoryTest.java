@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.diary.repository;
+package tipitapi.drawmytoday.domain.diary.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

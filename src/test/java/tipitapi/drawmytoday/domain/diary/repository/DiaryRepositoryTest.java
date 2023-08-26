@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.diary.repository;
+package tipitapi.drawmytoday.domain.diary.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithCreatedAt;
@@ -31,7 +31,6 @@ import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
-import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.user.domain.User;
 

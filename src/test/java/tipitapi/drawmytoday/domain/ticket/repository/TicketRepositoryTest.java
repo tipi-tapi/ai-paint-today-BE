@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.ticket.repository;
+package tipitapi.drawmytoday.domain.ticket.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,7 +18,6 @@ import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.common.config.QuerydslConfig;
 import tipitapi.drawmytoday.domain.ticket.domain.Ticket;
 import tipitapi.drawmytoday.domain.ticket.domain.TicketType;
-import tipitapi.drawmytoday.domain.ticket.repository.TicketRepository;
 import tipitapi.drawmytoday.domain.user.domain.User;
 
 @DataJpaTest

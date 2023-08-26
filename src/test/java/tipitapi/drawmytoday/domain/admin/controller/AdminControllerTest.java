@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.admin.controller;
+package tipitapi.drawmytoday.domain.admin.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -24,7 +24,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
-import tipitapi.drawmytoday.domain.admin.controller.AdminController;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.domain.admin.service.AdminService;
 

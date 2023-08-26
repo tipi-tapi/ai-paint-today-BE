@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.diary.service;
+package tipitapi.drawmytoday.domain.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,7 +27,6 @@ import tipitapi.drawmytoday.domain.diary.exception.DiaryDateAlreadyExistsExcepti
 import tipitapi.drawmytoday.domain.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.domain.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
-import tipitapi.drawmytoday.domain.diary.service.ValidateDiaryService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 
 @ExtendWith(MockitoExtension.class)

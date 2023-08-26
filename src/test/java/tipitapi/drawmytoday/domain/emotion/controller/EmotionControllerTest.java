@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.emotion.controller;
+package tipitapi.drawmytoday.domain.emotion.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -33,7 +33,6 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
-import tipitapi.drawmytoday.domain.emotion.controller.EmotionController;
 import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionResponse;
 import tipitapi.drawmytoday.domain.emotion.dto.GetActiveEmotionsResponse;
 import tipitapi.drawmytoday.domain.emotion.service.EmotionService;

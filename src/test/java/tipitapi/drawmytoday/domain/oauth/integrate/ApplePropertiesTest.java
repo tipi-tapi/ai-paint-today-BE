@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.oauth.integrate;
+package tipitapi.drawmytoday.domain.oauth.integrate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

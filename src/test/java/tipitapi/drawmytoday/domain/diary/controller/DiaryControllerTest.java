@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.diary.controller;
+package tipitapi.drawmytoday.domain.diary.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -34,7 +34,6 @@ import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
-import tipitapi.drawmytoday.domain.diary.controller.DiaryController;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;

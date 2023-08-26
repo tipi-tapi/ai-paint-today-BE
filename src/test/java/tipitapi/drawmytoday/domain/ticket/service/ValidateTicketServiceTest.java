@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.ticket.service;
+package tipitapi.drawmytoday.domain.ticket.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,7 +18,6 @@ import tipitapi.drawmytoday.domain.ticket.domain.Ticket;
 import tipitapi.drawmytoday.domain.ticket.domain.TicketType;
 import tipitapi.drawmytoday.domain.ticket.exception.ValidTicketNotExistsException;
 import tipitapi.drawmytoday.domain.ticket.repository.TicketRepository;
-import tipitapi.drawmytoday.domain.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 
 @ExtendWith(MockitoExtension.class)
