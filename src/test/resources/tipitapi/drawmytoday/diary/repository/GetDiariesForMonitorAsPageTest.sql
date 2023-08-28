@@ -1,18 +1,18 @@
 INSERT INTO `user` (user_id, created_at, updated_at, deleted_at, email, last_diary_date,
                     social_code, user_role)
-VALUES (1, '2023-03-01T15:20:02.236278', '2023-03-01T15:20:02.236278', null, null,
+VALUES (1, '2023-03-01T15:20:02.236278', '2023-03-01T15:20:02.236278', null, 'email@gmail.com',
         '2023-03-14T15:20:02.236278', 'GOOGLE', 'ADMIN');
 INSERT INTO `user` (user_id, created_at, updated_at, deleted_at, email, last_diary_date,
                     social_code, user_role)
-VALUES (2, '2023-03-02T15:20:02.236278', '2023-03-21T15:20:02.236278', null, null,
+VALUES (2, '2023-03-02T15:20:02.236278', '2023-03-21T15:20:02.236278', null, 'email@gmail.com',
         '2023-03-16T15:20:02.236278', 'APPLE', 'USER');
 INSERT INTO `user` (user_id, created_at, updated_at, deleted_at, email, last_diary_date,
                     social_code, user_role)
-VALUES (3, '2023-04-01T15:20:02.236278', '2023-04-04T15:20:02.236278', null, null,
+VALUES (3, '2023-04-01T15:20:02.236278', '2023-04-04T15:20:02.236278', null, 'email@gmail.com',
         '2023-03-18T15:20:02.236278', 'APPLE', 'ADMIN');
 INSERT INTO `user` (user_id, created_at, updated_at, deleted_at, email, last_diary_date,
                     social_code, user_role)
-VALUES (4, '2023-05-01T15:20:02.236278', '2023-05-02T15:20:02.236278', null, null,
+VALUES (4, '2023-05-01T15:20:02.236278', '2023-05-02T15:20:02.236278', null, 'email@gmail.com',
         '2023-03-20T15:20:02.236278', 'GOOGLE', 'USER');
 
 INSERT INTO `emotion` (emotion_id, created_at, color, color_prompt, emotion_prompt, is_active, name)
