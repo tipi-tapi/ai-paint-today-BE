@@ -8,7 +8,7 @@ import tipitapi.drawmytoday.domain.user.domain.UserRole;
 public class TestUser {
 
     public static User createUser() {
-        return User.create(SocialCode.GOOGLE);
+        return User.create("email@gmail.com", SocialCode.GOOGLE);
     }
 
     public static User createUserWithId(Long userId) {
@@ -24,6 +24,6 @@ public class TestUser {
     }
 
     public static User createUserWithSocialCode(SocialCode socialCode) {
-        return User.create(socialCode);
+        return User.create("email@gmail.com", socialCode);
     }
 }
