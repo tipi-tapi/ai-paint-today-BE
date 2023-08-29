@@ -239,7 +239,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
         @DisplayName("삭제된 일기가 있을 경우")
         class if_deleted_diary_exist {
 
-            //            @Test
+            @Test
             @DisplayName("삭제된 일기를 포함한 일기 리스트를 반환한다.")
             @Sql("GetDiariesForMonitorAsPageTest.sql")
             void return_diary_list_includes_deleted() {
@@ -285,7 +285,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
         @DisplayName("감정 ID가 주어졌을 경우")
         class if_emotion_id_given {
 
-            //            @Test
+            @Test
             @DisplayName("해당 감정이 존재한다면, 필터링한다.")
             @Sql("GetDiariesForMonitorAsPageTest.sql")
             void return_diary_list_with_emotion_filtered() {
@@ -301,7 +301,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                 assertThat(response.getContent().get(0).getId()).isEqualTo(5L);
             }
 
-            //            @Test
+            @Test
             @DisplayName("해당 감정이 존재하지 않는다면, 필터링을 적용하지 않는다.")
             @Sql("GetDiariesForMonitorAsPageTest.sql")
             void return_diary_list_without_emotion_filtered() {
