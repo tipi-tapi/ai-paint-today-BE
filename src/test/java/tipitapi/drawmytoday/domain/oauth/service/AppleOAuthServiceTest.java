@@ -68,7 +68,7 @@ class AppleOAuthServiceTest {
         private final HttpServletRequest request;
         private final RequestAppleLogin requestAppleLogin;
 
-        {
+        private Login_test() {
             MockHttpServletRequest request = new MockHttpServletRequest();
             request.addHeader("Authorization", "Bearer authCode");
             this.request = request;

@@ -65,7 +65,7 @@ class GoogleOAuthServiceTest {
 
         private final HttpServletRequest request;
 
-        {
+        private Login_test() {
             MockHttpServletRequest request = new MockHttpServletRequest();
             request.addHeader("Authorization", "Bearer authCode");
             this.request = request;
