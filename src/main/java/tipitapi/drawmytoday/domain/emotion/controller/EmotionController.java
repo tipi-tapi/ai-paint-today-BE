@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
@@ -52,11 +53,8 @@ public class EmotionController {
     public ResponseEntity<SuccessResponse<List<GetActiveEmotionsResponse>>> getAllEmotions(
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo,
         @Parameter(description = "반환 언어(ko/en)", in = ParameterIn.QUERY)
-        @RequestParam(value = "lan", required = false, defaultValue = "ko") String language
+        @RequestParam(name = "lan", required = false, defaultValue = "ko") Language language
     ) {
-        if (!language.matches("^(ko|en)$")) {
-            language = "ko";
-        }
         return SuccessResponse.of(
             emotionService.getActiveEmotions(tokenInfo.getUserId(), language)
         ).asHttp(HttpStatus.OK);
