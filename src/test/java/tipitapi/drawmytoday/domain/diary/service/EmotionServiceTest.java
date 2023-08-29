@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionRequest;
@@ -55,7 +56,7 @@ public class EmotionServiceTest {
                 given(validateUserService.validateUserById(1L)).willThrow(
                     new UserNotFoundException());
 
-                assertThatThrownBy(() -> emotionService.getActiveEmotions(1L, "ko"))
+                assertThatThrownBy(() -> emotionService.getActiveEmotions(1L, Language.ko))
                     .isInstanceOf(UserNotFoundException.class);
             }
         }
@@ -74,7 +75,7 @@ public class EmotionServiceTest {
                 given(emotionRepository.findAllActiveEmotions()).willReturn(List.of(activeEmotion));
 
                 List<GetActiveEmotionsResponse> emotions =
-                    emotionService.getActiveEmotions(1L, "ko");
+                    emotionService.getActiveEmotions(1L, Language.ko);
 
                 assertThat(emotions.get(0).getId()).isEqualTo(activeEmotion.getEmotionId());
                 assertThat(emotions).extracting(GetActiveEmotionsResponse::getId)
@@ -95,7 +96,7 @@ public class EmotionServiceTest {
                 given(emotionRepository.findAllActiveEmotions()).willReturn(List.of(activeEmotion));
 
                 List<GetActiveEmotionsResponse> emotions =
-                    emotionService.getActiveEmotions(1L, "en");
+                    emotionService.getActiveEmotions(1L, Language.en);
 
                 assertThat(emotions.get(0).getName()).isEqualTo(activeEmotion.getEmotionPrompt());
             }
