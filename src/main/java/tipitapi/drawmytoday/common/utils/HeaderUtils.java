@@ -39,7 +39,7 @@ public class HeaderUtils {
         return tokens[1];
     }
 
-    public static String getAuthorizationHeader(HttpServletRequest request) {
+    public static String getAuthCode(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
         if (!StringUtils.hasText(authorization)) {
             throw new TokenNotFoundException(ErrorCode.AUTH_CODE_NOT_FOUND);

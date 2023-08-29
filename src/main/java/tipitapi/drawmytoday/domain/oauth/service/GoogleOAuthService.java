@@ -96,7 +96,7 @@ public class GoogleOAuthService {
     }
 
     private OAuthAccessToken getAccessToken(HttpServletRequest request) {
-        String authorizationCode = HeaderUtils.getAuthorizationHeader(request);
+        String authorizationCode = HeaderUtils.getAuthCode(request);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/x-www-form-urlencoded");
