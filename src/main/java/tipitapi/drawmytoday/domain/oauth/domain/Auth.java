@@ -32,9 +32,13 @@ public class Auth extends BaseEntity {
     @Column(nullable = false)
     private String refreshToken;
 
-    public Auth(User user, String refreshToken) {
+    private Auth(User user, String refreshToken) {
         this.user = user;
         this.refreshToken = refreshToken;
+    }
+
+    public static Auth create(User user, String refreshToken) {
+        return new Auth(user, refreshToken);
     }
 
     public void setRefreshToken(String refreshToken) {
