@@ -90,10 +90,10 @@ public class UserRepositoryTest extends BaseRepositoryTest {
             @DisplayName("두 유저를 반환한다.")
             void return_two_user_list() {
                 User googleUser = userRepository.save(
-                    User.createWithEmail(email, SocialCode.GOOGLE));
-                User appleUser = userRepository.save(User.createWithEmail(email, SocialCode.APPLE));
+                    User.create(email, SocialCode.GOOGLE));
+                User appleUser = userRepository.save(User.create(email, SocialCode.APPLE));
                 User otherUser = userRepository.save(
-                    User.createWithEmail(otherEmail, SocialCode.GOOGLE));
+                    User.create(otherEmail, SocialCode.GOOGLE));
 
                 List<User> findUserList = userRepository.findAllByEmail(email);
 
@@ -109,8 +109,8 @@ public class UserRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("유저를 반환한다.")
             void return_one_user_list() {
-                User googleUser = User.createWithEmail(email, SocialCode.GOOGLE);
-                User otherUser = User.createWithEmail(otherEmail, SocialCode.GOOGLE);
+                User googleUser = User.create(email, SocialCode.GOOGLE);
+                User otherUser = User.create(otherEmail, SocialCode.GOOGLE);
                 userRepository.save(googleUser);
                 userRepository.save(otherUser);
 
@@ -128,7 +128,7 @@ public class UserRepositoryTest extends BaseRepositoryTest {
             @Test
             @DisplayName("빈 리스트를 반환한다.")
             void return_empty_list() {
-                User otherUser = User.createWithEmail(otherEmail, SocialCode.GOOGLE);
+                User otherUser = User.create(otherEmail, SocialCode.GOOGLE);
                 userRepository.save(otherUser);
 
                 List<User> findUserList = userRepository.findAllByEmail(email);
