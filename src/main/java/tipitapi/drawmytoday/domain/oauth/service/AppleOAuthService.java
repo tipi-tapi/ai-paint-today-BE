@@ -93,7 +93,7 @@ public class AppleOAuthService {
     }
 
     private OAuthAccessToken getAccessToken(HttpServletRequest request) {
-        String authorizationCode = HeaderUtils.getAuthorizationHeader(request);
+        String authorizationCode = HeaderUtils.getAuthCode(request);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
