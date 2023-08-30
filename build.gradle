@@ -25,12 +25,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-logging'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation platform('software.amazon.awssdk:bom:2.20.26')
     implementation 'software.amazon.awssdk:s3'
     implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 
 //	스프링 시큐리티, jwt 설정
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -75,7 +76,7 @@ clean {
 }
 
 tasks.named('test') {
-//    useJUnitPlatform()
+    useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
 
