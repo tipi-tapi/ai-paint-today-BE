@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
+import tipitapi.drawmytoday.domain.dalle.exception.DallEPolicyViolationException;
 import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.domain.diary.service.PromptService;
 import tipitapi.drawmytoday.domain.diary.service.PromptTextService;
@@ -72,15 +73,15 @@ class DallEServiceTest {
                 Emotion emotion = TestEmotion.createEmotion();
                 given(promptTextService.createPromptText(eq(emotion), eq(keyword)))
                     .willReturn(prompt);
-                given(dalleRequestService.getImageAsUrl(eq(prompt))).willReturn(null);
+                given(dalleRequestService.getImageAsUrl(eq(prompt))).willThrow(
+                    DallEPolicyViolationException.class);
                 given(promptTextService.createPromptText(eq(emotion), eq(null)))
                     .willReturn(otherPrompt);
                 given(dalleRequestService.getImageAsUrl(eq(otherPrompt))).willReturn(image);
 
                 // when
                 GeneratedImageAndPrompt generatedImageAndPrompt = dallEService.generateImage(
-                    emotion,
-                    keyword);
+                    emotion, keyword);
 
                 // then
                 verify(promptService).createPrompt(eq(prompt), eq(false));
@@ -98,10 +99,12 @@ class DallEServiceTest {
                 Emotion emotion = TestEmotion.createEmotion();
                 given(promptTextService.createPromptText(eq(emotion), eq(keyword)))
                     .willReturn(prompt);
-                given(dalleRequestService.getImageAsUrl(eq(prompt))).willReturn(null);
+                given(dalleRequestService.getImageAsUrl(eq(prompt))).willThrow(
+                    DallEPolicyViolationException.class);
                 given(promptTextService.createPromptText(eq(emotion), eq(null)))
                     .willReturn(otherPrompt);
-                given(dalleRequestService.getImageAsUrl(eq(otherPrompt))).willReturn(null);
+                given(dalleRequestService.getImageAsUrl(eq(otherPrompt))).willThrow(
+                    DallEPolicyViolationException.class);
 
                 // when
                 // then

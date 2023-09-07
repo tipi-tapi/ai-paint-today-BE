@@ -22,6 +22,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.domain.dalle.dto.DallEUrlResponse;
 import tipitapi.drawmytoday.domain.dalle.dto.DallEUrlResponse.DallEUrl;
+import tipitapi.drawmytoday.domain.dalle.exception.DallEPolicyViolationException;
 import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
 
@@ -61,7 +62,7 @@ class DallERequestServiceTest {
             }
 
             @Test
-            @DisplayName("정책 위반 응답이 오면 null을 반환한다")
+            @DisplayName("정책 위반 응답이 오면 예외를 던진다.")
             void when_response_is_content_policy_error_then_return_null() throws Exception {
                 // given
                 String responsebody = "{\n"
@@ -81,10 +82,9 @@ class DallERequestServiceTest {
                     any(Class.class))).willThrow(badRequest);
 
                 // when
-                byte[] image = dalleRequestService.getImageAsUrl("prompt");
-
                 // then
-                assertThat(image).isNull();
+                assertThatThrownBy(() -> dalleRequestService.getImageAsUrl("prompt"))
+                    .isInstanceOf(DallEPolicyViolationException.class);
             }
 
             @Test
