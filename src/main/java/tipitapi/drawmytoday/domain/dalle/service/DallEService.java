@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
 import tipitapi.drawmytoday.domain.dalle.exception.DallEException;
+import tipitapi.drawmytoday.domain.dalle.exception.DallEPolicyViolationException;
 import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.domain.diary.service.PromptService;
 import tipitapi.drawmytoday.domain.diary.service.PromptTextService;
@@ -23,24 +24,27 @@ public class DallEService {
     public GeneratedImageAndPrompt generateImage(Emotion emotion, String keyword)
         throws DallEException {
         String prompt = promptTextService.createPromptText(emotion, keyword);
-
         try {
             byte[] image = dalleRequestService.getImageAsUrl(prompt);
-
-            if (image == null) {
-                promptService.createPrompt(prompt, false);
-                prompt = promptTextService.createPromptText(emotion, null);
-                image = dalleRequestService.getImageAsUrl(prompt);
-
-                if (image == null) { // 재시도하였음에도, 컨텐츠 정책 위반 에러가 발생할경우 이미지 생성 실패 처리
-                    throw DallERequestFailException.violatePolicy();
-                }
-            }
-
             return new GeneratedImageAndPrompt(prompt, image);
+        } catch (DallEPolicyViolationException e) {
+            promptService.createPrompt(prompt, false);
+            return reGenerateImage(emotion);
         } catch (DallEException e) {
             promptService.createPrompt(prompt, false);
             throw e;
+        }
+    }
+
+    private GeneratedImageAndPrompt reGenerateImage(Emotion emotion) throws DallEException {
+        String prompt = promptTextService.createPromptText(emotion, null);
+        try {
+            byte[] image = dalleRequestService.getImageAsUrl(prompt);
+            return new GeneratedImageAndPrompt(prompt, image);
+        } catch (DallEException e) {
+            promptService.createPrompt(prompt, false);
+            throw (e instanceof DallEPolicyViolationException) ?
+                DallERequestFailException.violatePolicy() : e;
         }
     }
 

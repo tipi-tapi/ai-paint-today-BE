@@ -17,6 +17,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.domain.dalle.dto.CreateImageRequest;
 import tipitapi.drawmytoday.domain.dalle.dto.DallEUrlResponse;
+import tipitapi.drawmytoday.domain.dalle.exception.DallEException;
+import tipitapi.drawmytoday.domain.dalle.exception.DallEPolicyViolationException;
 import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
 
@@ -39,8 +41,7 @@ public class DallERequestService {
         };
     }
 
-    byte[] getImageAsUrl(String prompt)
-        throws DallERequestFailException, ImageInputStreamFailException {
+    byte[] getImageAsUrl(String prompt) throws DallEException {
         try {
             HttpEntity<CreateImageRequest> request = getRequest(CreateImageRequest.withUrl(prompt));
 
@@ -51,7 +52,7 @@ public class DallERequestService {
             return new URL(url).openStream().readAllBytes();
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.BAD_REQUEST && isContentPolicyError(e)) {
-                return null;
+                throw new DallEPolicyViolationException(e.getResponseBodyAsString());
             }
             throw new DallERequestFailException(e);
         } catch (IOException e) {
