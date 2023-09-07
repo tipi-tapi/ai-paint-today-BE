@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -23,6 +24,7 @@ import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
 
 @Service
+@Slf4j
 @Transactional(readOnly = true)
 public class DallERequestService {
 
@@ -52,6 +54,7 @@ public class DallERequestService {
             return new URL(url).openStream().readAllBytes();
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.BAD_REQUEST && isContentPolicyError(e)) {
+                log.warn("DallE 정책 위반 에러. prompt: {}", prompt);
                 throw new DallEPolicyViolationException(e.getResponseBodyAsString());
             }
             throw new DallERequestFailException(e);
