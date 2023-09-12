@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.response;
+package tipitapi.drawmytoday.common.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import tipitapi.drawmytoday.common.response.SuccessResponse;
 
 @DisplayName("SuccessResponse 클래스는")
 public class SuccessResponseTest {

@@ -1,13 +1,11 @@
 package tipitapi.drawmytoday.domain.oauth.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,8 +59,8 @@ public class AuthController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping(value = "/google/login")
-    public ResponseEntity<SuccessResponse<ResponseJwtToken>> googleLogin(HttpServletRequest request)
-        throws JsonProcessingException {
+    public ResponseEntity<SuccessResponse<ResponseJwtToken>> googleLogin(
+        HttpServletRequest request) {
         return SuccessResponse.of(
             googleOAuthService.login(request)
         ).asHttp(HttpStatus.OK);
@@ -88,7 +86,7 @@ public class AuthController {
     })
     @PostMapping(value = "/apple/login")
     public ResponseEntity<SuccessResponse<ResponseJwtToken>> appleLogin(HttpServletRequest request,
-        @RequestBody @Valid RequestAppleLogin requestAppleLogin) throws IOException {
+        @RequestBody @Valid RequestAppleLogin requestAppleLogin) {
         return SuccessResponse.of(
             appleOAuthService.login(request, requestAppleLogin)
         ).asHttp(HttpStatus.OK);

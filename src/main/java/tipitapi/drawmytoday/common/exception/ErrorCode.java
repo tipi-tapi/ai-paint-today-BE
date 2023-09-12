@@ -16,6 +16,7 @@ public enum ErrorCode {
     HANDLE_ACCESS_DENIED(403, "C006", "접근이 거부됐습니다."),
     ENCRYPTION_ERROR(500, "C007", "암호화에 실패했습니다."),
     DECRYPTION_ERROR(500, "C008", "복호화에 실패했습니다."),
+    PARSING_ERROR(500, "C009", "파싱에 실패했습니다."),
 
     // Security
     AUTHORITY_NOT_FOUND(404, "S001", "유저 권한이 없습니다."),

@@ -27,6 +27,8 @@ public class User extends BaseEntityWithUpdate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @NotNull
+    @Column(nullable = false)
     private String email;
 
     @NotNull
@@ -41,23 +43,18 @@ public class User extends BaseEntityWithUpdate {
 
     private LocalDateTime deletedAt;
 
-    private User(SocialCode socialCode) {
-        this.socialCode = socialCode;
-    }
-
-    @Builder
+    @Builder(access = AccessLevel.PRIVATE)
     private User(String email, SocialCode socialCode) {
         this.email = email;
         this.socialCode = socialCode;
         this.userRole = UserRole.USER;
     }
 
-    public static User create(SocialCode socialCode) {
-        return new User(socialCode);
-    }
-
-    public static User createWithEmail(String email, SocialCode socialCode) {
-        return new User(email, socialCode);
+    public static User create(String email, SocialCode socialCode) {
+        return User.builder()
+            .email(email)
+            .socialCode(socialCode)
+            .build();
     }
 
     public void setEmail(String email) {
