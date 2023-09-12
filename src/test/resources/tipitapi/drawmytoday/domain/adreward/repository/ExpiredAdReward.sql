@@ -2,7 +2,6 @@ INSERT INTO `user` (user_id, created_at, updated_at, deleted_at, email, last_dia
                     social_code, user_role)
 VALUES (1, '2023-03-01T15:20:02.236278', '2023-03-01T15:20:02.236278', null, 'email@gmail.com',
         null, 'GOOGLE',
-        null);
 INSERT INTO `ad_reward` (ad_reward_id, created_at, used_at, user_id)
 VALUES (1, '2023-04-01T09:20:02.236278', null, 1);
 INSERT INTO `ad_reward` (ad_reward_id, created_at, used_at, user_id)
