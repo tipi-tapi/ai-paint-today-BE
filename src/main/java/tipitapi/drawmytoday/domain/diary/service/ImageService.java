@@ -37,4 +37,10 @@ public class ImageService {
         r2Service.uploadImage(dallEImage, imagePath);
         return createImage(diary, imagePath, isSelected);
     }
+
+    @Transactional
+    public void unSelectAllImage(Long diaryId) {
+        imageRepository.findAllByDiaryDiaryId(diaryId)
+            .forEach(image -> image.setSelected(false));
+    }
 }

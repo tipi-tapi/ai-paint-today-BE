@@ -73,6 +73,22 @@ public class CreateDiaryService {
         return new CreateDiaryResponse(diary.getDiaryId());
     }
 
+    @Transactional(noRollbackFor = {DallEException.class})
+    public void regenerateDiaryImage(Long userId, Long diaryId, String keyword)
+        throws DallEException {
+        User user = validateUserService.validateUserById(userId);
+        Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
+        validateTicketService.findAndUseTicket(userId);
+
+        GeneratedImageAndPrompt generated = dallEService.generateImage(diary.getEmotion(), keyword);
+        String prompt = generated.getPrompt();
+        byte[] dallEImage = generated.getImage();
+
+        promptService.createPrompt(diary, prompt, true);
+        imageService.unSelectAllImage(diary.getDiaryId());
+        imageService.uploadAndCreateImage(diary, dallEImage, true);
+    }
+
     private Diary saveDiary(String notes, User user, Emotion emotion, LocalDateTime diaryDate,
         boolean testDiary) {
         String encryptedNotes = encryptor.encrypt(notes);

@@ -34,6 +34,7 @@ import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
+import tipitapi.drawmytoday.domain.diary.dto.RegenerateDiaryImageRequest;
 import tipitapi.drawmytoday.domain.diary.dto.UpdateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
@@ -249,5 +250,22 @@ public class DiaryController {
         return SuccessResponse.of(
             diaryService.getDrawLimit(tokenInfo.getUserId())
         ).asHttp(HttpStatus.OK);
+    }
+
+    @Operation(summary = "일기 이미지 재생성", description = "주어진 ID에 해당하는 일기를 기반으로 이미지를 재생성한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "일기 이미지 재생성 성공"),
+    })
+    @PostMapping("/{id}/regenerate_image")
+    public ResponseEntity<Void> regenerateDiaryImage(
+        @AuthUser JwtTokenInfo tokenInfo,
+        @RequestBody @Valid RegenerateDiaryImageRequest regenerateDiaryImageRequest,
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
+    ) throws DallEException {
+        createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId,
+            regenerateDiaryImageRequest.getKeyword());
+        return ResponseEntity.noContent().build();
     }
 }
