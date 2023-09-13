@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
@@ -20,8 +21,11 @@ public class GetDiaryResponse {
     @Schema(description = "일기 아이디", requiredMode = RequiredMode.REQUIRED)
     private final Long id;
 
-    @Schema(description = "이미지 URL", requiredMode = RequiredMode.REQUIRED)
-    private final String imageUrl;
+    @Schema(description = "대표 이미지 URL", requiredMode = RequiredMode.REQUIRED)
+    private final String selectedImageUrl;
+
+    @Schema(description = "대표 이미지를 제외한 이미지 URL 리스트", requiredMode = RequiredMode.NOT_REQUIRED)
+    private final List<String> unSelectedImageUrls;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -44,9 +48,10 @@ public class GetDiaryResponse {
     @Schema(description = "프롬프트", requiredMode = RequiredMode.NOT_REQUIRED)
     private String prompt;
 
-    public static GetDiaryResponse of(Diary diary, String imageUrl, String emotionText,
-        String promptText) {
-        return new GetDiaryResponse(diary.getDiaryId(), imageUrl, diary.getDiaryDate(),
+    public static GetDiaryResponse of(Diary diary, String selectedImageUrl,
+        List<String> unSelectedImageUrls, String emotionText, String promptText) {
+        return new GetDiaryResponse(diary.getDiaryId(), selectedImageUrl,
+            unSelectedImageUrls, diary.getDiaryDate(),
             diary.getCreatedAt(), emotionText, diary.getNotes(), promptText);
     }
 }
