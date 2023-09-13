@@ -20,7 +20,7 @@ public class TicketService {
     @Transactional
     public void createTicketByJoin(User user) {
         List<Ticket> tickets = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 1; i++) {
             tickets.add(Ticket.of(user, TicketType.JOIN));
         }
         ticketRepository.saveAll(tickets);
