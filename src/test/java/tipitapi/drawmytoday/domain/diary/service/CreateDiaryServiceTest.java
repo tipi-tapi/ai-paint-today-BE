@@ -186,4 +186,37 @@ class CreateDiaryServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("regenerateDiaryImage 메서드 테스트")
+    class RegenerateDiaryImageTest {
+
+        @Test
+        @DisplayName("이미지를 재생성한 이후 여러 동작을 수행한다.")
+        void regenerateDiaryImage() throws Exception {
+            //given
+            String prompt = "test prompt";
+            byte[] image = new byte[1];
+            long userId = 1L;
+            long diaryId = 2L;
+            User user = TestUser.createUserWithId(userId);
+            Emotion emotion = TestEmotion.createEmotionWithId(1L);
+            Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
+
+            given(validateUserService.validateUserById(any(Long.class))).willReturn(user);
+            given(validateDiaryService.validateDiaryById(any(Long.class), any(User.class)))
+                .willReturn(diary);
+            given(dallEService.generateImage(any(Emotion.class), anyString()))
+                .willReturn(new GeneratedImageAndPrompt(prompt, image));
+
+            //when
+            createDiaryService.regenerateDiaryImage(userId, diaryId, "키워드");
+
+            //then
+            verify(validateTicketService).findAndUseTicket(eq(userId));
+            verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
+            verify(imageService).unSelectAllImage(eq(diaryId));
+            verify(imageService).uploadAndCreateImage(eq(diary), eq(image), eq(true));
+        }
+    }
+
 }

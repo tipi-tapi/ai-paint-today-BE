@@ -456,4 +456,31 @@ class DiaryControllerTest extends ControllerTestSetup {
                     parseLocalDateTime(validRewardCreatedDate)));
         }
     }
+
+    @Nested
+    @DisplayName("regenerateDiaryImage 메서드는")
+    class RegenerateDiaryImageTest {
+
+        @Test
+        @DisplayName("diaryId에 해당하는 일기의 이미지를 재생성한다.")
+        void regenerate_diary_image() throws Exception {
+            // given
+            Long diaryId = 1L;
+            String keyword = "keyword";
+
+            // when
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("keyword", keyword);
+            String requestBody = objectMapper.writeValueAsString(requestMap);
+            ResultActions result = mockMvc.perform(
+                post(BASIC_URL + "/" + diaryId + "/regenerate_image")
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody));
+
+            // then
+            result.andExpect(status().isCreated());
+            verify(createDiaryService).regenerateDiaryImage(REQUEST_USER_ID, diaryId, keyword);
+        }
+    }
 }
