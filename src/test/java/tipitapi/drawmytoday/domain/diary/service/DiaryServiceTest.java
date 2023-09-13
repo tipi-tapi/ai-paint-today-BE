@@ -32,6 +32,7 @@ import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
+import tipitapi.drawmytoday.domain.diary.domain.ReviewType;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
@@ -645,6 +646,25 @@ class DiaryServiceTest {
                 assertThat(response.getLastDiaryCreatedAt()).isEqualTo(lastDiaryDate);
                 assertThat(response.getTicketCreatedAt()).isNull();
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("reviewDiary 메소드 테스트")
+    class ReviewDiaryTest {
+
+        @Test
+        @DisplayName("userId와 diaryId 검증 이후 diary의 review를 input으로 받은 review로 수정한다.")
+        void it_updates_diary_review() {
+            User user = createUserWithId(1L);
+            Diary diary = createDiaryWithId(1L, user, createEmotion());
+            given(validateUserService.validateUserById(1L)).willReturn(user);
+            given(validateDiaryService.validateDiaryById(1L, user))
+                .willReturn(diary);
+
+            diaryService.reviewDiary(1L, 1L, ReviewType.GOOD);
+
+            assertThat(diary.getReview()).isEqualTo(ReviewType.GOOD);
         }
     }
 }
