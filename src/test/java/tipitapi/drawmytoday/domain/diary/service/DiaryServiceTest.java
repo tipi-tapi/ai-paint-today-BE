@@ -85,12 +85,12 @@ class DiaryServiceTest {
             void it_returns_diary() {
                 User user = createUserWithId(1L);
                 Diary diary = createDiaryWithId(1L, user, createEmotion());
-                Image image = createImage(diary);
+                List<Image> images = List.of(createImage(diary));
                 Language language = Language.ko;
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getImage(diary)).willReturn(image);
+                given(imageService.getImages(diary)).willReturn(images);
                 given(
                     r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");
@@ -108,13 +108,13 @@ class DiaryServiceTest {
                 User user = createUserWithId(1L);
                 Emotion emotion = createEmotion();
                 Diary diary = createDiaryWithId(1L, user, emotion);
-                Image image = createImage(diary);
+                List<Image> images = List.of(createImage(diary));
 
                 Language language = Language.en;
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getImage(diary)).willReturn(image);
+                given(imageService.getImages(diary)).willReturn(images);
                 given(
                     r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");
@@ -132,13 +132,13 @@ class DiaryServiceTest {
                 User user = createUserWithId(1L);
                 Emotion emotion = createEmotion();
                 Diary diary = createDiaryWithId(1L, user, emotion);
-                Image image = createImage(diary);
+                List<Image> images = List.of(createImage(diary));
 
                 Language language = Language.ko;
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getImage(diary)).willReturn(image);
+                given(imageService.getImages(diary)).willReturn(images);
                 given(
                     r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");

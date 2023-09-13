@@ -79,11 +79,12 @@ class DiaryControllerTest extends ControllerTestSetup {
                 String emotionText = emotion.getEmotionText(language);
                 Diary diary = TestDiary.createDiaryWithIdAndCreatedAt(
                     diaryId, LocalDateTime.now(), user, emotion);
-                String imageUrl = "imageUrl";
+                String selectedImageUrl = "selectedImageUrl";
+                List<String> unselectedImageUrls = List.of("unselectedImageUrl1",
+                    "unselectedImageUrl2");
                 String promptText = "promptText";
-                GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl,
-                    emotionText,
-                    promptText);
+                GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, selectedImageUrl,
+                    unselectedImageUrls, emotionText, promptText);
                 given(diaryService.getDiary(REQUEST_USER_ID, diaryId, language)).willReturn(
                     getDiaryResponse);
 
@@ -93,7 +94,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.id").value(diaryId))
-                    .andExpect(jsonPath("$.data.imageUrl").value(imageUrl))
+                    .andExpect(jsonPath("$.data.selectedImageUrl").value(selectedImageUrl))
                     .andExpect(jsonPath("$.data.date").value(
                         parseLocalDateTime(diary.getDiaryDate())))
                     .andExpect(jsonPath("$.data.createdAt").value(
