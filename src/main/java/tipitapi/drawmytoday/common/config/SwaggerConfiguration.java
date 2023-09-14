@@ -118,4 +118,15 @@ public class SwaggerConfiguration {
             .pathsToMatch(paths)
             .build();
     }
+
+    @Bean
+    public GroupedOpenApi galleryOpenAPi() {
+        String[] paths = {"/gallery/**"};
+
+        return GroupedOpenApi
+            .builder()
+            .group("갤러리 API")
+            .pathsToMatch(paths)
+            .build();
+    }
 }
