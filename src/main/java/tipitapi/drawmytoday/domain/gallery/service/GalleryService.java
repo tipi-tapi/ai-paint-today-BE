@@ -17,6 +17,7 @@ public class GalleryService {
     private final ValidatePaintingService validatePaintingService;
     private final PaintingService paintingService;
     private final PaintingHeartService paintingHeartService;
+    private final PaintingReportService paintingReportService;
 
     public Page<GetPaintingResponse> getGallery(Long userId, int size, int page, GallerySort sort) {
         validateUserService.validateUserById(userId);
@@ -34,6 +35,14 @@ public class GalleryService {
     public void deletePainting(Long userId, Long paintingId) {
         validateUserService.validateUserById(userId);
         validatePaintingService.validateIsPaintingOwner(userId, paintingId);
+        paintingReportService.isPaintingReportExist(paintingId);
         paintingService.deletePainting(paintingId);
+    }
+
+    @Transactional
+    public void reportPainting(Long userId, Long paintingId) {
+        validateUserService.validateUserById(userId);
+        validatePaintingService.validateIsNotPaintingOwner(userId, paintingId);
+        paintingReportService.reportPainting(userId, paintingId);
     }
 }

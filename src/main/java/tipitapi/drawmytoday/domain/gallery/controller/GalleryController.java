@@ -94,4 +94,27 @@ public class GalleryController {
         galleryService.deletePainting(tokenInfo.getUserId(), paintingId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @Operation(summary = "작품 신고", description = "작품을 신고하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "작품 신고 성공"),
+        @ApiResponse(
+            responseCode = "403",
+            description = "PH001: 작품의 주인은 본인 작품을 신고할 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "409",
+            description = "PH003: 이미 신고된 작품입니다.",
+            content = @Content(schema = @Schema(hidden = true)))
+    })
+    @PostMapping("/{id}/report")
+    public ResponseEntity<Void> reportPainting(
+        @AuthUser JwtTokenInfo tokenInfo,
+        @PathVariable("id") Long paintingId
+    ) {
+        galleryService.reportPainting(tokenInfo.getUserId(), paintingId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

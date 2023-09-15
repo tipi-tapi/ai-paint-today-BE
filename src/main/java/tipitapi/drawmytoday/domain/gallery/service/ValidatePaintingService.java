@@ -18,7 +18,7 @@ public class ValidatePaintingService {
         paintingRepository.findWithImageAndDiaryByPaintingId(paintingId)
             .filter(
                 painting -> !painting.getImage().getDiary().getUser().getUserId().equals(userId))
-            .orElseThrow(() -> new PaintingOwnerException(ErrorCode.PAINTING_OWNER_HEART));
+            .orElseThrow(() -> new PaintingOwnerException(ErrorCode.PAINTING_OWNER));
     }
 
     public void validateIsPaintingOwner(Long userId, Long paintingId) {
