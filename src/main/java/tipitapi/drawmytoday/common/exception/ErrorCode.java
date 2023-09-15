@@ -72,8 +72,8 @@ public enum ErrorCode {
     VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다."),
 
     // Painting Heart
-    PAINTING_OWNER_HEART(403, "PH001", "작품의 주인은 본인 작품에 공감을 하거나 공감 취소할 수 없습니다.");
-
+    PAINTING_OWNER_HEART(403, "PH001", "작품의 주인은 본인 작품에 공감을 하거나 공감 취소할 수 없습니다."),
+    NOT_PAINTING_OWNER(403, "PH002", "작품의 주인이 아닙니다.");
 
     private final int status;
     private final String code;

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.converter.GallerySort;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
@@ -13,6 +14,7 @@ import tipitapi.drawmytoday.domain.gallery.repository.PaintingRepository;
 import tipitapi.drawmytoday.domain.r2.service.R2PreSignedService;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PaintingService {
 
@@ -33,6 +35,11 @@ public class PaintingService {
             default:
                 throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Transactional
+    public void deletePainting(Long paintingId) {
+        paintingRepository.deleteById(paintingId);
     }
 
     private GetPaintingResponse generatePresignedURL(GetPaintingResponse response) {

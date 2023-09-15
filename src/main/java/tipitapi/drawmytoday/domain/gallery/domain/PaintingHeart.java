@@ -19,13 +19,6 @@ import tipitapi.drawmytoday.domain.user.domain.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PaintingHeart extends BaseEntity {
 
-    public static PaintingHeart createPaintingHeart(User user, Painting painting) {
-        return PaintingHeart.builder()
-            .user(user)
-            .painting(painting)
-            .build();
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paintingHeartId;
@@ -39,8 +32,15 @@ public class PaintingHeart extends BaseEntity {
     private Painting painting;
 
     @Builder(access = AccessLevel.PRIVATE)
-    public PaintingHeart(User user, Painting painting) {
+    private PaintingHeart(User user, Painting painting) {
         this.user = user;
         this.painting = painting;
+    }
+
+    public static PaintingHeart createPaintingHeart(User user, Painting painting) {
+        return PaintingHeart.builder()
+            .user(user)
+            .painting(painting)
+            .build();
     }
 }

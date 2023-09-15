@@ -26,7 +26,14 @@ public class GalleryService {
     @Transactional
     public void changePaintingHeart(Long userId, Long paintingId) {
         validateUserService.validateUserById(userId);
-        validatePaintingService.validateIsPaintingOwner(userId, paintingId);
+        validatePaintingService.validateIsNotPaintingOwner(userId, paintingId);
         paintingHeartService.changePaintingHeart(userId, paintingId);
+    }
+
+    @Transactional
+    public void deletePainting(Long userId, Long paintingId) {
+        validateUserService.validateUserById(userId);
+        validatePaintingService.validateIsPaintingOwner(userId, paintingId);
+        paintingService.deletePainting(paintingId);
     }
 }
