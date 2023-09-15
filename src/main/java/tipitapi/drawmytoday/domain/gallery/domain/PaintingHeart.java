@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.domain.user.domain.User;
@@ -17,6 +18,13 @@ import tipitapi.drawmytoday.domain.user.domain.User;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PaintingHeart extends BaseEntity {
+
+    public static PaintingHeart createPaintingHeart(User user, Painting painting) {
+        return PaintingHeart.builder()
+            .user(user)
+            .painting(painting)
+            .build();
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +37,10 @@ public class PaintingHeart extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "painting_id", nullable = false)
     private Painting painting;
+
+    @Builder(access = AccessLevel.PRIVATE)
+    public PaintingHeart(User user, Painting painting) {
+        this.user = user;
+        this.painting = painting;
+    }
 }

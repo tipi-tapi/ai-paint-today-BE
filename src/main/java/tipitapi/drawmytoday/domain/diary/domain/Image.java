@@ -8,11 +8,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
+import tipitapi.drawmytoday.domain.gallery.domain.Painting;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,6 +29,9 @@ public class Image extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id", nullable = false)
     private Diary diary;
+
+    @OneToOne(mappedBy = "image")
+    private Painting painting;
 
     @NotNull
     @Column(nullable = false)

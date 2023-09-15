@@ -3,6 +3,8 @@ package tipitapi.drawmytoday.domain.gallery.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -11,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,5 +52,25 @@ public class GalleryController {
         return SuccessResponse.of(
             galleryService.getGallery(tokenInfo.getUserId(), size, page, sort)
         ).asHttp(HttpStatus.OK);
+    }
+
+    @Operation(summary = "작품 공감", description = "작품에 공감 버튼을 누르면 공감되거나 공감이 취소되는 API")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "작품 공감이나 공감 취소 성공"),
+        @ApiResponse(
+            responseCode = "403",
+            description = "PH001: 작품의 주인은 본인 작품에 공감을 하거나 공감 취소할 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true)))
+    })
+    @PostMapping("/{id}/heart")
+    public ResponseEntity<Void> paintingHeart(
+        @AuthUser JwtTokenInfo tokenInfo,
+        @Parameter(name = "id", description = "공감을 누를 작품의 id(painting_id)", in = ParameterIn.PATH)
+        @PathVariable("id") Long paintingId
+    ) {
+        galleryService.changePaintingHeart(tokenInfo.getUserId(), paintingId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

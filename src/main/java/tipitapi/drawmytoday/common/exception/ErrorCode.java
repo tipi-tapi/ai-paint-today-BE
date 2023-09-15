@@ -69,7 +69,10 @@ public enum ErrorCode {
     REST_CLIENT_FAILED(500, "R001", "외부로의 REST 통신에 실패하였습니다."),
 
     // Ticket
-    VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다.");
+    VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다."),
+
+    // Painting Heart
+    PAINTING_OWNER_HEART(403, "PH001", "작품의 주인은 본인 작품에 공감을 하거나 공감 취소할 수 없습니다.");
 
 
     private final int status;

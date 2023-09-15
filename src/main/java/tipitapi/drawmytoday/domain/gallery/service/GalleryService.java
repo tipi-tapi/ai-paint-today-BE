@@ -14,10 +14,19 @@ import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 public class GalleryService {
 
     private final ValidateUserService validateUserService;
+    private final ValidatePaintingService validatePaintingService;
     private final PaintingService paintingService;
+    private final PaintingHeartService paintingHeartService;
 
     public Page<GetPaintingResponse> getGallery(Long userId, int size, int page, GallerySort sort) {
         validateUserService.validateUserById(userId);
         return paintingService.getAllPaintings(size, page, sort);
+    }
+
+    @Transactional
+    public void changePaintingHeart(Long userId, Long paintingId) {
+        validateUserService.validateUserById(userId);
+        validatePaintingService.validateIsPaintingOwner(userId, paintingId);
+        paintingHeartService.changePaintingHeart(userId, paintingId);
     }
 }
