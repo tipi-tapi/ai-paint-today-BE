@@ -14,14 +14,14 @@ import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.domain.user.domain.User;
 
-@Table(name = "painting_heart")
+@Table(name = "painting_like")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PaintingHeart extends BaseEntity {
+public class PaintingLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paintingHeartId;
+    private Long paintingLikeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -32,13 +32,13 @@ public class PaintingHeart extends BaseEntity {
     private Painting painting;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private PaintingHeart(User user, Painting painting) {
+    private PaintingLike(User user, Painting painting) {
         this.user = user;
         this.painting = painting;
     }
 
-    public static PaintingHeart createPaintingHeart(User user, Painting painting) {
-        return PaintingHeart.builder()
+    public static PaintingLike createPaintingLike(User user, Painting painting) {
+        return PaintingLike.builder()
             .user(user)
             .painting(painting)
             .build();

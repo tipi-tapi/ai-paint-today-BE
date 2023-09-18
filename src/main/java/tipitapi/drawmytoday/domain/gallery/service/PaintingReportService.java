@@ -19,13 +19,8 @@ public class PaintingReportService {
     private final ValidatePaintingReportService validatePaintingReportService;
 
     @Transactional
-    public void reportPainting(Long userId, Long paintingId) {
-        validatePaintingReportService.validatePaintingReport(paintingId);
-        User userReference = em.getReference(User.class, userId);
-        Painting paintingReference = em.getReference(Painting.class, paintingId);
-        paintingReportRepository.save(
-            PaintingReport.create(userReference, paintingReference, null));
+    public void reportPainting(User user, Painting painting) {
+        validatePaintingReportService.validatePaintingReport(painting);
+        paintingReportRepository.save(PaintingReport.create(user, painting, null));
     }
-
-
 }

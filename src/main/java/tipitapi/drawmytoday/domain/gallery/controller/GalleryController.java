@@ -66,12 +66,12 @@ public class GalleryController {
             content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping("/{id}/heart")
-    public ResponseEntity<Void> paintingHeart(
+    public ResponseEntity<Void> PaintingLike(
         @AuthUser JwtTokenInfo tokenInfo,
         @Parameter(name = "id", description = "공감을 누를 작품의 id(painting_id)", in = ParameterIn.PATH)
         @PathVariable("id") Long paintingId
     ) {
-        galleryService.changePaintingHeart(tokenInfo.getUserId(), paintingId);
+        galleryService.togglePaintingLike(tokenInfo.getUserId(), paintingId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
