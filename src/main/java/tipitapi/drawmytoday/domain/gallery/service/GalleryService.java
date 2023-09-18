@@ -15,6 +15,7 @@ public class GalleryService {
 
     private final ValidateUserService validateUserService;
     private final ValidatePaintingService validatePaintingService;
+    private final ValidatePaintingReportService validatePaintingReportService;
     private final PaintingService paintingService;
     private final PaintingHeartService paintingHeartService;
     private final PaintingReportService paintingReportService;
@@ -35,7 +36,7 @@ public class GalleryService {
     public void deletePainting(Long userId, Long paintingId) {
         validateUserService.validateUserById(userId);
         validatePaintingService.validateIsPaintingOwner(userId, paintingId);
-        paintingReportService.isPaintingReportExist(paintingId);
+        validatePaintingReportService.validatePaintingReport(paintingId);
         paintingService.deletePainting(paintingId);
     }
 
