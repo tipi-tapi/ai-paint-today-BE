@@ -3,3 +3,4 @@ openai:
         key: ${OPENAI_API_KEY}
     dalle:
         url: ${DALLE_API_URL}
+        mock: ${MOCK_DALLE_API_URL}

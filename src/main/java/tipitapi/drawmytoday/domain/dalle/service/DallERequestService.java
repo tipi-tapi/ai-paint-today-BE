@@ -33,7 +33,7 @@ public class DallERequestService {
     private final HttpHeaders requestHeader;
 
     public DallERequestService(@Qualifier("openaiRestTemplate") RestTemplate restTemplate,
-        @Value("${openai.dalle.url}") String apiUrl) {
+        @Value("${openai.dalle.mock}") String apiUrl) {
         this.restTemplate = restTemplate;
         this.apiUrl = apiUrl;
         this.requestHeader = new HttpHeaders() {
