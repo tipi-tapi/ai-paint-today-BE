@@ -34,6 +34,7 @@ import tipitapi.drawmytoday.domain.dalle.service.DallEService;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
+import tipitapi.drawmytoday.domain.diary.exception.PromptNotExistException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.service.ValidateEmotionService;
@@ -192,6 +193,27 @@ class CreateDiaryServiceTest {
     @Nested
     @DisplayName("regenerateDiaryImage 메서드 테스트")
     class RegenerateDiaryImageTest {
+
+        @Test
+        @DisplayName("일기에 해당하는 성공한 프롬프트가 없을 경우 예외를 던진다.")
+        void throw_exception_when_no_success_prompt() throws Exception {
+            //given
+            long userId = 1L;
+            long diaryId = 2L;
+            User user = TestUser.createUserWithId(userId);
+            Emotion emotion = TestEmotion.createEmotionWithId(1L);
+            Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
+
+            given(validateUserService.validateUserById(any(Long.class))).willReturn(user);
+            given(validateDiaryService.validateDiaryById(any(Long.class), any(User.class)))
+                .willReturn(diary);
+            given(promptService.getPromptByDiaryId(eq(diaryId))).willReturn(Optional.empty());
+
+            //when
+            //then
+            assertThatThrownBy(() -> createDiaryService.regenerateDiaryImage(userId, diaryId))
+                .isInstanceOf(PromptNotExistException.class);
+        }
 
         @Test
         @DisplayName("이미지를 재생성한 이후 재생성한 이미지를 대표 이미지로 등록한다.")
