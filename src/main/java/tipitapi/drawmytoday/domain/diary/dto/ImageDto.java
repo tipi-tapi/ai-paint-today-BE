@@ -1,7 +1,8 @@
 package tipitapi.drawmytoday.domain.diary.dto;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,14 +14,14 @@ import lombok.Getter;
 
 @Getter
 @Schema(description = "이미지 Response")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonInclude(Include.NON_NULL)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ImageDto {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @Schema(description = "이미지 생성 시각", requiredMode = RequiredMode.REQUIRED)
-    private final LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @Schema(description = "대표 이미지 여부", requiredMode = RequiredMode.REQUIRED)
     private boolean selected;
