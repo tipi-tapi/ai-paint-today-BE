@@ -41,6 +41,7 @@ import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
+import tipitapi.drawmytoday.domain.diary.dto.ImageDto;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -79,12 +80,12 @@ class DiaryControllerTest extends ControllerTestSetup {
                 String emotionText = emotion.getEmotionText(language);
                 Diary diary = TestDiary.createDiaryWithIdAndCreatedAt(
                     diaryId, LocalDateTime.now(), user, emotion);
-                String selectedImageUrl = "selectedImageUrl";
-                List<String> unselectedImageUrls = List.of("unselectedImageUrl1",
-                    "unselectedImageUrl2");
+                String imageUrl = "imageUrl";
+                List<ImageDto> imageList = List.of(ImageDto.of(
+                    LocalDateTime.now(), true, imageUrl));
                 String promptText = "promptText";
-                GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, selectedImageUrl,
-                    unselectedImageUrls, emotionText, promptText);
+                GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl,
+                    imageList, emotionText, promptText);
                 given(diaryService.getDiary(REQUEST_USER_ID, diaryId, language)).willReturn(
                     getDiaryResponse);
 
@@ -94,7 +95,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 // then
                 result.andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.id").value(diaryId))
-                    .andExpect(jsonPath("$.data.selectedImageUrl").value(selectedImageUrl))
+                    .andExpect(jsonPath("$.data.imageUrl").value(imageUrl))
                     .andExpect(jsonPath("$.data.date").value(
                         parseLocalDateTime(diary.getDiaryDate())))
                     .andExpect(jsonPath("$.data.createdAt").value(
@@ -467,21 +468,15 @@ class DiaryControllerTest extends ControllerTestSetup {
         void regenerate_diary_image() throws Exception {
             // given
             Long diaryId = 1L;
-            String keyword = "keyword";
 
             // when
-            Map<String, Object> requestMap = new HashMap<>();
-            requestMap.put("keyword", keyword);
-            String requestBody = objectMapper.writeValueAsString(requestMap);
             ResultActions result = mockMvc.perform(
-                post(BASIC_URL + "/" + diaryId + "/regenerate_image")
-                    .with(SecurityMockMvcRequestPostProcessors.csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody));
+                post(BASIC_URL + "/" + diaryId + "/regenerate")
+                    .with(SecurityMockMvcRequestPostProcessors.csrf()));
 
             // then
             result.andExpect(status().isCreated());
-            verify(createDiaryService).regenerateDiaryImage(REQUEST_USER_ID, diaryId, keyword);
+            verify(createDiaryService).regenerateDiaryImage(REQUEST_USER_ID, diaryId);
         }
     }
 }

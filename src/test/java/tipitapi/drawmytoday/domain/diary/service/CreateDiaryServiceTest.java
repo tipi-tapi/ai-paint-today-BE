@@ -12,6 +12,7 @@ import static org.mockito.Mockito.never;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
+import tipitapi.drawmytoday.common.testdata.TestPrompt;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
@@ -30,6 +32,7 @@ import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.domain.dalle.service.DallEService;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -191,29 +194,30 @@ class CreateDiaryServiceTest {
     class RegenerateDiaryImageTest {
 
         @Test
-        @DisplayName("이미지를 재생성한 이후 여러 동작을 수행한다.")
+        @DisplayName("이미지를 재생성한 이후 재생성한 이미지를 대표 이미지로 등록한다.")
         void regenerateDiaryImage() throws Exception {
             //given
-            String prompt = "test prompt";
             byte[] image = new byte[1];
             long userId = 1L;
             long diaryId = 2L;
+            String promptText = "test prompt";
             User user = TestUser.createUserWithId(userId);
             Emotion emotion = TestEmotion.createEmotionWithId(1L);
             Diary diary = TestDiary.createDiaryWithId(diaryId, user, emotion);
+            Prompt prompt = TestPrompt.createPromptWithId(1L, promptText);
 
             given(validateUserService.validateUserById(any(Long.class))).willReturn(user);
             given(validateDiaryService.validateDiaryById(any(Long.class), any(User.class)))
                 .willReturn(diary);
-            given(dallEService.generateImage(any(Emotion.class), anyString()))
-                .willReturn(new GeneratedImageAndPrompt(prompt, image));
+            given(promptService.getPromptByDiaryId(eq(diaryId))).willReturn(Optional.of(prompt));
+            given(dallEService.generateImage(eq(prompt)))
+                .willReturn(new GeneratedImageAndPrompt(promptText, image));
 
             //when
-            createDiaryService.regenerateDiaryImage(userId, diaryId, "키워드");
+            createDiaryService.regenerateDiaryImage(userId, diaryId);
 
             //then
             verify(validateTicketService).findAndUseTicket(eq(userId));
-            verify(promptService).createPrompt(eq(diary), eq(prompt), eq(true));
             verify(imageService).unSelectAllImage(eq(diaryId));
             verify(imageService).uploadAndCreateImage(eq(diary), eq(image), eq(true));
         }
