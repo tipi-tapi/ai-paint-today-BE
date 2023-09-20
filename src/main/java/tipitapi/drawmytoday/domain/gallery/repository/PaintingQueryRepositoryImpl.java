@@ -2,7 +2,7 @@ package tipitapi.drawmytoday.domain.gallery.repository;
 
 import static tipitapi.drawmytoday.domain.diary.domain.QImage.image;
 import static tipitapi.drawmytoday.domain.gallery.domain.QPainting.painting;
-import static tipitapi.drawmytoday.domain.gallery.domain.QPaintingLike.PaintingLike;
+import static tipitapi.drawmytoday.domain.gallery.domain.QPaintingLike.paintingLike;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -25,9 +25,9 @@ public class PaintingQueryRepositoryImpl implements PaintingQueryRepository {
             .select(new QGetPaintingResponse(painting.title, image.imageUrl, painting.notes))
             .from(painting)
             .join(painting.image, image)
-            .leftJoin(PaintingLike).on(painting.paintingId.eq(PaintingLike.painting.paintingId))
+            .leftJoin(paintingLike).on(painting.paintingId.eq(paintingLike.painting.paintingId))
             .groupBy(painting)
-            .orderBy(PaintingLike.count().desc())
+            .orderBy(paintingLike.count().desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
