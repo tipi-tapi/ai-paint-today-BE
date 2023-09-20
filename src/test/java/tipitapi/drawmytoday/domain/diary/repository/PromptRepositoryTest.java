@@ -27,13 +27,12 @@ class PromptRepositoryTest extends BaseRepositoryTest {
     class findAllByDiaryDiaryIdAndIsSuccessTrueTest {
 
         @Nested
-        @DisplayName("주어진 일기의 성공한 Prompt가 존재할 경우")
-        class if_success_prompt_of_diary_exists {
-
+        @DisplayName("주어진 일기의 성공한 Prompt와 실패한 Prompt가 존재할 경우")
+        class if_prompt_of_diary_exists {
 
             @Test
             @DisplayName("성공한 Prompt들만 반환한다.")
-            void return_success_prompts() {
+            void return_only_success_prompts() {
                 Diary diary = createDiary(createUser(), createEmotion());
                 createPrompt(diary, "1", true);
                 createPrompt(diary, "2", false);
