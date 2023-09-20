@@ -262,7 +262,8 @@ public class DiaryController {
             content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(
             responseCode = "500",
-            description = "DE001 : DALL-E 이미지 생성에 실패하였습니다.\t\nIIS001 : 이미지 스트림을 가져오는데 실패하였습니다.",
+            description = "DE001 : DALL-E 이미지 생성에 실패하였습니다.\t\nIIS001 : 이미지 스트림을 가져오는데 실패하였습니다."
+                + "\t\nP001 : 기존에 그린 일기 이미지에 해당하는 프롬프트가 존재하지 않습니다.",
             content = @Content(schema = @Schema(hidden = true))),
     })
     @PostMapping("/{id}/regenerate")

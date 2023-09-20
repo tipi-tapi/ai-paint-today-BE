@@ -24,7 +24,7 @@ public class GetDiaryResponse {
     @Schema(description = "대표 이미지 URL", requiredMode = RequiredMode.REQUIRED)
     private final String imageUrl;
 
-    @Schema(description = "대표 이미지를 포함한 이미지 URL 리스트", requiredMode = RequiredMode.REQUIRED)
+    @Schema(description = "대표 이미지를 포함한 이미지 URL 리스트", requiredMode = RequiredMode.NOT_REQUIRED)
     private final List<ImageDto> imageList;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
