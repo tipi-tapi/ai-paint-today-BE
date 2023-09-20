@@ -22,10 +22,10 @@ public class GetDiaryResponse {
     private final Long id;
 
     @Schema(description = "대표 이미지 URL", requiredMode = RequiredMode.REQUIRED)
-    private final String selectedImageUrl;
+    private final String imageUrl;
 
-    @Schema(description = "대표 이미지를 제외한 이미지 URL 리스트", requiredMode = RequiredMode.NOT_REQUIRED)
-    private final List<String> unSelectedImageUrls;
+    @Schema(description = "대표 이미지를 포함한 이미지 URL 리스트", requiredMode = RequiredMode.REQUIRED)
+    private final List<ImageDto> imageList;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -49,9 +49,9 @@ public class GetDiaryResponse {
     private String prompt;
 
     public static GetDiaryResponse of(Diary diary, String selectedImageUrl,
-        List<String> unSelectedImageUrls, String emotionText, String promptText) {
-        return new GetDiaryResponse(diary.getDiaryId(), selectedImageUrl,
-            unSelectedImageUrls, diary.getDiaryDate(),
-            diary.getCreatedAt(), emotionText, diary.getNotes(), promptText);
+        List<ImageDto> imageList, String emotionText, String promptText) {
+        return new GetDiaryResponse(diary.getDiaryId(), selectedImageUrl, imageList,
+            diary.getDiaryDate(), diary.getCreatedAt(), emotionText, diary.getNotes(), promptText);
     }
+
 }

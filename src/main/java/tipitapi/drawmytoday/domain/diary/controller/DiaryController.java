@@ -34,7 +34,6 @@ import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
-import tipitapi.drawmytoday.domain.diary.dto.RegenerateDiaryImageRequest;
 import tipitapi.drawmytoday.domain.diary.dto.UpdateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
@@ -269,11 +268,9 @@ public class DiaryController {
     @PostMapping("/{id}/regenerate")
     public ResponseEntity<Void> regenerateDiaryImage(
         @AuthUser JwtTokenInfo tokenInfo,
-        @RequestBody RegenerateDiaryImageRequest regenerateDiaryImageRequest,
         @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
     ) throws DallEException {
-        createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId,
-            regenerateDiaryImageRequest.getKeyword());
+        createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

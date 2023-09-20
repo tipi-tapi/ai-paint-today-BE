@@ -48,6 +48,9 @@ public enum ErrorCode {
     // Emotion
     EMOTION_NOT_FOUND(404, "E001", "감정을 찾을 수 없습니다."),
 
+    // Prompt
+    PROMPT_NOT_FOUND(404, "P001", "프롬프트를 찾을 수 없습니다."),
+
     // R2
     R2_SERVICE_ERROR(500, "R001", "R2Exception 에러가 발생하였습니다."),
     R2_SDK_ERROR(500, "R002", "SdkClientException 에러가 발생하였습니다."),

@@ -6,5 +6,5 @@ import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 
 public interface PromptRepository extends JpaRepository<Prompt, Long> {
 
-    List<Prompt> findAllByDiaryDiaryId(Long diaryId);
+    List<Prompt> findAllByDiaryDiaryIdAndIsSuccessTrue(Long diaryId);
 }

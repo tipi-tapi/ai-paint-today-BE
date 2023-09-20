@@ -7,6 +7,7 @@ import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
 import tipitapi.drawmytoday.domain.dalle.exception.DallEException;
 import tipitapi.drawmytoday.domain.dalle.exception.DallEPolicyViolationException;
 import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
+import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.service.PromptService;
 import tipitapi.drawmytoday.domain.diary.service.PromptTextService;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -48,4 +49,15 @@ public class DallEService {
         }
     }
 
+
+    public GeneratedImageAndPrompt generateImage(Prompt prompt) throws DallEException {
+        try {
+            byte[] image = dalleRequestService.getImageAsUrl(prompt.getPromptText());
+            return new GeneratedImageAndPrompt(prompt.getPromptText(), image);
+        } catch (DallEException e) {
+            promptService.createPrompt(prompt.getPromptText(), false);
+            throw (e instanceof DallEPolicyViolationException) ?
+                DallERequestFailException.violatePolicy() : e;
+        }
+    }
 }

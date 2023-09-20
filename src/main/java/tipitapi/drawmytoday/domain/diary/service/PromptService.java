@@ -24,7 +24,7 @@ public class PromptService {
     }
 
     public Optional<Prompt> getPromptByDiaryId(Long diaryId) {
-        return promptRepository.findAllByDiaryDiaryId(diaryId)
+        return promptRepository.findAllByDiaryDiaryIdAndIsSuccessTrue(diaryId)
             .stream().findFirst();
     }
 }
