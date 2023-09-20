@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.domain.diary.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.Image;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.domain.ReviewType;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
@@ -20,6 +22,7 @@ import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
+import tipitapi.drawmytoday.domain.diary.dto.ImageDto;
 import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.r2.service.R2PreSignedService;
@@ -48,15 +51,25 @@ public class DiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         diary.setNotes(encryptor.decrypt(diary.getNotes()));
 
-        String imageUrl = r2PreSignedService.getPreSignedUrlForShare(
-            imageService.getImage(diary).getImageUrl(), 30);
+        List<Image> images = imageService.getImages(diary);
+        String selectedImageUrl = images.stream()
+            .filter(Image::isSelected)
+            .findFirst()
+            .map(image -> r2PreSignedService.getPreSignedUrlForShare(image.getImageUrl(), 30))
+            .orElseThrow(ImageNotFoundException::new);
+
+        List<ImageDto> sortedImages = images.stream()
+            .sorted(Comparator.comparing(Image::getCreatedAt).reversed())
+            .map(image -> ImageDto.of(image.getCreatedAt(), image.isSelected(),
+                r2PreSignedService.getPreSignedUrlForShare(image.getImageUrl(), 30)))
+            .collect(Collectors.toList());
 
         String emotionText = diary.getEmotion().getEmotionText(language);
 
-        Optional<Prompt> prompt = promptService.getPromptByDiaryId(diaryId);
-        String promptText = prompt.map(Prompt::getPromptText).orElse(null);
+        String promptText = promptService.getPromptByDiaryId(diaryId)
+            .map(Prompt::getPromptText).orElse(null);
 
-        return GetDiaryResponse.of(diary, imageUrl, emotionText, promptText);
+        return GetDiaryResponse.of(diary, selectedImageUrl, sortedImages, emotionText, promptText);
     }
 
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {

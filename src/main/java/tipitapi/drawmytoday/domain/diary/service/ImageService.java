@@ -1,6 +1,7 @@
 package tipitapi.drawmytoday.domain.diary.service;
 
 import java.util.Date;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,10 @@ public class ImageService {
             .orElseThrow(ImageNotFoundException::new);
     }
 
+    public List<Image> getImages(Diary diary) {
+        return imageRepository.findAllByDiaryDiaryId(diary.getDiaryId());
+    }
+
     public Image createImage(Diary diary, String imagePath, boolean isSelected) {
         return imageRepository.save(Image.create(diary, imagePath, isSelected));
     }
@@ -36,5 +41,11 @@ public class ImageService {
             new Date().getTime(), 1);
         r2Service.uploadImage(dallEImage, imagePath);
         return createImage(diary, imagePath, isSelected);
+    }
+
+    @Transactional
+    public void unSelectAllImage(Long diaryId) {
+        imageRepository.findAllByDiaryDiaryId(diaryId)
+            .forEach(image -> image.setSelected(false));
     }
 }

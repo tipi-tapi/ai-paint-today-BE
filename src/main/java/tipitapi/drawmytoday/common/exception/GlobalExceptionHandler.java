@@ -2,7 +2,6 @@ package tipitapi.drawmytoday.common.exception;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import tipitapi.drawmytoday.common.response.ErrorResponse;
@@ -28,7 +28,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Object> handleBusinessException(BusinessException e) {
-        log.warn("handleBusinessException", e);
+        if (e.getErrorCode().getStatus() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+            log.error("handleBusinessException", e);
+        } else {
+            log.warn("handleBusinessException", e);
+        }
         ErrorCode errorCode = e.getErrorCode();
         return handleExceptionInternal(errorCode);
     }

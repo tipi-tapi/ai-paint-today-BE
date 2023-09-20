@@ -81,4 +81,39 @@ class ImageRepositoryTest extends BaseRepositoryTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("findAllByDiaryDiaryId 메소드 테스트")
+    class FindAllByDiaryDiaryIdTest {
+
+        @Nested
+        @DisplayName("주어진 일기의 이미지가 존재할 경우")
+        class if_images_of_diary_exists {
+
+            @Test
+            @DisplayName("이미지 목록을 반환한다.")
+            void return_image_list() {
+                Diary diary = createDiaryWithId(1L, createUser());
+                Image image1 = createImage(1L, diary);
+                Image image2 = createImage(2L, diary);
+
+                assertThat(imageRepository.findAllByDiaryDiaryId(diary.getDiaryId()))
+                    .containsExactlyInAnyOrder(image1, image2);
+            }
+        }
+
+        @Nested
+        @DisplayName("주어진 일기의 이미지가 존재하지 않을 경우")
+        class if_images_of_diary_not_exists {
+
+            @Test
+            @DisplayName("빈 목록을 반환한다.")
+            void return_empty_list() {
+                Diary diary = createDiaryWithId(1L, createUser());
+
+                assertThat(imageRepository.findAllByDiaryDiaryId(diary.getDiaryId()))
+                    .isEmpty();
+            }
+        }
+    }
 }

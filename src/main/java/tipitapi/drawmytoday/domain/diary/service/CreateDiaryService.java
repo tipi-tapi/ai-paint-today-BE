@@ -11,7 +11,9 @@ import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
 import tipitapi.drawmytoday.domain.dalle.exception.DallEException;
 import tipitapi.drawmytoday.domain.dalle.service.DallEService;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
+import tipitapi.drawmytoday.domain.diary.exception.PromptNotExistException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.service.ValidateEmotionService;
@@ -71,6 +73,20 @@ public class CreateDiaryService {
         imageService.createImage(diary, DUMMY_IMAGE_PATH, true);
 
         return new CreateDiaryResponse(diary.getDiaryId());
+    }
+
+    @Transactional(noRollbackFor = {DallEException.class})
+    public void regenerateDiaryImage(Long userId, Long diaryId) throws DallEException {
+        User user = validateUserService.validateUserById(userId);
+        Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
+        validateTicketService.findAndUseTicket(userId);
+
+        Prompt prompt = promptService.getPromptByDiaryId(diaryId)
+            .orElseThrow(PromptNotExistException::new);
+        GeneratedImageAndPrompt generated = dallEService.generateImage(prompt);
+
+        imageService.unSelectAllImage(diary.getDiaryId());
+        imageService.uploadAndCreateImage(diary, generated.getImage(), true);
     }
 
     private Diary saveDiary(String notes, User user, Emotion emotion, LocalDateTime diaryDate,
