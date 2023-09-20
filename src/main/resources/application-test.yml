@@ -4,6 +4,8 @@ spring:
         url: ${DB_URL}
         username: ${DB_USERNAME}
         password: ${DB_PASSWORD}
+        hikari:
+            maximum-pool-size: 40
 
     jpa:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
