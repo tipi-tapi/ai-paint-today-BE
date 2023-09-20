@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.domain.ticket.domain.Ticket;
-import tipitapi.drawmytoday.domain.ticket.exception.ValidTicketNotExistsException;
 import tipitapi.drawmytoday.domain.ticket.repository.TicketRepository;
 
 @Service
@@ -21,8 +20,9 @@ public class ValidateTicketService {
 
     @Transactional
     public void findAndUseTicket(Long userId) {
-        ticketRepository.findValidTicket(userId)
-            .orElseThrow(ValidTicketNotExistsException::new)
-            .use();
+        // mocking 이므로 주석 처리
+//        ticketRepository.findValidTicket(userId)
+//            .orElseThrow(ValidTicketNotExistsException::new)
+//            .use();
     }
 }

@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
-import tipitapi.drawmytoday.domain.diary.exception.DiaryDateAlreadyExistsException;
 import tipitapi.drawmytoday.domain.diary.exception.DiaryNotFoundException;
 import tipitapi.drawmytoday.domain.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
@@ -26,9 +25,10 @@ public class ValidateDiaryService {
     }
 
     public void validateExistsByDate(Long userId, LocalDate diaryDate) {
-        if (diaryRepository.getDiaryExistsByDiaryDate(userId, diaryDate).isPresent()) {
-            throw new DiaryDateAlreadyExistsException();
-        }
+        // mocking 이므로 주석 처리
+//        if (diaryRepository.getDiaryExistsByDiaryDate(userId, diaryDate).isPresent()) {
+//            throw new DiaryDateAlreadyExistsException();
+//        }
     }
 
     private void ownedByUser(Diary diary, User user) {
