@@ -266,7 +266,7 @@ public class DiaryController {
             description = "DE001 : DALL-E 이미지 생성에 실패하였습니다.\t\nIIS001 : 이미지 스트림을 가져오는데 실패하였습니다.",
             content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/{id}/regenerate_image")
+    @PostMapping("/{id}/regenerate")
     public ResponseEntity<Void> regenerateDiaryImage(
         @AuthUser JwtTokenInfo tokenInfo,
         @RequestBody RegenerateDiaryImageRequest regenerateDiaryImageRequest,
