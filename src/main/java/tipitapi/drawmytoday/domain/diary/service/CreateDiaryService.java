@@ -13,7 +13,7 @@ import tipitapi.drawmytoday.domain.dalle.service.DallEService;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
-import tipitapi.drawmytoday.domain.diary.exception.PromptNotFoundException;
+import tipitapi.drawmytoday.domain.diary.exception.PromptNotExistException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.service.ValidateEmotionService;
@@ -82,7 +82,7 @@ public class CreateDiaryService {
         validateTicketService.findAndUseTicket(userId);
 
         Prompt prompt = promptService.getPromptByDiaryId(diaryId)
-            .orElseThrow(PromptNotFoundException::new);
+            .orElseThrow(PromptNotExistException::new);
         GeneratedImageAndPrompt generated = dallEService.generateImage(prompt);
 
         imageService.unSelectAllImage(diary.getDiaryId());

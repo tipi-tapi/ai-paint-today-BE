@@ -3,9 +3,9 @@ package tipitapi.drawmytoday.domain.diary.exception;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 
-public class PromptNotFoundException extends BusinessException {
+public class PromptNotExistException extends BusinessException {
 
-    public PromptNotFoundException() {
-        super(ErrorCode.PROMPT_NOT_FOUND);
+    public PromptNotExistException() {
+        super(ErrorCode.PROMPT_NOT_EXIST);
     }
 }
