@@ -7,9 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.utils.Encryptor;
-import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
-import tipitapi.drawmytoday.domain.dalle.exception.DallEException;
-import tipitapi.drawmytoday.domain.dalle.service.DallEService;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
@@ -17,6 +14,9 @@ import tipitapi.drawmytoday.domain.diary.exception.PromptNotExistException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.service.ValidateEmotionService;
+import tipitapi.drawmytoday.domain.generator.dto.GeneratedImageAndPrompt;
+import tipitapi.drawmytoday.domain.generator.exception.ImageGeneratorException;
+import tipitapi.drawmytoday.domain.generator.service.ImageGeneratorService;
 import tipitapi.drawmytoday.domain.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
@@ -32,15 +32,15 @@ public class CreateDiaryService {
     private final ValidateEmotionService validateEmotionService;
     private final ValidateDiaryService validateDiaryService;
     private final ValidateTicketService validateTicketService;
-    private final DallEService dallEService;
+    private final ImageGeneratorService karloService;
     private final PromptService promptService;
     private final PromptTextService promptTextService;
     private final Encryptor encryptor;
     private final String DUMMY_IMAGE_PATH = "test/dummy.png";
 
-    @Transactional(noRollbackFor = {DallEException.class})
+    @Transactional(noRollbackFor = {ImageGeneratorException.class})
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
-        String notes, LocalDate diaryDate, LocalTime userTime) throws DallEException {
+        String notes, LocalDate diaryDate, LocalTime userTime) throws ImageGeneratorException {
 
         User user = validateUserService.validateUserById(userId);
         validateDiaryService.validateExistsByDate(userId, diaryDate);
@@ -48,7 +48,7 @@ public class CreateDiaryService {
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         LocalDateTime diaryDateTime = diaryDate.atTime(userTime);
 
-        GeneratedImageAndPrompt generated = dallEService.generateImage(emotion, keyword);
+        GeneratedImageAndPrompt generated = karloService.generateImage(emotion, keyword);
         String prompt = generated.getPrompt();
         byte[] dallEImage = generated.getImage();
 
@@ -75,15 +75,15 @@ public class CreateDiaryService {
         return new CreateDiaryResponse(diary.getDiaryId());
     }
 
-    @Transactional(noRollbackFor = {DallEException.class})
-    public void regenerateDiaryImage(Long userId, Long diaryId) throws DallEException {
+    @Transactional(noRollbackFor = {ImageGeneratorException.class})
+    public void regenerateDiaryImage(Long userId, Long diaryId) throws ImageGeneratorException {
         User user = validateUserService.validateUserById(userId);
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         validateTicketService.findAndUseTicket(userId);
 
         Prompt prompt = promptService.getPromptByDiaryId(diaryId)
             .orElseThrow(PromptNotExistException::new);
-        GeneratedImageAndPrompt generated = dallEService.generateImage(prompt);
+        GeneratedImageAndPrompt generated = karloService.generateImage(prompt);
 
         imageService.unSelectAllImage(diary.getDiaryId());
         imageService.uploadAndCreateImage(diary, generated.getImage(), true);

@@ -26,7 +26,6 @@ import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
-import tipitapi.drawmytoday.domain.dalle.exception.DallEException;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
@@ -38,6 +37,7 @@ import tipitapi.drawmytoday.domain.diary.dto.ReviewDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.dto.UpdateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
+import tipitapi.drawmytoday.domain.generator.exception.ImageGeneratorException;
 
 @RestController
 @RequestMapping("/diary")
@@ -173,7 +173,7 @@ public class DiaryController {
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo,
         @Parameter(description = "테스트 여부", in = ParameterIn.QUERY)
         @RequestParam(value = "test", required = false, defaultValue = "false") boolean test
-    ) throws DallEException {
+    ) throws ImageGeneratorException {
         CreateDiaryResponse response;
         if (test) {
             response = createDiaryService.createTestDiary(tokenInfo.getUserId(),
@@ -295,7 +295,7 @@ public class DiaryController {
     public ResponseEntity<Void> regenerateDiaryImage(
         @AuthUser JwtTokenInfo tokenInfo,
         @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
-    ) throws DallEException {
+    ) throws ImageGeneratorException {
         createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

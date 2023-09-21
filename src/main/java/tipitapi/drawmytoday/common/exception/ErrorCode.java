@@ -60,6 +60,9 @@ public enum ErrorCode {
     DALLE_REQUEST_FAIL(500, "DE001", "DALL-E 요청에 실패하였습니다."),
     DALLE_CONTENT_POLICY_VIOLATION(500, "DE002", "DALL-E의 컨텐츠 정책에 위배되었습니다."),
 
+    // Karlo
+    KARLO_REQUEST_FAIL(500, "K001", "Karlo 요청에 실패하였습니다."),
+
     // Image InputStream
     IMAGE_INPUT_STREAM_FAIL(500, "IIS001", "이미지 스트림을 가져오는데 실패하였습니다."),
 

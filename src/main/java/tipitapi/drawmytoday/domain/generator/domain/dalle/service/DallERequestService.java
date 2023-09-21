@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.domain.dalle.service;
+package tipitapi.drawmytoday.domain.generator.domain.dalle.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import tipitapi.drawmytoday.domain.dalle.dto.CreateImageRequest;
-import tipitapi.drawmytoday.domain.dalle.dto.DallEUrlResponse;
-import tipitapi.drawmytoday.domain.dalle.exception.DallEException;
-import tipitapi.drawmytoday.domain.dalle.exception.DallEPolicyViolationException;
-import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
-import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.dto.CreateDallEImageRequest;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.dto.DallEUrlResponse;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.exception.DallEPolicyViolationException;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.exception.DallERequestFailException;
+import tipitapi.drawmytoday.domain.generator.exception.ImageGeneratorException;
+import tipitapi.drawmytoday.domain.generator.exception.ImageInputStreamFailException;
 
 @Service
 @Slf4j
@@ -43,9 +43,10 @@ public class DallERequestService {
         };
     }
 
-    byte[] getImageAsUrl(String prompt) throws DallEException {
+    byte[] getImageAsUrl(String prompt) throws ImageGeneratorException {
         try {
-            HttpEntity<CreateImageRequest> request = getRequest(CreateImageRequest.withUrl(prompt));
+            HttpEntity<CreateDallEImageRequest> request = getRequest(
+                CreateDallEImageRequest.withUrl(prompt));
 
             String url = Optional.ofNullable(
                     restTemplate.postForObject(apiUrl, request, DallEUrlResponse.class)
@@ -55,7 +56,7 @@ public class DallERequestService {
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.BAD_REQUEST && isContentPolicyError(e)) {
                 log.warn("DallE 정책 위반 에러. prompt: {}", prompt);
-                throw new DallEPolicyViolationException(e.getResponseBodyAsString());
+                throw new DallEPolicyViolationException(e);
             }
             throw new DallERequestFailException(e);
         } catch (IOException e) {
@@ -81,7 +82,7 @@ public class DallERequestService {
         return false;
     }
 
-    private HttpEntity<CreateImageRequest> getRequest(CreateImageRequest requestDto) {
+    private HttpEntity<CreateDallEImageRequest> getRequest(CreateDallEImageRequest requestDto) {
         return new HttpEntity<>(requestDto, requestHeader);
     }
 
