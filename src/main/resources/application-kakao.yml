@@ -1,0 +1,5 @@
+kakao:
+    api:
+        key: ${KAKAO_API_KEY}
+    karlo:
+        image_generate_url: ${KARLO_API_URL}
