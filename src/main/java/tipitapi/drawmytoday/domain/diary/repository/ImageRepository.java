@@ -11,4 +11,6 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     Optional<Image> findByIsSelectedTrueAndDiary(Diary diary);
 
     List<Image> findAllByDiaryDiaryId(Long diaryId);
+
+    List<Image> findAllByDiaryDiaryIdOrderByCreatedAtDesc(Long diaryId);
 }

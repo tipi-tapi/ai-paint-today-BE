@@ -25,7 +25,7 @@ public class GetDiaryResponse {
     private final String imageUrl;
 
     @Schema(description = "대표 이미지를 포함한 이미지 URL 리스트", requiredMode = RequiredMode.NOT_REQUIRED)
-    private final List<ImageDto> imageList;
+    private final List<GetImageResponse> imageList;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -49,7 +49,7 @@ public class GetDiaryResponse {
     private String prompt;
 
     public static GetDiaryResponse of(Diary diary, String selectedImageUrl,
-        List<ImageDto> imageList, String emotionText, String promptText) {
+        List<GetImageResponse> imageList, String emotionText, String promptText) {
         return new GetDiaryResponse(diary.getDiaryId(), selectedImageUrl, imageList,
             diary.getDiaryDate(), diary.getCreatedAt(), emotionText, diary.getNotes(), promptText);
     }
