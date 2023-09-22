@@ -33,8 +33,8 @@ public class TicketServiceTest {
     class CreateTicketByJoinTest {
 
         @Test
-        @DisplayName("7개의 JOIN 타입의 티켓을 등록해야합니다.")
-        void it_creates_7_join_tickets() {
+        @DisplayName("1개의 JOIN 타입의 티켓을 등록해야합니다.")
+        void it_creates_1_join_tickets() {
             User user = createUser();
 
             ticketService.createTicketByJoin(user);
@@ -43,7 +43,7 @@ public class TicketServiceTest {
             verify(ticketRepository, times(1)).saveAll(ticketArgumentCaptor.capture());
 
             List<Ticket> tickets = ticketArgumentCaptor.getValue();
-            assertEquals(tickets.size(), 7);
+            assertEquals(tickets.size(), 1);
             assertThat(tickets).allMatch(ticket -> ticket.getTicketType() == TicketType.JOIN);
         }
     }

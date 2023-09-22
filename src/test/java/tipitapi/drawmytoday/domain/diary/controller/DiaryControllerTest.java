@@ -22,6 +22,8 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,6 +37,7 @@ import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.ReviewType;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
@@ -477,6 +480,51 @@ class DiaryControllerTest extends ControllerTestSetup {
             // then
             result.andExpect(status().isCreated());
             verify(createDiaryService).regenerateDiaryImage(REQUEST_USER_ID, diaryId);
+        }
+    }
+  
+    @DisplayName("reviewDiary 메서드는")
+    class ReviewDiaryTest {
+
+        @ParameterizedTest
+        @ValueSource(strings = {"", "INVALID_REVIEW"})
+        @DisplayName("review 값이 없거나 잘못된 값이라면 BAD_REQUEST 상태코드를 응답한다.")
+        void invalid_request_body_then_return_400(String review) throws Exception {
+            // given
+            Long diaryId = 1L;
+
+            // when
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("review", review);
+            String requestBody = objectMapper.writeValueAsString(requestMap);
+            ResultActions result = mockMvc.perform(post(BASIC_URL + "/" + diaryId + "/review")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody));
+
+            // then
+            result.andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("diaryId에 해당하는 일기를 리뷰한다.")
+        void review_diary() throws Exception {
+            // given
+            Long diaryId = 1L;
+            ReviewType reviewType = ReviewType.GOOD;
+
+            // when
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("review", reviewType);
+            String requestBody = objectMapper.writeValueAsString(requestMap);
+            ResultActions result = mockMvc.perform(post(BASIC_URL + "/" + diaryId + "/review")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody));
+
+            // then
+            result.andExpect(status().isNoContent());
+            verify(diaryService).reviewDiary(diaryId, REQUEST_USER_ID, reviewType);
         }
     }
 }
