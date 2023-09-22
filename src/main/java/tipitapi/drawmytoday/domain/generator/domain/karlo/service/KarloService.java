@@ -21,6 +21,7 @@ class KarloService implements ImageGeneratorService {
     private final KarloRequestService karloRequestService;
 
     @Override
+    @Transactional(noRollbackFor = ImageGeneratorException.class)
     public GeneratedImageAndPrompt generateImage(Emotion emotion, String keyword)
         throws ImageGeneratorException {
         String prompt = promptTextService.createPromptText(emotion, keyword);
@@ -34,6 +35,7 @@ class KarloService implements ImageGeneratorService {
     }
 
     @Override
+    @Transactional(noRollbackFor = ImageGeneratorException.class)
     public GeneratedImageAndPrompt generateImage(Prompt prompt) throws ImageGeneratorException {
         try {
             byte[] image = karloRequestService.getImageAsUrl(prompt.getPromptText());

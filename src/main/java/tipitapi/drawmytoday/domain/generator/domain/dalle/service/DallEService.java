@@ -52,6 +52,7 @@ public class DallEService implements ImageGeneratorService {
     }
 
 
+    @Transactional(noRollbackFor = ImageGeneratorException.class)
     public GeneratedImageAndPrompt generateImage(Prompt prompt) throws ImageGeneratorException {
         try {
             byte[] image = dalleRequestService.getImageAsUrl(prompt.getPromptText());
