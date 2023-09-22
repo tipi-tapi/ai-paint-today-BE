@@ -32,6 +32,10 @@ public class ImageService {
         return imageRepository.findAllByDiaryDiaryId(diary.getDiaryId());
     }
 
+    public List<Image> getLatestImages(Diary diary) {
+        return imageRepository.findAllByDiaryDiaryIdOrderByCreatedAtDesc(diary.getDiaryId());
+    }
+
     public Image createImage(Diary diary, String imagePath, boolean isSelected) {
         return imageRepository.save(Image.create(diary, imagePath, isSelected));
     }
