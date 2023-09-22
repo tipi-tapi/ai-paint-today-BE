@@ -275,6 +275,7 @@ public class DiaryController {
     ) throws DallEException {
         createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
     @Operation(summary = "일기 평가", description = "주어진 ID의 일기를 평가한다.")
     @ApiResponses(value = {
