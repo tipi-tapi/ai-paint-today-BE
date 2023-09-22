@@ -42,9 +42,9 @@ import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.domain.diary.dto.GetImageResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
-import tipitapi.drawmytoday.domain.diary.dto.ImageDto;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -84,7 +84,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 Diary diary = TestDiary.createDiaryWithIdAndCreatedAt(
                     diaryId, LocalDateTime.now(), user, emotion);
                 String imageUrl = "imageUrl";
-                List<ImageDto> imageList = List.of(ImageDto.of(
+                List<GetImageResponse> imageList = List.of(GetImageResponse.of(
                     LocalDateTime.now(), true, imageUrl));
                 String promptText = "promptText";
                 GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl,
