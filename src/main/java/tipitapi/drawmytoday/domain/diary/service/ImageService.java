@@ -32,7 +32,7 @@ public class ImageService {
         return imageRepository.findAllByDiaryDiaryId(diary.getDiaryId());
     }
 
-    public List<Image> getLastedImages(Diary diary) {
+    public List<Image> getLatestImages(Diary diary) {
         return imageRepository.findAllByDiaryDiaryIdOrderByCreatedAtDesc(diary.getDiaryId());
     }
 

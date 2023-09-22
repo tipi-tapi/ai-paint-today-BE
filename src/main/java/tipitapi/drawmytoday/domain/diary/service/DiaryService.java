@@ -49,7 +49,7 @@ public class DiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         diary.setNotes(encryptor.decrypt(diary.getNotes()));
 
-        List<Image> images = imageService.getLastedImages(diary);
+        List<Image> images = imageService.getLatestImages(diary);
         String selectedImageUrl = images.stream()
             .filter(Image::isSelected)
             .findFirst()
