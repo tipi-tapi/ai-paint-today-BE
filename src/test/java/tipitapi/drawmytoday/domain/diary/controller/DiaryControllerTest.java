@@ -44,6 +44,7 @@ import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
+import tipitapi.drawmytoday.domain.diary.dto.ImageDto;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -83,10 +84,11 @@ class DiaryControllerTest extends ControllerTestSetup {
                 Diary diary = TestDiary.createDiaryWithIdAndCreatedAt(
                     diaryId, LocalDateTime.now(), user, emotion);
                 String imageUrl = "imageUrl";
+                List<ImageDto> imageList = List.of(ImageDto.of(
+                    LocalDateTime.now(), true, imageUrl));
                 String promptText = "promptText";
                 GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl,
-                    emotionText,
-                    promptText);
+                    imageList, emotionText, promptText);
                 given(diaryService.getDiary(REQUEST_USER_ID, diaryId, language)).willReturn(
                     getDiaryResponse);
 
@@ -461,6 +463,26 @@ class DiaryControllerTest extends ControllerTestSetup {
     }
 
     @Nested
+    @DisplayName("regenerateDiaryImage 메서드는")
+    class RegenerateDiaryImageTest {
+
+        @Test
+        @DisplayName("diaryId에 해당하는 일기의 이미지를 재생성한다.")
+        void regenerate_diary_image() throws Exception {
+            // given
+            Long diaryId = 1L;
+
+            // when
+            ResultActions result = mockMvc.perform(
+                post(BASIC_URL + "/" + diaryId + "/regenerate")
+                    .with(SecurityMockMvcRequestPostProcessors.csrf()));
+
+            // then
+            result.andExpect(status().isCreated());
+            verify(createDiaryService).regenerateDiaryImage(REQUEST_USER_ID, diaryId);
+        }
+    }
+  
     @DisplayName("reviewDiary 메서드는")
     class ReviewDiaryTest {
 

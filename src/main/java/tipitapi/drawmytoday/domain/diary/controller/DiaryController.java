@@ -252,6 +252,30 @@ public class DiaryController {
         ).asHttp(HttpStatus.OK);
     }
 
+
+    @Operation(summary = "일기 이미지 재생성", description = "주어진 ID에 해당하는 일기를 기반으로 이미지를 재생성한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "일기 이미지 재생성 성공"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "T001 : 유효한 티켓이 존재하지 않습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "DE001 : DALL-E 이미지 생성에 실패하였습니다.\t\nIIS001 : 이미지 스트림을 가져오는데 실패하였습니다."
+                + "\t\nP001 : 기존에 그린 일기 이미지에 해당하는 프롬프트가 존재하지 않습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PostMapping("/{id}/regenerate")
+    public ResponseEntity<Void> regenerateDiaryImage(
+        @AuthUser JwtTokenInfo tokenInfo,
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
+    ) throws DallEException {
+        createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+
     @Operation(summary = "일기 평가", description = "주어진 ID의 일기를 평가한다.")
     @ApiResponses(value = {
         @ApiResponse(
