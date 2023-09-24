@@ -41,4 +41,8 @@ public class R2PreSignedService {
             throw new R2FailedException(e);
         }
     }
+
+    public String getCustomDomainUrl(String objectKey) {
+        return "https://choihyeok.site/" + objectKey;
+    }
 }

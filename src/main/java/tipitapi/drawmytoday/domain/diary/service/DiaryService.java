@@ -47,8 +47,8 @@ public class DiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         diary.setNotes(encryptor.decrypt(diary.getNotes()));
 
-        String imageUrl = r2PreSignedService.getPreSignedUrlForShare(
-            imageService.getImage(diary).getImageUrl(), 30);
+        String imageUrl = r2PreSignedService.getCustomDomainUrl(
+            imageService.getImage(diary).getImageUrl());
 
         String emotionText = diary.getEmotion().getEmotionText(language);
 
@@ -130,8 +130,8 @@ public class DiaryService {
                 return true;
             })
             .map(diary -> {
-                String imageUrl = r2PreSignedService.getPreSignedUrlForShare(
-                    diary.getImageList().get(0).getImageUrl(), 30);
+                String imageUrl = r2PreSignedService.getCustomDomainUrl(
+                    diary.getImageList().get(0).getImageUrl());
                 return GetMonthlyDiariesResponse.of(diary.getDiaryId(), imageUrl,
                     diary.getDiaryDate());
             })
