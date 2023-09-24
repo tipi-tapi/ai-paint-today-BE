@@ -54,12 +54,12 @@ public class DiaryService {
         String selectedImageUrl = images.stream()
             .filter(Image::isSelected)
             .findFirst()
-            .map(image -> r2PreSignedService.getPreSignedUrlForShare(image.getImageUrl(), 30))
+            .map(image -> r2PreSignedService.getCustomDomainUrl(image.getImageUrl()))
             .orElseThrow(ImageNotFoundException::new);
 
         List<GetImageResponse> sortedImages = images.stream()
             .map(image -> GetImageResponse.of(image.getCreatedAt(), image.isSelected(),
-                r2PreSignedService.getPreSignedUrlForShare(image.getImageUrl(), 30)))
+                r2PreSignedService.getCustomDomainUrl(image.getImageUrl())))
             .collect(Collectors.toList());
 
         String emotionText = diary.getEmotion().getEmotionText(language);
@@ -142,8 +142,8 @@ public class DiaryService {
                 return true;
             })
             .map(diary -> {
-                String imageUrl = r2PreSignedService.getPreSignedUrlForShare(
-                    diary.getImageList().get(0).getImageUrl(), 30);
+                String imageUrl = r2PreSignedService.getCustomDomainUrl(
+                    diary.getImageList().get(0).getImageUrl());
                 return GetMonthlyDiariesResponse.of(diary.getDiaryId(), imageUrl,
                     diary.getDiaryDate());
             })
