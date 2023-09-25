@@ -15,7 +15,6 @@ import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
-import tipitapi.drawmytoday.domain.diary.domain.ReviewType;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
@@ -152,10 +151,10 @@ public class DiaryService {
     }
 
     @Transactional
-    public void reviewDiary(Long userId, Long diaryId, ReviewType reviewType) {
+    public void reviewDiary(Long userId, Long diaryId, String review) {
         User user = validateUserService.validateUserById(userId);
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
 
-        diary.reviewDiary(reviewType);
+        diary.reviewDiary(review);
     }
 }

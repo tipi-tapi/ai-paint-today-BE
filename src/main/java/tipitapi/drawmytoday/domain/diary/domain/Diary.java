@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -63,8 +61,7 @@ public class Diary extends BaseEntityWithUpdate {
     @Column(length = 32)
     private String weather;
 
-    @Enumerated(EnumType.STRING)
-    private ReviewType review;
+    private String review;
 
     @OneToMany(mappedBy = "diary")
     private List<Image> imageList;
@@ -78,7 +75,7 @@ public class Diary extends BaseEntityWithUpdate {
     @Builder
     private Diary(User user, Emotion emotion, LocalDateTime diaryDate, String notes, boolean isAi,
         String title,
-        String weather, ReviewType review, boolean isTest) {
+        String weather, String review, boolean isTest) {
         this.user = user;
         this.emotion = emotion;
         this.diaryDate = diaryDate;
@@ -118,7 +115,7 @@ public class Diary extends BaseEntityWithUpdate {
         this.notes = notes;
     }
 
-    public void reviewDiary(ReviewType reviewType) {
+    public void reviewDiary(String reviewType) {
         this.review = reviewType;
     }
 }
