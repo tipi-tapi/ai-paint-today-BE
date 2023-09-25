@@ -115,7 +115,7 @@ public class Diary extends BaseEntityWithUpdate {
         this.notes = notes;
     }
 
-    public void reviewDiary(String reviewType) {
-        this.review = reviewType;
+    public void reviewDiary(String review) {
+        this.review = review;
     }
 }
