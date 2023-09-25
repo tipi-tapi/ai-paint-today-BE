@@ -32,7 +32,6 @@ import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
-import tipitapi.drawmytoday.domain.diary.domain.ReviewType;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
@@ -658,13 +657,14 @@ class DiaryServiceTest {
         void it_updates_diary_review() {
             User user = createUserWithId(1L);
             Diary diary = createDiaryWithId(1L, user, createEmotion());
+            String review = "5";
             given(validateUserService.validateUserById(1L)).willReturn(user);
             given(validateDiaryService.validateDiaryById(1L, user))
                 .willReturn(diary);
 
-            diaryService.reviewDiary(1L, 1L, ReviewType.GOOD);
+            diaryService.reviewDiary(1L, 1L, review);
 
-            assertThat(diary.getReview()).isEqualTo(ReviewType.GOOD);
+            assertThat(diary.getReview()).isEqualTo(review);
         }
     }
 }

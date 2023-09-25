@@ -37,7 +37,6 @@ import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
-import tipitapi.drawmytoday.domain.diary.domain.ReviewType;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
@@ -467,8 +466,8 @@ class DiaryControllerTest extends ControllerTestSetup {
     class ReviewDiaryTest {
 
         @ParameterizedTest
-        @ValueSource(strings = {"", "INVALID_REVIEW"})
-        @DisplayName("review 값이 없거나 잘못된 값이라면 BAD_REQUEST 상태코드를 응답한다.")
+        @ValueSource(strings = {"", "0", "6", "a"})
+        @DisplayName("review 값이 없거나 1~5 사이의 숫자가 아니면 BAD_REQUEST 상태코드를 응답한다.")
         void invalid_request_body_then_return_400(String review) throws Exception {
             // given
             Long diaryId = 1L;
@@ -486,16 +485,16 @@ class DiaryControllerTest extends ControllerTestSetup {
             result.andExpect(status().isBadRequest());
         }
 
-        @Test
-        @DisplayName("diaryId에 해당하는 일기를 리뷰한다.")
-        void review_diary() throws Exception {
+        @ParameterizedTest
+        @ValueSource(strings = {"1", "2", "3", "4", "5"})
+        @DisplayName("review에 1~5 사이의 값이 들어오면 diaryId에 해당하는 일기를 리뷰한다.")
+        void review_diary(String review) throws Exception {
             // given
             Long diaryId = 1L;
-            ReviewType reviewType = ReviewType.GOOD;
 
             // when
             Map<String, Object> requestMap = new HashMap<>();
-            requestMap.put("review", reviewType);
+            requestMap.put("review", review);
             String requestBody = objectMapper.writeValueAsString(requestMap);
             ResultActions result = mockMvc.perform(post(BASIC_URL + "/" + diaryId + "/review")
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -504,7 +503,7 @@ class DiaryControllerTest extends ControllerTestSetup {
 
             // then
             result.andExpect(status().isNoContent());
-            verify(diaryService).reviewDiary(diaryId, REQUEST_USER_ID, reviewType);
+            verify(diaryService).reviewDiary(diaryId, REQUEST_USER_ID, review);
         }
     }
 
