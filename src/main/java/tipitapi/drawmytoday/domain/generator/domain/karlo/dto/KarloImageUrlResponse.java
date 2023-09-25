@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class KarloImageUrlResponse {
 
     private String id;
-    private Integer seed;
+    private Long seed;
     @JsonProperty("image")
     private String imageUrl;
 }
