@@ -30,7 +30,7 @@ public class AdminDiaryService {
 
     private GetDiaryAdminResponse generatePresignedURL(GetDiaryAdminResponse response) {
         response.updateImageUrl(
-            r2PreSignedService.getPreSignedUrlForShare(response.getImageURL(), imageExpiration));
+            r2PreSignedService.getCustomDomainUrl(response.getImageURL()));
         return response;
     }
 }
