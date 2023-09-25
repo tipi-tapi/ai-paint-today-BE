@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.common.exception;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import tipitapi.drawmytoday.common.response.ErrorResponse;
 import tipitapi.drawmytoday.common.response.ErrorResponse.ValidationError;
-import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
-import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
+import tipitapi.drawmytoday.domain.generator.exception.ImageGeneratorException;
+import tipitapi.drawmytoday.domain.generator.exception.ImageInputStreamFailException;
 import tipitapi.drawmytoday.domain.r2.exception.R2FailedException;
 
 @RestControllerAdvice
@@ -92,10 +92,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ErrorCode.R2_FAILED);
     }
 
-    @ExceptionHandler(DallERequestFailException.class)
-    public ResponseEntity<Object> handleDallERequestFailException(DallERequestFailException e) {
-        log.error("DallERequestFailException", e);
-        return handleExceptionInternal(ErrorCode.DALLE_REQUEST_FAIL);
+    @ExceptionHandler(ImageGeneratorException.class)
+    public ResponseEntity<Object> handleImageGeneratorException(ImageGeneratorException e) {
+        log.error("ImageGeneratorException", e);
+        return handleExceptionInternal(e.getErrorCode());
     }
 
     @ExceptionHandler(ImageInputStreamFailException.class)

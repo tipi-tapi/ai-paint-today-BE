@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.domain.dalle.service;
+package tipitapi.drawmytoday.domain.generator.domain.dalle.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,12 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
-import tipitapi.drawmytoday.domain.dalle.dto.GeneratedImageAndPrompt;
-import tipitapi.drawmytoday.domain.dalle.exception.DallEPolicyViolationException;
-import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
 import tipitapi.drawmytoday.domain.diary.service.PromptService;
 import tipitapi.drawmytoday.domain.diary.service.PromptTextService;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.exception.DallEPolicyViolationException;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.exception.DallERequestFailException;
+import tipitapi.drawmytoday.domain.generator.dto.GeneratedImageAndPrompt;
 
 @ExtendWith(MockitoExtension.class)
 class DallEServiceTest {

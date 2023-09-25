@@ -1,8 +1,8 @@
-package tipitapi.drawmytoday.domain.dalle.dto;
+package tipitapi.drawmytoday.domain.generator.domain.dalle.dto;
 
 import java.util.List;
 import lombok.Getter;
-import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.exception.DallERequestFailException;
 
 @Getter
 public class DallEBase64Response {

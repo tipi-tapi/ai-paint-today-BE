@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.domain.dalle.service;
+package tipitapi.drawmytoday.domain.generator.domain.dalle.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -20,11 +20,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import tipitapi.drawmytoday.domain.dalle.dto.DallEUrlResponse;
-import tipitapi.drawmytoday.domain.dalle.dto.DallEUrlResponse.DallEUrl;
-import tipitapi.drawmytoday.domain.dalle.exception.DallEPolicyViolationException;
-import tipitapi.drawmytoday.domain.dalle.exception.DallERequestFailException;
-import tipitapi.drawmytoday.domain.dalle.exception.ImageInputStreamFailException;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.dto.DallEUrlResponse;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.dto.DallEUrlResponse.DallEUrl;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.exception.DallEPolicyViolationException;
+import tipitapi.drawmytoday.domain.generator.domain.dalle.exception.DallERequestFailException;
+import tipitapi.drawmytoday.domain.generator.exception.ImageInputStreamFailException;
 
 @ExtendWith(MockitoExtension.class)
 class DallERequestServiceTest {

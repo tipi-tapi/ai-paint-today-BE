@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.domain.dalle.dto;
+package tipitapi.drawmytoday.domain.generator.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

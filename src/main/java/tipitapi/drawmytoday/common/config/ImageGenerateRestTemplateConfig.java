@@ -7,10 +7,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class OpenAIRestTemplateConfig {
+public class ImageGenerateRestTemplateConfig {
 
     @Value("${openai.api.key}")
     private String openaiApiKey;
+
+    @Value("${kakao.api.key}")
+    private String kakaoApiKey;
 
     @Bean
     @Qualifier("openaiRestTemplate")
@@ -18,6 +21,16 @@ public class OpenAIRestTemplateConfig {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add((request, body, execution) -> {
             request.getHeaders().add("Authorization", "Bearer " + openaiApiKey);
+            return execution.execute(request, body);
+        });
+        return restTemplate;
+    }
+
+    @Bean
+    public RestTemplate karloRestTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().add("Authorization", "KakaoAK " + kakaoApiKey);
             return execution.execute(request, body);
         });
         return restTemplate;

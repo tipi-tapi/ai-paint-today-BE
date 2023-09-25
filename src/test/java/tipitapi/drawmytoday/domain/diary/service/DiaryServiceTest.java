@@ -91,7 +91,7 @@ class DiaryServiceTest {
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getImages(diary)).willReturn(images);
+                given(imageService.getLatestImages(diary)).willReturn(images);
                 given(
                     r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");
@@ -115,7 +115,7 @@ class DiaryServiceTest {
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getImages(diary)).willReturn(images);
+                given(imageService.getLatestImages(diary)).willReturn(images);
                 given(
                     r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");
@@ -139,7 +139,7 @@ class DiaryServiceTest {
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getImages(diary)).willReturn(images);
+                given(imageService.getLatestImages(diary)).willReturn(images);
                 given(
                     r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
                 ).willReturn("https://test.com");
