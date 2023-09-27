@@ -5,11 +5,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithId;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithIdAndCreatedAt;
 import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotion;
 import static tipitapi.drawmytoday.common.testdata.TestImage.createImage;
+import static tipitapi.drawmytoday.common.testdata.TestImage.createImageWithId;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
@@ -69,6 +72,8 @@ class DiaryServiceTest {
     PromptService promptService;
     @Mock
     ValidateTicketService validateTicketService;
+    @Mock
+    ValidateImageService validateImageService;
     @InjectMocks
     DiaryService diaryService;
 
@@ -653,18 +658,19 @@ class DiaryServiceTest {
     class ReviewDiaryTest {
 
         @Test
-        @DisplayName("userId와 diaryId 검증 이후 diary의 review를 input으로 받은 review로 수정한다.")
+        @DisplayName("userId와 imageId 검증 이후 review를 업데이트한다.")
         void it_updates_diary_review() {
             User user = createUserWithId(1L);
             Diary diary = createDiaryWithId(1L, user, createEmotion());
+            Image image = createImageWithId(1L, diary);
             String review = "5";
-            given(validateUserService.validateUserById(1L)).willReturn(user);
-            given(validateDiaryService.validateDiaryById(1L, user))
-                .willReturn(diary);
+            given(validateUserService.validateUserById(any(Long.class))).willReturn(user);
+            given(validateImageService.validateImageById(any(Long.class))).willReturn(image);
 
             diaryService.reviewDiary(1L, 1L, review);
 
-            assertThat(diary.getReview()).isEqualTo(review);
+            assertThat(image.getReview()).isEqualTo(review);
+            verify(validateImageService).validateImageOwner(eq(image.getImageId()), eq(user));
         }
     }
 }
