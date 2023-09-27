@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.domain.diary.domain;
 
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,8 +13,10 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 
+@SQLDelete(sql = "UPDATE image SET deleted_at = current_timestamp WHERE image_id = ?")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -34,6 +37,8 @@ public class Image extends BaseEntity {
 
     @NotNull
     private boolean isSelected;
+
+    private LocalDateTime deletedAt;
 
     private Image(Diary diary, String imageUrl, boolean isSelected) {
         this.diary = diary;
