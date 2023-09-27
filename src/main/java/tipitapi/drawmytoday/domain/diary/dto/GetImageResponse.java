@@ -18,6 +18,8 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class GetImageResponse {
 
+    private Long id;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @Schema(description = "이미지 생성 시각", requiredMode = RequiredMode.REQUIRED)
@@ -29,7 +31,8 @@ public class GetImageResponse {
     @Schema(description = "이미지 URL", requiredMode = RequiredMode.REQUIRED)
     private String url;
 
-    public static GetImageResponse of(LocalDateTime createdAt, boolean selected, String url) {
-        return new GetImageResponse(createdAt, selected, url);
+    public static GetImageResponse of
+        (Long id, LocalDateTime createdAt, boolean selected, String url) {
+        return new GetImageResponse(id, createdAt, selected, url);
     }
 }
