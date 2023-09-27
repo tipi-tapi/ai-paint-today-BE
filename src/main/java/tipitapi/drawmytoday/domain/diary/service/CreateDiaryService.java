@@ -64,6 +64,7 @@ public class CreateDiaryService {
         String notes, LocalDate diaryDate, LocalTime userTime) {
         User user = validateUserService.validateAdminUserById(userId);
         validateDiaryService.validateExistsByDate(userId, diaryDate);
+        validateTicketService.findAndUseTicket(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
         LocalDateTime diaryDateTime = diaryDate.atTime(userTime);
 
