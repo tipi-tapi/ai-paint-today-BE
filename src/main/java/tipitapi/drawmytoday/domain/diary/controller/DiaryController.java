@@ -269,10 +269,10 @@ public class DiaryController {
     @PostMapping("/{id}/review")
     public ResponseEntity<Void> reviewDiary(
         @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long imageId,
         @RequestBody @Valid ReviewDiaryRequest reviewDiaryRequest
     ) {
-        diaryService.reviewDiary(tokenInfo.getUserId(), diaryId, reviewDiaryRequest.getReview());
+        diaryService.reviewDiary(tokenInfo.getUserId(), imageId, reviewDiaryRequest.getReview());
         return ResponseEntity.noContent().build();
     }
 
