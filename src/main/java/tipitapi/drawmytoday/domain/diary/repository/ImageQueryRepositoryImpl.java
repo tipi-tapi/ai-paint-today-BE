@@ -24,7 +24,6 @@ public class ImageQueryRepositoryImpl implements ImageQueryRepository {
 
     @Override
     public Optional<Image> findImage(Long imageId) {
-
         return Optional.ofNullable(
             queryFactory
                 .selectFrom(image)
