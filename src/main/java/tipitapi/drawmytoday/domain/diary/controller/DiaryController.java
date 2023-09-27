@@ -259,17 +259,17 @@ public class DiaryController {
             description = "성공적으로 일기를 평가함"),
         @ApiResponse(
             responseCode = "403",
-            description = "D002 : 자신의 일기에만 접근할 수 있습니다.",
+            description = "I002 : 자신의 이미지에만 접근할 수 있습니다.",
             content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(
             responseCode = "404",
-            description = "D001 : 일기를 찾을 수 없습니다.",
+            description = "I001 : 이미지를 찾을 수 없습니다.",
             content = @Content(schema = @Schema(hidden = true))),
     })
     @PostMapping("/{id}/review")
     public ResponseEntity<Void> reviewDiary(
         @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long imageId,
+        @Parameter(description = "이미지 id", in = ParameterIn.PATH) @PathVariable("id") Long imageId,
         @RequestBody @Valid ReviewDiaryRequest reviewDiaryRequest
     ) {
         diaryService.reviewDiary(tokenInfo.getUserId(), imageId, reviewDiaryRequest.getReview());
