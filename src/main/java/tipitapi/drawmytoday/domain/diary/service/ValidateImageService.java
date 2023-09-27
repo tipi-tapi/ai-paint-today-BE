@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
 import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
+import tipitapi.drawmytoday.domain.diary.exception.NotOwnerOfImageException;
 import tipitapi.drawmytoday.domain.diary.repository.ImageRepository;
 import tipitapi.drawmytoday.domain.user.domain.User;
 
@@ -15,8 +16,12 @@ public class ValidateImageService {
 
     private final ImageRepository imageRepository;
 
-    public Image validateImageByUserId(Long imageId, User user) {
-        return imageRepository.findByImageIdAndDiaryUser(imageId, user)
-            .orElseThrow(ImageNotFoundException::new);
+    public Image validateImageById(Long imageId) {
+        return imageRepository.findById(imageId).orElseThrow(ImageNotFoundException::new);
+    }
+
+    public void validateImageOwner(Long imageId, User user) {
+        imageRepository.findByImageIdAndDiaryUser(imageId, user)
+            .orElseThrow(NotOwnerOfImageException::new);
     }
 }

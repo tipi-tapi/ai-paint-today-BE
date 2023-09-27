@@ -154,7 +154,8 @@ public class DiaryService {
     @Transactional
     public void reviewDiary(Long userId, Long imageId, String review) {
         User user = validateUserService.validateUserById(userId);
-        Image image = validateImageService.validateImageByUserId(imageId, user);
+        Image image = validateImageService.validateImageById(imageId);
+        validateImageService.validateImageOwner(imageId, user);
 
         image.reviewDiary(review);
     }

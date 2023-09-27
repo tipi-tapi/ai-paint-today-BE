@@ -5,7 +5,7 @@ import tipitapi.drawmytoday.common.exception.ErrorCode;
 
 public class NotOwnerOfImageException extends BusinessException {
 
-    public NotOwnerOfImageException(ErrorCode errorCode) {
-        super(errorCode);
+    public NotOwnerOfImageException() {
+        super(ErrorCode.IMAGE_NOT_OWNER);
     }
 }

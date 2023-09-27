@@ -6,6 +6,6 @@ import tipitapi.drawmytoday.common.exception.ErrorCode;
 public class NotOwnerOfDiaryException extends BusinessException {
 
     public NotOwnerOfDiaryException() {
-        super(ErrorCode.IMAGE_NOT_OWNER);
+        super(ErrorCode.DIARY_NOT_OWNER);
     }
 }
