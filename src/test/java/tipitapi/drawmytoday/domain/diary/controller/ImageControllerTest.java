@@ -28,4 +28,23 @@ class ImageControllerTest extends ControllerTestSetup {
     @MockBean
     private ImageService imageService;
 
+    @Nested
+    @DisplayName("deleteImage 메서드는")
+    class DeleteImageTest {
+
+        @Test
+        @DisplayName("imageId에 해당하는 일기를 삭제한다.")
+        void delete_image() throws Exception {
+            // given
+            Long imageId = 1L;
+
+            // when
+            ResultActions result = mockMvc.perform(delete(BASIC_URL + "/" + imageId)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()));
+
+            // then
+            result.andExpect(status().isNoContent());
+            verify(imageService).deleteImage(imageId, REQUEST_USER_ID);
+        }
+    }
 }

@@ -26,4 +26,38 @@ public class ImageController {
 
     private final ImageService imageService;
 
+    @Operation(summary = "일기 이미지 삭제", description = "주어진 ID의 일기 이미지를 삭제(Soft Delete)한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "성공적으로 일기 이미지를 삭제함"),
+        @ApiResponse(
+            responseCode = "403",
+            description = "D002 : 자신의 일기에만 접근할 수 있습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "403",
+            description = "I002 : 대표 이미지는 삭제할 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "403",
+            description = "I003 : 일기는 최소 한 장의 이미지가 필요합니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "D001 : 일기를 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "I001 : 선택된 이미지를 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteImage(
+        @AuthUser JwtTokenInfo tokenInfo,
+        @Parameter(description = "일기 이미지 id", in = ParameterIn.PATH) @PathVariable("id") Long imageId
+    ) {
+        imageService.deleteImage(tokenInfo.getUserId(), imageId);
+        return ResponseEntity.noContent().build();
+    }
 }
