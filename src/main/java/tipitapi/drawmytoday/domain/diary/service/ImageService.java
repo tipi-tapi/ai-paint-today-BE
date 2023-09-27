@@ -39,7 +39,7 @@ public class ImageService {
     }
 
     public List<Image> getLatestImages(Diary diary) {
-        return imageRepository.findAllByDiaryDiaryIdOrderByCreatedAtDesc(diary.getDiaryId());
+        return imageRepository.findLatestByDiary(diary.getDiaryId());
     }
 
     public Image createImage(Diary diary, String imagePath, boolean isSelected) {

@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.domain.diary.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -114,6 +115,27 @@ class ImageRepositoryTest extends BaseRepositoryTest {
                 assertThat(imageRepository.findAllByDiaryDiaryId(diary.getDiaryId()))
                     .isEmpty();
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("findLatestByDiary 메서드 테스트")
+    class FindLatestByDiary {
+
+        @Test
+        @DisplayName("주어진 일기의 최신순 이미지 목록을 반환한다.")
+        void it_returns_latest_images_of_diary() {
+            Diary diary = createDiaryWithId(1L, createUser());
+            Image image1 = createImage(1L, diary);
+            Image image2 = createImage(2L, diary);
+            Image deletedImage = createImage(3L, diary);
+            imageRepository.delete(deletedImage);
+
+            List<Image> result = imageRepository.findLatestByDiary(diary.getDiaryId());
+
+            assertThat(result.size()).isEqualTo(2);
+            assertThat(result.get(0).getImageId()).isEqualTo(image2.getImageId());
+            assertThat(result.get(1).getImageId()).isEqualTo(image1.getImageId());
         }
     }
 
