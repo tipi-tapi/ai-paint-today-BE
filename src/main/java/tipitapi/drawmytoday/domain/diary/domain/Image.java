@@ -13,8 +13,8 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
+import org.hibernate.annotations.SQLDelete;
 
 @SQLDelete(sql = "UPDATE image SET deleted_at = current_timestamp WHERE image_id = ?")
 @Getter
@@ -38,6 +38,8 @@ public class Image extends BaseEntity {
     @NotNull
     private boolean isSelected;
 
+    private String review;
+
     private LocalDateTime deletedAt;
 
     private Image(Diary diary, String imageUrl, boolean isSelected) {
@@ -53,5 +55,9 @@ public class Image extends BaseEntity {
 
     public void setSelected(boolean isSelected) {
         this.isSelected = isSelected;
+    }
+
+    public void reviewDiary(String review) {
+        this.review = review;
     }
 }

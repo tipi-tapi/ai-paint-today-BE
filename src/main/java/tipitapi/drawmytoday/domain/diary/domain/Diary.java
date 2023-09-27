@@ -61,8 +61,6 @@ public class Diary extends BaseEntityWithUpdate {
     @Column(length = 32)
     private String weather;
 
-    private String review;
-
     @OneToMany(mappedBy = "diary")
     private List<Image> imageList;
 
@@ -74,8 +72,7 @@ public class Diary extends BaseEntityWithUpdate {
 
     @Builder
     private Diary(User user, Emotion emotion, LocalDateTime diaryDate, String notes, boolean isAi,
-        String title,
-        String weather, String review, boolean isTest) {
+        String title, String weather, boolean isTest) {
         this.user = user;
         this.emotion = emotion;
         this.diaryDate = diaryDate;
@@ -83,7 +80,6 @@ public class Diary extends BaseEntityWithUpdate {
         this.isAi = isAi;
         this.title = title;
         this.weather = weather;
-        this.review = review;
         this.isTest = isTest;
         this.imageList = new ArrayList<>();
     }
@@ -115,7 +111,4 @@ public class Diary extends BaseEntityWithUpdate {
         this.notes = notes;
     }
 
-    public void reviewDiary(String review) {
-        this.review = review;
-    }
 }
