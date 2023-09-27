@@ -43,7 +43,9 @@ public enum ErrorCode {
     DIARY_DATE_ALREADY_EXISTS(409, "D004", "이미 일기를 그린 날짜입니다."),
 
     // Image
-    IMAGE_NOT_FOUND(404, "I001", "선택된 이미지를 찾을 수 없습니다."),
+    IMAGE_NOT_FOUND(404, "I001", "이미지를 찾을 수 없습니다."),
+    SELECTED_IMAGE_DELETION_DENIED(403, "I002", "대표 이미지는 삭제할 수 없습니다."),
+    DIARY_NEEDS_IMAGE(403, "I003", "일기는 최소 한 장의 이미지가 필요합니다."),
 
     // Emotion
     EMOTION_NOT_FOUND(404, "E001", "감정을 찾을 수 없습니다."),
