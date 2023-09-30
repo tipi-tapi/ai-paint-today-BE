@@ -58,8 +58,9 @@ public class DiaryService {
             .orElseThrow(ImageNotFoundException::new);
 
         List<GetImageResponse> sortedImages = images.stream()
-            .map(image -> GetImageResponse.of(image.getCreatedAt(), image.isSelected(),
-                r2PreSignedService.getCustomDomainUrl(image.getImageUrl())))
+            .map(image ->
+                GetImageResponse.of(image.getImageId(), image.getCreatedAt(), image.isSelected(),
+                    r2PreSignedService.getCustomDomainUrl(image.getImageUrl())))
             .collect(Collectors.toList());
 
         String emotionText = diary.getEmotion().getEmotionText(language);

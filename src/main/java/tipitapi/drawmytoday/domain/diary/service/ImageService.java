@@ -8,9 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
+import tipitapi.drawmytoday.domain.diary.exception.DiaryNeedsImageException;
 import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
+import tipitapi.drawmytoday.domain.diary.exception.SelectedImageDeletionDeniedException;
 import tipitapi.drawmytoday.domain.diary.repository.ImageRepository;
 import tipitapi.drawmytoday.domain.r2.service.R2Service;
+import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
 @Service
 @Transactional(readOnly = true)
@@ -19,6 +23,8 @@ public class ImageService {
 
     private final ImageRepository imageRepository;
     private final R2Service r2Service;
+    private final ValidateUserService validateUserService;
+    private final ValidateDiaryService validateDiaryService;
 
     @Value("${spring.profiles.active:Unknown}")
     private String profile;
@@ -33,7 +39,7 @@ public class ImageService {
     }
 
     public List<Image> getLatestImages(Diary diary) {
-        return imageRepository.findAllByDiaryDiaryIdOrderByCreatedAtDesc(diary.getDiaryId());
+        return imageRepository.findLatestByDiary(diary.getDiaryId());
     }
 
     public Image createImage(Diary diary, String imagePath, boolean isSelected) {
@@ -51,5 +57,27 @@ public class ImageService {
     public void unSelectAllImage(Long diaryId) {
         imageRepository.findAllByDiaryDiaryId(diaryId)
             .forEach(image -> image.setSelected(false));
+    }
+
+    @Transactional
+    public void deleteImage(Long userId, Long imageId) {
+        User user = validateUserService.validateUserById(userId);
+        Image image = validateImage(imageId, user);
+
+        imageRepository.delete(image);
+    }
+
+    private Image validateImage(Long imageId, User user) {
+        Image image = imageRepository.findImage(imageId).orElseThrow(ImageNotFoundException::new);
+        if (image.isSelected()) {
+            throw new SelectedImageDeletionDeniedException();
+        }
+
+        validateDiaryService.validateDiaryById(image.getDiary().getDiaryId(), user);
+
+        if (imageRepository.countImage(image.getDiary().getDiaryId()) <= 1) {
+            throw new DiaryNeedsImageException();
+        }
+        return image;
     }
 }

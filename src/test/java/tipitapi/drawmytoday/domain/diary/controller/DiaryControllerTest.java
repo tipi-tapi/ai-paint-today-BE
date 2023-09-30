@@ -85,7 +85,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                     diaryId, LocalDateTime.now(), user, emotion);
                 String imageUrl = "imageUrl";
                 List<GetImageResponse> imageList = List.of(GetImageResponse.of(
-                    LocalDateTime.now(), true, imageUrl));
+                    1L, LocalDateTime.now(), true, imageUrl));
                 String promptText = "promptText";
                 GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl,
                     imageList, emotionText, promptText);

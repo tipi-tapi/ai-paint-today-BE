@@ -6,11 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
 
-public interface ImageRepository extends JpaRepository<Image, Long> {
+public interface ImageRepository extends JpaRepository<Image, Long>, ImageQueryRepository {
 
     Optional<Image> findByIsSelectedTrueAndDiary(Diary diary);
 
     List<Image> findAllByDiaryDiaryId(Long diaryId);
-
-    List<Image> findAllByDiaryDiaryIdOrderByCreatedAtDesc(Long diaryId);
 }
