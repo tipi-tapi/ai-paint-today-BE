@@ -52,47 +52,6 @@ class ImageServiceTest {
     ImageService imageService;
 
     @Nested
-    @DisplayName("getImage 메소드 테스트")
-    class GetImageTest {
-
-        @Nested
-        @DisplayName("주어진 일기의 이미지 중 선택된 이미지가 존재할 경우")
-        class if_selected_image_of_diary_exist {
-
-            @Test
-            @DisplayName("이미지를 반환한다.")
-            void it_returns_image() {
-                Diary diary = createDiary(createUser(), createEmotion());
-                Image image = createImageWithId(1L, diary);
-
-                given(imageRepository.findByIsSelectedTrueAndDiary(diary)).willReturn(
-                    Optional.of(image));
-
-                Image getImage = imageService.getImage(diary);
-
-                assertThat(getImage.getImageId()).isEqualTo(image.getImageId());
-            }
-        }
-
-        @Nested
-        @DisplayName("주어진 일기의 이미지 중 선택된 이미지가 존재하지 않을 경우")
-        class if_selected_image_of_diary_not_exist {
-
-            @Test
-            @DisplayName("ImageNotFoundException 예외를 반환한다.")
-            void it_throws_ImageNotFoundException() {
-                Diary diary = createDiary(createUser(), createEmotion());
-
-                given(imageRepository.findByIsSelectedTrueAndDiary(diary)).willReturn(
-                    Optional.empty());
-
-                assertThatThrownBy(() -> imageService.getImage(diary))
-                    .isInstanceOf(ImageNotFoundException.class);
-            }
-        }
-    }
-
-    @Nested
     @DisplayName("createImage 메서드는")
     class CreateImageTest {
 

@@ -42,6 +42,14 @@ public class ImageQueryRepositoryImpl implements ImageQueryRepository {
     }
 
     @Override
+    public List<Image> findByDiary(Long diaryId) {
+        return queryFactory
+            .selectFrom(image)
+            .where(image.diary.diaryId.eq(diaryId).and(image.deletedAt.isNull()))
+            .fetch();
+    }
+
+    @Override
     public Optional<Image> findByImageIdAndDiaryUser(Long imageId, User user) {
         return Optional.ofNullable(queryFactory
             .selectFrom(image)

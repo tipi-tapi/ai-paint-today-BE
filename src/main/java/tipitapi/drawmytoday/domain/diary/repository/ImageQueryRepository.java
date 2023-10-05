@@ -13,5 +13,8 @@ public interface ImageQueryRepository {
 
     Long countImage(Long diaryId);
 
+    List<Image> findByDiary(Long diaryId);
+
     Optional<Image> findByImageIdAndDiaryUser(Long imageId, User user);
+
 }
