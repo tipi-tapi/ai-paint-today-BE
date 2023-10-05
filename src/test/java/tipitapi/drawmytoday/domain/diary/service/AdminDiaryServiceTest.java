@@ -54,6 +54,8 @@ class AdminDiaryServiceTest {
                 diaryRepository.getDiariesForMonitorAsPage(any(Pageable.class),
                     any(Direction.class), eq(1L)))
                 .willReturn(new PageImpl<>(diaries));
+            given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
+                .willReturn("https://test.com");
 
             // when
             Page<GetDiaryAdminResponse> response = adminDiaryService.getDiaries(10, 0,
