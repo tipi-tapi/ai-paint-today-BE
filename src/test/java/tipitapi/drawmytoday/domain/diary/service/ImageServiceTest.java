@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -13,6 +14,7 @@ import static tipitapi.drawmytoday.common.testdata.TestEmotion.createEmotion;
 import static tipitapi.drawmytoday.common.testdata.TestImage.createImage;
 import static tipitapi.drawmytoday.common.testdata.TestImage.createImageWithId;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUser;
+import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +46,8 @@ class ImageServiceTest {
     ValidateUserService validateUserService;
     @Mock
     ValidateDiaryService validateDiaryService;
+    @Mock
+    ValidateImageService validateImageService;
     @InjectMocks
     ImageService imageService;
 
@@ -196,6 +200,27 @@ class ImageServiceTest {
                 assertThatThrownBy(() -> imageService.deleteImage(1L, 1L))
                     .isInstanceOf(DiaryNeedsImageException.class);
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("reviewDiary 메소드 테스트")
+    class ReviewDiaryTest {
+
+        @Test
+        @DisplayName("userId와 imageId 검증 이후 review를 업데이트한다.")
+        void it_updates_diary_review() {
+            User user = createUserWithId(1L);
+            Diary diary = createDiaryWithId(1L, user, createEmotion());
+            Image image = createImageWithId(1L, diary);
+            String review = "5";
+            given(validateUserService.validateUserById(any(Long.class))).willReturn(user);
+            given(validateImageService.validateImageById(any(Long.class))).willReturn(image);
+
+            imageService.reviewDiary(1L, 1L, review);
+
+            assertThat(image.getReview()).isEqualTo(review);
+            verify(validateImageService).validateImageOwner(eq(image.getImageId()), eq(user));
         }
     }
 }

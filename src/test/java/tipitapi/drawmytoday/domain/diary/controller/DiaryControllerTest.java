@@ -22,8 +22,6 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -458,52 +456,6 @@ class DiaryControllerTest extends ControllerTestSetup {
                     parseLocalDateTime(lastDiaryCreatedDate)))
                 .andExpect(jsonPath("$.data.ticketCreatedAt").value(
                     parseLocalDateTime(validRewardCreatedDate)));
-        }
-    }
-
-    @Nested
-    @DisplayName("reviewDiary 메서드는")
-    class ReviewDiaryTest {
-
-        @ParameterizedTest
-        @ValueSource(strings = {"", "0", "6", "a"})
-        @DisplayName("review 값이 없거나 1~5 사이의 숫자가 아니면 BAD_REQUEST 상태코드를 응답한다.")
-        void invalid_request_body_then_return_400(String review) throws Exception {
-            // given
-            Long diaryId = 1L;
-
-            // when
-            Map<String, Object> requestMap = new HashMap<>();
-            requestMap.put("review", review);
-            String requestBody = objectMapper.writeValueAsString(requestMap);
-            ResultActions result = mockMvc.perform(post(BASIC_URL + "/" + diaryId + "/review")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody));
-
-            // then
-            result.andExpect(status().isBadRequest());
-        }
-
-        @ParameterizedTest
-        @ValueSource(strings = {"1", "2", "3", "4", "5"})
-        @DisplayName("review에 1~5 사이의 값이 들어오면 diaryId에 해당하는 일기를 리뷰한다.")
-        void review_diary(String review) throws Exception {
-            // given
-            Long diaryId = 1L;
-
-            // when
-            Map<String, Object> requestMap = new HashMap<>();
-            requestMap.put("review", review);
-            String requestBody = objectMapper.writeValueAsString(requestMap);
-            ResultActions result = mockMvc.perform(post(BASIC_URL + "/" + diaryId + "/review")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody));
-
-            // then
-            result.andExpect(status().isNoContent());
-            verify(diaryService).reviewDiary(diaryId, REQUEST_USER_ID, review);
         }
     }
 
