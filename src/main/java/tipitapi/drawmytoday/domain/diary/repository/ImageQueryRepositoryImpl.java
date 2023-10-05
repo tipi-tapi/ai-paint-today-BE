@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
+import tipitapi.drawmytoday.domain.user.domain.User;
 
 @RequiredArgsConstructor
 public class ImageQueryRepositoryImpl implements ImageQueryRepository {
@@ -46,5 +47,15 @@ public class ImageQueryRepositoryImpl implements ImageQueryRepository {
             .selectFrom(image)
             .where(image.diary.diaryId.eq(diaryId).and(image.deletedAt.isNull()))
             .fetch();
+    }
+
+    @Override
+    public Optional<Image> findByImageIdAndDiaryUser(Long imageId, User user) {
+        return Optional.ofNullable(queryFactory
+            .selectFrom(image)
+            .where(image.imageId.eq(imageId)
+                .and(image.diary.user.eq(user))
+                .and(image.deletedAt.isNull()))
+            .fetchFirst());
     }
 }

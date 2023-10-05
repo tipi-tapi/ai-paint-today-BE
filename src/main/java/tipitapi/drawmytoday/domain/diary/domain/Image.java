@@ -38,6 +38,8 @@ public class Image extends BaseEntity {
     @NotNull
     private boolean isSelected;
 
+    private String review;
+
     private LocalDateTime deletedAt;
 
     private Image(Diary diary, String imageUrl, boolean isSelected) {
@@ -53,5 +55,9 @@ public class Image extends BaseEntity {
 
     public void setSelected(boolean isSelected) {
         this.isSelected = isSelected;
+    }
+
+    public void reviewImage(String review) {
+        this.review = review;
     }
 }

@@ -46,6 +46,7 @@ public enum ErrorCode {
     IMAGE_NOT_FOUND(404, "I001", "이미지를 찾을 수 없습니다."),
     SELECTED_IMAGE_DELETION_DENIED(403, "I002", "대표 이미지는 삭제할 수 없습니다."),
     DIARY_NEEDS_IMAGE(403, "I003", "일기는 최소 한 장의 이미지가 필요합니다."),
+    IMAGE_NOT_OWNER(403, "I004", "자신의 이미지에만 접근할 수 있습니다."),
 
     // Emotion
     EMOTION_NOT_FOUND(404, "E001", "감정을 찾을 수 없습니다."),
