@@ -93,9 +93,8 @@ class DiaryServiceTest {
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
                 given(imageService.getLatestImages(diary)).willReturn(images);
-                given(
-                    r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
-                ).willReturn("https://test.com");
+                given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
+                    .willReturn("https://test.com");
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
 
@@ -117,9 +116,8 @@ class DiaryServiceTest {
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
                 given(imageService.getLatestImages(diary)).willReturn(images);
-                given(
-                    r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
-                ).willReturn("https://test.com");
+                given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
+                    .willReturn("https://test.com");
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
 
@@ -141,9 +139,8 @@ class DiaryServiceTest {
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
                 given(imageService.getLatestImages(diary)).willReturn(images);
-                given(
-                    r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
-                ).willReturn("https://test.com");
+                given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
+                    .willReturn("https://test.com");
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
 

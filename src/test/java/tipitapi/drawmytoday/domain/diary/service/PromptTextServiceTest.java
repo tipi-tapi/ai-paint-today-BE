@@ -28,7 +28,7 @@ class PromptTextServiceTest {
         class KeywordIs {
 
             @Test
-            @DisplayName("null이면 keyword 자리에 emotions을 넣어 반환한다.")
+            @DisplayName("null이면 keyword 자리에 portrait을 넣어 반환한다.")
             void nullThanAddEmotional() throws Exception {
                 //given
                 Emotion emotion = TestEmotion.createEmotion();
@@ -37,12 +37,12 @@ class PromptTextServiceTest {
                 String promptText = promptTextService.createPromptText(emotion, keyword);
 
                 //then
-                assertThat(promptText).contains("emotions");
+                assertThat(promptText).contains("portrait");
             }
 
             @ParameterizedTest
             @ValueSource(strings = {"", " ", "  "})
-            @DisplayName("비어있으면 keyword 자리에 emotions을 넣어 반환한다.")
+            @DisplayName("비어있으면 keyword 자리에 portrait을을 넣어 반환한다.")
             void emptyThanAddEmotional(String keyword) throws Exception {
                 //given
                 Emotion emotion = TestEmotion.createEmotion();
@@ -51,7 +51,7 @@ class PromptTextServiceTest {
                 String promptText = promptTextService.createPromptText(emotion, keyword);
 
                 //then
-                assertThat(promptText).contains("emotions");
+                assertThat(promptText).contains("portrait");
             }
 
             @Test
