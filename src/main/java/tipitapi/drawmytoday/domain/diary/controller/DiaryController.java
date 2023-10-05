@@ -33,7 +33,6 @@ import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
-import tipitapi.drawmytoday.domain.diary.dto.ReviewDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.dto.UpdateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
@@ -250,30 +249,6 @@ public class DiaryController {
         return SuccessResponse.of(
             diaryService.getDrawLimit(tokenInfo.getUserId())
         ).asHttp(HttpStatus.OK);
-    }
-
-    @Operation(summary = "일기 평가", description = "주어진 ID의 일기를 평가한다.")
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "204",
-            description = "성공적으로 일기를 평가함"),
-        @ApiResponse(
-            responseCode = "403",
-            description = "D002 : 자신의 일기에만 접근할 수 있습니다.",
-            content = @Content(schema = @Schema(hidden = true))),
-        @ApiResponse(
-            responseCode = "404",
-            description = "D001 : 일기를 찾을 수 없습니다.",
-            content = @Content(schema = @Schema(hidden = true))),
-    })
-    @PostMapping("/{id}/review")
-    public ResponseEntity<Void> reviewDiary(
-        @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
-        @RequestBody @Valid ReviewDiaryRequest reviewDiaryRequest
-    ) {
-        diaryService.reviewDiary(tokenInfo.getUserId(), diaryId, reviewDiaryRequest.getReview());
-        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "일기 이미지 재생성", description = "주어진 ID에 해당하는 일기를 기반으로 이미지를 재생성한다.")
