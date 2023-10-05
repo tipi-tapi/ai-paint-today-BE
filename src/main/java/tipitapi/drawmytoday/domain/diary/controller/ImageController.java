@@ -65,11 +65,11 @@ public class ImageController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "일기 평가", description = "주어진 ID의 일기를 평가한다.")
+    @Operation(summary = "이미지 평가", description = "주어진 ID의 일기를 평가한다.")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "204",
-            description = "성공적으로 일기를 평가함"),
+            description = "성공적으로 이미지를 평가함"),
         @ApiResponse(
             responseCode = "403",
             description = "I004 : 자신의 이미지에만 접근할 수 있습니다.",
