@@ -39,4 +39,12 @@ public class ImageQueryRepositoryImpl implements ImageQueryRepository {
             .where(image.diary.diaryId.eq(diaryId).and(image.deletedAt.isNull()))
             .fetchOne();
     }
+
+    @Override
+    public List<Image> findByDiary(Long diaryId) {
+        return queryFactory
+            .selectFrom(image)
+            .where(image.diary.diaryId.eq(diaryId).and(image.deletedAt.isNull()))
+            .fetch();
+    }
 }

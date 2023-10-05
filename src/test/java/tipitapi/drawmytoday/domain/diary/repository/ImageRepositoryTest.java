@@ -26,9 +26,8 @@ class ImageRepositoryTest extends BaseRepositoryTest {
     ImageRepository imageRepository;
 
     @Nested
-    @Nested
-    @DisplayName("findAllByDiaryDiaryId 메소드 테스트")
-    class FindAllByDiaryDiaryIdTest {
+    @DisplayName("findByDiary 메소드 테스트")
+    class FindByDiaryTest {
 
         @Nested
         @DisplayName("주어진 일기의 이미지가 존재할 경우")
@@ -41,7 +40,7 @@ class ImageRepositoryTest extends BaseRepositoryTest {
                 Image image1 = createImage(1L, diary);
                 Image image2 = createImage(2L, diary);
 
-                assertThat(imageRepository.findAllByDiaryDiaryId(diary.getDiaryId()))
+                assertThat(imageRepository.findByDiary(diary.getDiaryId()))
                     .containsExactlyInAnyOrder(image1, image2);
             }
         }
@@ -55,7 +54,23 @@ class ImageRepositoryTest extends BaseRepositoryTest {
             void return_empty_list() {
                 Diary diary = createDiaryWithId(1L, createUser());
 
-                assertThat(imageRepository.findAllByDiaryDiaryId(diary.getDiaryId()))
+                assertThat(imageRepository.findByDiary(diary.getDiaryId()))
+                    .isEmpty();
+            }
+        }
+
+        @Nested
+        @DisplayName("주어진 일기의 이미지가 삭제되었을 경우")
+        class if_images_of_diary_deleted {
+
+            @Test
+            @DisplayName("빈 목록을 반환한다.")
+            void return_empty_list() {
+                Diary diary = createDiaryWithId(1L, createUser());
+                Image image1 = createImage(1L, diary);
+                imageRepository.delete(image1);
+
+                assertThat(imageRepository.findByDiary(diary.getDiaryId()))
                     .isEmpty();
             }
         }

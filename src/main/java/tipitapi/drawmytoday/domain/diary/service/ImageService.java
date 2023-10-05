@@ -46,7 +46,7 @@ public class ImageService {
 
     @Transactional
     public void unSelectAllImage(Long diaryId) {
-        imageRepository.findAllByDiaryDiaryId(diaryId)
+        imageRepository.findByDiary(diaryId)
             .forEach(image -> image.setSelected(false));
     }
 
