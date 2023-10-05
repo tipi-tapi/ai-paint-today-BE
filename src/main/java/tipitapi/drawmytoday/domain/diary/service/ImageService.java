@@ -25,6 +25,7 @@ public class ImageService {
     private final R2Service r2Service;
     private final ValidateUserService validateUserService;
     private final ValidateDiaryService validateDiaryService;
+    private final ValidateImageService validateImageService;
 
     @Value("${spring.profiles.active:Unknown}")
     private String profile;
@@ -65,6 +66,15 @@ public class ImageService {
         Image image = validateImage(imageId, user);
 
         imageRepository.delete(image);
+    }
+
+    @Transactional
+    public void reviewDiary(Long userId, Long imageId, String review) {
+        User user = validateUserService.validateUserById(userId);
+        Image image = validateImageService.validateImageById(imageId);
+        validateImageService.validateImageOwner(imageId, user);
+
+        image.reviewDiary(review);
     }
 
     private Image validateImage(Long imageId, User user) {

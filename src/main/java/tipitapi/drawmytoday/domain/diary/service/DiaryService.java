@@ -41,7 +41,6 @@ public class DiaryService {
     private final R2PreSignedService r2PreSignedService;
     private final Encryptor encryptor;
     private final ValidateDiaryService validateDiaryService;
-    private final ValidateImageService validateImageService;
     private final ValidateTicketService validateTicketService;
 
     public GetDiaryResponse getDiary(Long userId, Long diaryId, Language language) {
@@ -151,12 +150,4 @@ public class DiaryService {
             .collect(Collectors.toList());
     }
 
-    @Transactional
-    public void reviewDiary(Long userId, Long imageId, String review) {
-        User user = validateUserService.validateUserById(userId);
-        Image image = validateImageService.validateImageById(imageId);
-        validateImageService.validateImageOwner(imageId, user);
-
-        image.reviewDiary(review);
-    }
 }
