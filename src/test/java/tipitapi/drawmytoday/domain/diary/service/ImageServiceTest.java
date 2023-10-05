@@ -204,12 +204,12 @@ class ImageServiceTest {
     }
 
     @Nested
-    @DisplayName("reviewDiary 메소드 테스트")
-    class ReviewDiaryTest {
+    @DisplayName("reviewImage 메소드 테스트")
+    class ReviewImageTest {
 
         @Test
         @DisplayName("userId와 imageId 검증 이후 review를 업데이트한다.")
-        void it_updates_diary_review() {
+        void it_updates_image_review() {
             User user = createUserWithId(1L);
             Diary diary = createDiaryWithId(1L, user, createEmotion());
             Image image = createImageWithId(1L, diary);
@@ -217,7 +217,7 @@ class ImageServiceTest {
             given(validateUserService.validateUserById(any(Long.class))).willReturn(user);
             given(validateImageService.validateImageById(any(Long.class))).willReturn(image);
 
-            imageService.reviewDiary(1L, 1L, review);
+            imageService.reviewImage(1L, 1L, review);
 
             assertThat(image.getReview()).isEqualTo(review);
             verify(validateImageService).validateImageOwner(eq(image.getImageId()), eq(user));

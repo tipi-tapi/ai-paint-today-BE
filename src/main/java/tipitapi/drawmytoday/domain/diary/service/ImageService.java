@@ -69,12 +69,12 @@ public class ImageService {
     }
 
     @Transactional
-    public void reviewDiary(Long userId, Long imageId, String review) {
+    public void reviewImage(Long userId, Long imageId, String review) {
         User user = validateUserService.validateUserById(userId);
         Image image = validateImageService.validateImageById(imageId);
         validateImageService.validateImageOwner(imageId, user);
 
-        image.reviewDiary(review);
+        image.reviewImage(review);
     }
 
     private Image validateImage(Long imageId, User user) {

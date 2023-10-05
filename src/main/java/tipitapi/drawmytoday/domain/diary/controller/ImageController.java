@@ -85,7 +85,7 @@ public class ImageController {
         @Parameter(description = "이미지 id", in = ParameterIn.PATH) @PathVariable("id") Long imageId,
         @RequestBody @Valid ReviewDiaryRequest reviewDiaryRequest
     ) {
-        imageService.reviewDiary(tokenInfo.getUserId(), imageId, reviewDiaryRequest.getReview());
+        imageService.reviewImage(tokenInfo.getUserId(), imageId, reviewDiaryRequest.getReview());
         return ResponseEntity.noContent().build();
     }
 }

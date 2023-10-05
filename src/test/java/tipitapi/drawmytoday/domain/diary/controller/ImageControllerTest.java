@@ -80,8 +80,8 @@ class ImageControllerTest extends ControllerTestSetup {
 
         @ParameterizedTest
         @ValueSource(strings = {"1", "2", "3", "4", "5"})
-        @DisplayName("review에 1~5 사이의 값이 들어오면 diaryId에 해당하는 일기를 리뷰한다.")
-        void review_diary(String review) throws Exception {
+        @DisplayName("review에 1~5 사이의 값이 들어오면 diaryId에 해당하는 이미지를 리뷰한다.")
+        void review_image(String review) throws Exception {
             // given
             Long imageId = 1L;
 
@@ -96,7 +96,7 @@ class ImageControllerTest extends ControllerTestSetup {
 
             // then
             result.andExpect(status().isNoContent());
-            verify(imageService).reviewDiary(imageId, REQUEST_USER_ID, review);
+            verify(imageService).reviewImage(imageId, REQUEST_USER_ID, review);
         }
     }
 }

@@ -13,8 +13,8 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import tipitapi.drawmytoday.common.entity.BaseEntity;
 import org.hibernate.annotations.SQLDelete;
+import tipitapi.drawmytoday.common.entity.BaseEntity;
 
 @SQLDelete(sql = "UPDATE image SET deleted_at = current_timestamp WHERE image_id = ?")
 @Getter
@@ -57,7 +57,7 @@ public class Image extends BaseEntity {
         this.isSelected = isSelected;
     }
 
-    public void reviewDiary(String review) {
+    public void reviewImage(String review) {
         this.review = review;
     }
 }
