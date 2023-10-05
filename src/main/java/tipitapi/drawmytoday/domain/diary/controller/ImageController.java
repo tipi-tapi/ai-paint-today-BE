@@ -65,7 +65,7 @@ public class ImageController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "이미지 평가", description = "주어진 ID의 일기를 평가한다.")
+    @Operation(summary = "이미지 평가", description = "주어진 ID의 이미지를 평가한다.")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "204",
