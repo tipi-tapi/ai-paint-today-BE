@@ -29,15 +29,6 @@ public class ImageService {
     @Value("${spring.profiles.active:Unknown}")
     private String profile;
 
-    public Image getImage(Diary diary) {
-        return imageRepository.findByIsSelectedTrueAndDiary(diary)
-            .orElseThrow(ImageNotFoundException::new);
-    }
-
-    public List<Image> getImages(Diary diary) {
-        return imageRepository.findAllByDiaryDiaryId(diary.getDiaryId());
-    }
-
     public List<Image> getLatestImages(Diary diary) {
         return imageRepository.findLatestByDiary(diary.getDiaryId());
     }
