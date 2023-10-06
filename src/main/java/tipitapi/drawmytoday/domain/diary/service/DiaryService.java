@@ -71,12 +71,16 @@ public class DiaryService {
     }
 
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
-        User user = validateUserService.validateUserById(userId);
+        validateUserService.validateUserById(userId);
         LocalDateTime startMonth = DateUtils.getStartDate(year, month);
         LocalDateTime endMonth = DateUtils.getEndDate(year, month);
-        List<Diary> getDiaryList = diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
-            user.getUserId(), startMonth, endMonth);
-        return convertDiariesToResponse(getDiaryList);
+        List<GetMonthlyDiariesResponse> monthlyDiaries = diaryRepository.getMonthlyDiaries(
+            userId, startMonth, endMonth);
+        for (GetMonthlyDiariesResponse monthlyDiary : monthlyDiaries) {
+            monthlyDiary.setImageUrl(
+                r2PreSignedService.getCustomDomainUrl(monthlyDiary.getImageUrl()));
+        }
+        return monthlyDiaries;
     }
 
     public GetDiaryExistByDateResponse getDiaryExistByDate(Long userId, int year, int month,
@@ -132,22 +136,4 @@ public class DiaryService {
 
         return GetDiaryLimitResponse.of(available, lastDiaryDate, ticketCreatedAt);
     }
-
-    private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {
-        return getDiaryList.stream()
-            .filter(diary -> {
-                if (diary.getImageList().isEmpty()) {
-                    throw new ImageNotFoundException();
-                }
-                return true;
-            })
-            .map(diary -> {
-                String imageUrl = r2PreSignedService.getCustomDomainUrl(
-                    diary.getSelectedImage().getImageUrl());
-                return GetMonthlyDiariesResponse.of(diary.getDiaryId(), imageUrl,
-                    diary.getDiaryDate());
-            })
-            .collect(Collectors.toList());
-    }
-
 }
