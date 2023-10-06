@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.converter.Language;
@@ -29,6 +30,7 @@ import tipitapi.drawmytoday.domain.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -76,9 +78,16 @@ public class DiaryService {
         LocalDateTime endMonth = DateUtils.getEndDate(year, month);
         List<GetMonthlyDiariesResponse> monthlyDiaries = diaryRepository.getMonthlyDiaries(
             userId, startMonth, endMonth);
-        for (GetMonthlyDiariesResponse monthlyDiary : monthlyDiaries) {
-            monthlyDiary.setImageUrl(
-                r2PreSignedService.getCustomDomainUrl(monthlyDiary.getImageUrl()));
+
+        for (int i = 0; i < monthlyDiaries.size(); i++) {
+            GetMonthlyDiariesResponse monthlyDiary = monthlyDiaries.get(i);
+            if (monthlyDiary.getImageUrl() == null) {
+                log.error("DiaryId가 {}에 해당하는 이미지가 없습니다.", monthlyDiary.getId());
+                monthlyDiaries.remove(i--);
+            } else {
+                monthlyDiary.setImageUrl(
+                    r2PreSignedService.getCustomDomainUrl(monthlyDiary.getImageUrl()));
+            }
         }
         return monthlyDiaries;
     }
