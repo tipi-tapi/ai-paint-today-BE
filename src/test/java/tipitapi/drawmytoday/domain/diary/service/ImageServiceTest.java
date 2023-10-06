@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiary;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithId;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
@@ -48,6 +50,7 @@ class ImageServiceTest {
     ValidateDiaryService validateDiaryService;
     @Mock
     ValidateImageService validateImageService;
+    @Spy
     @InjectMocks
     ImageService imageService;
 
@@ -182,4 +185,31 @@ class ImageServiceTest {
             verify(validateImageService).validateImageOwner(eq(image.getImageId()), eq(user));
         }
     }
+
+    @Nested
+    @DisplayName("setSelectedImage 메서드 테스트")
+    class SetSelectedImageTest {
+
+        @Test
+        @DisplayName("user, image, diary를 검증한 후 기존 대표 설정을 해제하고 주어진 이미지를 대표 이미지로 설정한다.")
+        void it_sets_selected_image() {
+            User user = createUserWithId(1L);
+            Diary diary = createDiaryWithId(1L, user, createEmotion());
+            Image image = createImageWithId(1L, diary);
+            given(validateUserService.validateUserById(anyLong())).willReturn(user);
+            given(validateImageService.validateImageById(anyLong())).willReturn(image);
+            given(validateDiaryService.validateDiaryById(anyLong(), any(User.class)))
+                .willReturn(diary);
+            doNothing().when(imageService).unSelectAllImage(anyLong());
+
+            imageService.setSelectedImage(1L, 1L);
+
+            assertThat(image.isSelected()).isTrue();
+            verify(validateUserService).validateUserById(eq(user.getUserId()));
+            verify(validateImageService).validateImageById(eq(image.getImageId()));
+            verify(validateDiaryService).validateDiaryById(eq(diary.getDiaryId()), eq(user));
+            verify(imageService).unSelectAllImage(eq(diary.getDiaryId()));
+        }
+    }
+
 }

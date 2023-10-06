@@ -68,6 +68,16 @@ public class ImageService {
         image.reviewImage(review);
     }
 
+    @Transactional
+    public void setSelectedImage(Long userId, Long imageId) {
+        User user = validateUserService.validateUserById(userId);
+        Image image = validateImageService.validateImageById(imageId);
+        Diary diary = validateDiaryService.validateDiaryById(image.getDiary().getDiaryId(), user);
+
+        unSelectAllImage(diary.getDiaryId());
+        image.setSelected(true);
+    }
+
     private Image validateImage(Long imageId, User user) {
         Image image = imageRepository.findImage(imageId).orElseThrow(ImageNotFoundException::new);
         if (image.isSelected()) {

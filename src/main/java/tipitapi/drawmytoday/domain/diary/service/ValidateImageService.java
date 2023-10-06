@@ -17,7 +17,7 @@ public class ValidateImageService {
     private final ImageRepository imageRepository;
 
     public Image validateImageById(Long imageId) {
-        return imageRepository.findById(imageId).orElseThrow(ImageNotFoundException::new);
+        return imageRepository.findImage(imageId).orElseThrow(ImageNotFoundException::new);
     }
 
     public void validateImageOwner(Long imageId, User user) {
