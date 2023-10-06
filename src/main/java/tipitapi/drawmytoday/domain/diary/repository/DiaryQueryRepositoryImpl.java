@@ -75,12 +75,15 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, LocalDateTime startMonth,
         LocalDateTime endMonth) {
         return queryFactory.select(
-                new QGetMonthlyDiariesResponse(diary.diaryId, image.imageUrl, diary.diaryDate))
+                new QGetMonthlyDiariesResponse(diary.diaryId, image.imageUrl.max(), diary.diaryDate))
             .from(diary)
             .leftJoin(image)
-            .on(diary.diaryId.eq(image.diary.diaryId).and(image.isSelected.eq(true)))
+            .on(diary.diaryId.eq(image.diary.diaryId)
+                .and(image.isSelected.eq(true)))
             .where(diary.diaryDate.between(startMonth, endMonth)
                 .and(diary.user.userId.eq(userId)))
+            .orderBy(diary.diaryDate.asc())
+            .groupBy(diary.diaryId)
             .fetch();
     }
 }
