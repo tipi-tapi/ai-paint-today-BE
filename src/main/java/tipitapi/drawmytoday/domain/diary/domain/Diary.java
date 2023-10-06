@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
+import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.user.domain.User;
 
@@ -109,6 +110,13 @@ public class Diary extends BaseEntityWithUpdate {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public Image getSelectedImage() {
+        return imageList.stream()
+            .filter(Image::isSelected)
+            .findFirst()
+            .orElseThrow(ImageNotFoundException::new);
     }
 
 }

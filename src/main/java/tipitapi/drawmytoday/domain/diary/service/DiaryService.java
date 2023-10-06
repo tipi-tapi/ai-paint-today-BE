@@ -143,7 +143,7 @@ public class DiaryService {
             })
             .map(diary -> {
                 String imageUrl = r2PreSignedService.getCustomDomainUrl(
-                    diary.getImageList().get(0).getImageUrl());
+                    diary.getSelectedImage().getImageUrl());
                 return GetMonthlyDiariesResponse.of(diary.getDiaryId(), imageUrl,
                     diary.getDiaryDate());
             })
