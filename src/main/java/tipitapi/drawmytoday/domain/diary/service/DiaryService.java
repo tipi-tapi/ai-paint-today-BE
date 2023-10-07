@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.converter.Language;
@@ -29,6 +30,7 @@ import tipitapi.drawmytoday.domain.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -71,12 +73,23 @@ public class DiaryService {
     }
 
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
-        User user = validateUserService.validateUserById(userId);
+        validateUserService.validateUserById(userId);
         LocalDateTime startMonth = DateUtils.getStartDate(year, month);
         LocalDateTime endMonth = DateUtils.getEndDate(year, month);
-        List<Diary> getDiaryList = diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
-            user.getUserId(), startMonth, endMonth);
-        return convertDiariesToResponse(getDiaryList);
+        List<GetMonthlyDiariesResponse> monthlyDiaries = diaryRepository.getMonthlyDiaries(
+            userId, startMonth, endMonth);
+
+        for (int i = 0; i < monthlyDiaries.size(); i++) {
+            GetMonthlyDiariesResponse monthlyDiary = monthlyDiaries.get(i);
+            if (monthlyDiary.getImageUrl() == null) {
+                log.error("DiaryId가 {}에 해당하는 이미지가 없습니다.", monthlyDiary.getId());
+                monthlyDiaries.remove(i--);
+            } else {
+                monthlyDiary.setImageUrl(
+                    r2PreSignedService.getCustomDomainUrl(monthlyDiary.getImageUrl()));
+            }
+        }
+        return monthlyDiaries;
     }
 
     public GetDiaryExistByDateResponse getDiaryExistByDate(Long userId, int year, int month,
@@ -132,22 +145,4 @@ public class DiaryService {
 
         return GetDiaryLimitResponse.of(available, lastDiaryDate, ticketCreatedAt);
     }
-
-    private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {
-        return getDiaryList.stream()
-            .filter(diary -> {
-                if (diary.getImageList().isEmpty()) {
-                    throw new ImageNotFoundException();
-                }
-                return true;
-            })
-            .map(diary -> {
-                String imageUrl = r2PreSignedService.getCustomDomainUrl(
-                    diary.getImageList().get(0).getImageUrl());
-                return GetMonthlyDiariesResponse.of(diary.getDiaryId(), imageUrl,
-                    diary.getDiaryDate());
-            })
-            .collect(Collectors.toList());
-    }
-
 }

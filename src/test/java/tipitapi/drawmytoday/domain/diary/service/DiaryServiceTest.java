@@ -15,6 +15,7 @@ import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +39,6 @@ import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.domain.diary.exception.DiaryNotFoundException;
-import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.domain.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -238,36 +238,45 @@ class DiaryServiceTest {
         class if_diary_of_user_exists {
 
             @Test
-            @DisplayName("일기에 해당하는 이미지가 없을 경우")
+            @DisplayName("일기에 해당하는 이미지가 없을 경우 해당 일기는 반환하지 않는다.")
             void it_returns_diaries_without_image() {
+                // given
                 User user = createUserWithId(1L);
-                Diary diary = createDiaryWithId(1L, user, createEmotion());
+                GetMonthlyDiariesResponse response = new GetMonthlyDiariesResponse(
+                    1L, null, LocalDateTime.of(2023, 6, 1, 0, 0));
+                List<GetMonthlyDiariesResponse> responses = new ArrayList<>();
+                responses.add(response);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
-                    any(Long.class), any(LocalDateTime.class), any(LocalDateTime.class)))
-                    .willReturn(List.of(diary));
+                given(diaryRepository.getMonthlyDiaries(any(Long.class), any(LocalDateTime.class),
+                    any(LocalDateTime.class))).willReturn(responses);
 
-                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, 6))
-                    .isInstanceOf(ImageNotFoundException.class);
+                // when
+                List<GetMonthlyDiariesResponse> monthlyDiaries = diaryService.getMonthlyDiaries(
+                    1L, 2023, 6);
+
+                // then
+                assertThat(monthlyDiaries).hasSize(0);
             }
 
             @Test
             @DisplayName("일기들을 반환한다.")
             void it_returns_diaries() {
                 User user = createUserWithId(1L);
-                Diary diary = createDiaryWithId(1L, user, createEmotion());
-                createImage(diary);
+                Long diaryId = 2L;
+                GetMonthlyDiariesResponse response = new GetMonthlyDiariesResponse(
+                    diaryId, "imageUrl", LocalDateTime.of(2023, 6, 1, 0, 0));
+                List<GetMonthlyDiariesResponse> responses = new ArrayList<>();
+                responses.add(response);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
-                    any(Long.class), any(LocalDateTime.class), any(LocalDateTime.class)))
-                    .willReturn(List.of(diary));
+                given(diaryRepository.getMonthlyDiaries(any(Long.class), any(LocalDateTime.class),
+                    any(LocalDateTime.class))).willReturn(responses);
 
                 List<GetMonthlyDiariesResponse> getDiaryResponses = diaryService.getMonthlyDiaries(
                     1L,
                     2023, 6);
 
                 assertThat(getDiaryResponses).hasSize(1);
-                assertThat(getDiaryResponses.get(0).getId()).isEqualTo(diary.getDiaryId());
+                assertThat(getDiaryResponses.get(0).getId()).isEqualTo(diaryId);
             }
         }
     }

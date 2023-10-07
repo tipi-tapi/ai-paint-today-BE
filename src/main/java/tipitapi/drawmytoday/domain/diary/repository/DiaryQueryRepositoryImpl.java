@@ -9,6 +9,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import org.springframework.data.support.PageableExecutionUtils;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.domain.admin.dto.QGetDiaryAdminResponse;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
+import tipitapi.drawmytoday.domain.diary.dto.QGetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 
 @RequiredArgsConstructor
@@ -66,5 +69,21 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
             .where(diary.diaryDate.between(diaryDate.atStartOfDay(), diaryDate.atTime(23, 59, 59))
                 .and(diary.user.userId.eq(userId)))
             .fetchFirst());
+    }
+
+    @Override
+    public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, LocalDateTime startMonth,
+        LocalDateTime endMonth) {
+        return queryFactory.select(
+                new QGetMonthlyDiariesResponse(diary.diaryId, image.imageUrl.max(), diary.diaryDate))
+            .from(diary)
+            .leftJoin(image)
+            .on(diary.diaryId.eq(image.diary.diaryId)
+                .and(image.isSelected.eq(true)))
+            .where(diary.diaryDate.between(startMonth, endMonth)
+                .and(diary.user.userId.eq(userId)))
+            .orderBy(diary.diaryDate.asc())
+            .groupBy(diary.diaryId)
+            .fetch();
     }
 }
