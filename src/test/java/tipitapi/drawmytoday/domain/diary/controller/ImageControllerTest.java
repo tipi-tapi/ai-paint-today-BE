@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.domain.diary.controller;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -97,6 +98,26 @@ class ImageControllerTest extends ControllerTestSetup {
             // then
             result.andExpect(status().isNoContent());
             verify(imageService).reviewImage(imageId, REQUEST_USER_ID, review);
+        }
+    }
+
+    @Nested
+    @DisplayName("setSelectedImage 메서드는")
+    class SetSelectedImageTest {
+
+        @Test
+        @DisplayName("imageId에 해당하는 일기를 대표 설정한다.")
+        void sets_image_selected() throws Exception {
+            // given
+            Long imageId = 1L;
+
+            // when
+            ResultActions result = mockMvc.perform(put(BASIC_URL + "/" + imageId)
+                .with(SecurityMockMvcRequestPostProcessors.csrf()));
+
+            // then
+            result.andExpect(status().isNoContent());
+            verify(imageService).setSelectedImage(REQUEST_USER_ID, imageId);
         }
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -86,6 +87,33 @@ public class ImageController {
         @RequestBody @Valid ReviewDiaryRequest reviewDiaryRequest
     ) {
         imageService.reviewImage(tokenInfo.getUserId(), imageId, reviewDiaryRequest.getReview());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "대표 이미지 설정", description = "주어진 ID의 이미지를 일기의 대표 이미지로 설정한다.")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "성공적으로 이미지를 평가함"),
+        @ApiResponse(
+            responseCode = "403",
+            description = "I004 : 자신의 이미지에만 접근할 수 있습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "D001 : 일기를 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "I001 : 이미지를 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> setSelectedImage(
+        @AuthUser JwtTokenInfo tokenInfo,
+        @Parameter(description = "이미지 ID", in = ParameterIn.PATH) @PathVariable("id") Long imageId
+    ) {
+        imageService.setSelectedImage(tokenInfo.getUserId(), imageId);
         return ResponseEntity.noContent().build();
     }
 }
