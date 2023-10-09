@@ -58,4 +58,13 @@ public class ImageQueryRepositoryImpl implements ImageQueryRepository {
                 .and(image.deletedAt.isNull()))
             .fetchFirst());
     }
+
+    @Override
+    public Optional<Image> findOneLastedByDiary(Long diaryId) {
+        return Optional.ofNullable(queryFactory
+            .selectFrom(image)
+            .where(image.diary.diaryId.eq(diaryId).and(image.deletedAt.isNull()))
+            .orderBy(image.createdAt.desc())
+            .fetchFirst());
+    }
 }

@@ -72,6 +72,7 @@ public class DiaryService {
         return GetDiaryResponse.of(diary, selectedImageUrl, sortedImages, emotionText, promptText);
     }
 
+    @Transactional
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
         validateUserService.validateUserById(userId);
         LocalDateTime startMonth = DateUtils.getStartDate(year, month);
@@ -80,13 +81,20 @@ public class DiaryService {
             userId, startMonth, endMonth);
 
         for (int i = 0; i < monthlyDiaries.size(); i++) {
-            GetMonthlyDiariesResponse monthlyDiary = monthlyDiaries.get(i);
-            if (monthlyDiary.getImageUrl() == null) {
-                log.error("DiaryId가 {}에 해당하는 이미지가 없습니다.", monthlyDiary.getId());
-                monthlyDiaries.remove(i--);
+            GetMonthlyDiariesResponse diaryResponse = monthlyDiaries.get(i);
+            if (diaryResponse.getImageUrl() == null) {
+                log.error("DiaryId가 {}인 일기에 해당하는 대표 이미지가 없습니다.", diaryResponse.getId());
+                Optional<Image> latestImage = imageService.getOneLatestImage(diaryResponse.getId());
+                if (latestImage.isPresent()) {
+                    latestImage.get().setSelected(true);
+                    diaryResponse.setImageUrl(
+                        r2PreSignedService.getCustomDomainUrl(latestImage.get().getImageUrl()));
+                } else {
+                    monthlyDiaries.remove(i--);
+                }
             } else {
-                monthlyDiary.setImageUrl(
-                    r2PreSignedService.getCustomDomainUrl(monthlyDiary.getImageUrl()));
+                diaryResponse.setImageUrl(
+                    r2PreSignedService.getCustomDomainUrl(diaryResponse.getImageUrl()));
             }
         }
         return monthlyDiaries;
