@@ -80,23 +80,8 @@ public class DiaryService {
         List<GetMonthlyDiariesResponse> monthlyDiaries = diaryRepository.getMonthlyDiaries(
             userId, startMonth, endMonth);
 
-        for (int i = 0; i < monthlyDiaries.size(); i++) {
-            GetMonthlyDiariesResponse diaryResponse = monthlyDiaries.get(i);
-            if (diaryResponse.getImageUrl() == null) {
-                log.error("DiaryId가 {}인 일기에 해당하는 대표 이미지가 없습니다.", diaryResponse.getId());
-                Optional<Image> latestImage = imageService.getOneLatestImage(diaryResponse.getId());
-                if (latestImage.isPresent()) {
-                    latestImage.get().setSelected(true);
-                    diaryResponse.setImageUrl(
-                        r2PreSignedService.getCustomDomainUrl(latestImage.get().getImageUrl()));
-                } else {
-                    monthlyDiaries.remove(i--);
-                }
-            } else {
-                diaryResponse.setImageUrl(
-                    r2PreSignedService.getCustomDomainUrl(diaryResponse.getImageUrl()));
-            }
-        }
+        validateImageAndConvertUrl(monthlyDiaries);
+
         return monthlyDiaries;
     }
 
@@ -152,5 +137,25 @@ public class DiaryService {
         }
 
         return GetDiaryLimitResponse.of(available, lastDiaryDate, ticketCreatedAt);
+    }
+
+    private void validateImageAndConvertUrl(List<GetMonthlyDiariesResponse> monthlyDiaries) {
+        for (int i = 0; i < monthlyDiaries.size(); i++) {
+            GetMonthlyDiariesResponse diaryResponse = monthlyDiaries.get(i);
+            if (diaryResponse.getImageUrl() == null) {
+                log.error("DiaryId가 {}인 일기에 해당하는 대표 이미지가 없습니다.", diaryResponse.getId());
+                Optional<Image> latestImage = imageService.getOneLatestImage(diaryResponse.getId());
+                if (latestImage.isPresent()) {
+                    latestImage.get().setSelected(true);
+                    diaryResponse.setImageUrl(
+                        r2PreSignedService.getCustomDomainUrl(latestImage.get().getImageUrl()));
+                } else {
+                    monthlyDiaries.remove(i--);
+                }
+            } else {
+                diaryResponse.setImageUrl(
+                    r2PreSignedService.getCustomDomainUrl(diaryResponse.getImageUrl()));
+            }
+        }
     }
 }
