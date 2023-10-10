@@ -80,7 +80,7 @@ public class DiaryService {
         List<GetMonthlyDiariesResponse> monthlyDiaries = diaryRepository.getMonthlyDiaries(
             userId, startMonth, endMonth);
 
-        validateImageAndConvertUrl(monthlyDiaries);
+        validateSelectedImageAndConvertUrl(monthlyDiaries);
 
         return monthlyDiaries;
     }
@@ -139,7 +139,8 @@ public class DiaryService {
         return GetDiaryLimitResponse.of(available, lastDiaryDate, ticketCreatedAt);
     }
 
-    private void validateImageAndConvertUrl(List<GetMonthlyDiariesResponse> monthlyDiaries) {
+    private void validateSelectedImageAndConvertUrl(
+        List<GetMonthlyDiariesResponse> monthlyDiaries) {
         for (int i = 0; i < monthlyDiaries.size(); i++) {
             GetMonthlyDiariesResponse diaryResponse = monthlyDiaries.get(i);
             if (diaryResponse.getImageUrl() == null) {
