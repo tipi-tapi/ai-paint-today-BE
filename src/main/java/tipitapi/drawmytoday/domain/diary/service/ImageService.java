@@ -36,7 +36,7 @@ public class ImageService {
     }
 
     public Optional<Image> getOneLatestImage(Long diaryId) {
-        return imageRepository.findOneLastedByDiary(diaryId);
+        return imageRepository.findRecentByDiary(diaryId);
     }
 
     public Image createImage(Diary diary, String imagePath, boolean isSelected) {
