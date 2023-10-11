@@ -17,4 +17,5 @@ public interface ImageQueryRepository {
 
     Optional<Image> findByImageIdAndDiaryUser(Long imageId, User user);
 
+    Optional<Image> findRecentByDiary(Long diaryId);
 }

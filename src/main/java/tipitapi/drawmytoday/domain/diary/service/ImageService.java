@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.domain.diary.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,10 @@ public class ImageService {
 
     public List<Image> getLatestImages(Diary diary) {
         return imageRepository.findLatestByDiary(diary.getDiaryId());
+    }
+
+    public Optional<Image> getOneLatestImage(Long diaryId) {
+        return imageRepository.findRecentByDiary(diaryId);
     }
 
     public Image createImage(Diary diary, String imagePath, boolean isSelected) {

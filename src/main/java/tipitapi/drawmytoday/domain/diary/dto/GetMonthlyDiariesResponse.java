@@ -19,7 +19,7 @@ public class GetMonthlyDiariesResponse {
     @Schema(description = "일기 아이디", requiredMode = RequiredMode.REQUIRED)
     private final Long id;
 
-    @Schema(description = "이미지 URL", requiredMode = RequiredMode.REQUIRED)
+    @Schema(description = "대표 이미지 URL", requiredMode = RequiredMode.REQUIRED)
     @Setter
     private String imageUrl;
 
