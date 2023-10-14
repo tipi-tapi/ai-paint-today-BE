@@ -44,7 +44,7 @@ public class ImageService {
     }
 
     public Image uploadAndCreateImage(Diary diary, byte[] dallEImage, boolean isSelected) {
-        String imagePath = String.format(profile + "/post/%d/%s_%d.png", diary.getDiaryId(),
+        String imagePath = String.format(profile + "/post/%d/%s_%d.webp", diary.getDiaryId(),
             new Date().getTime(), 1);
         r2Service.uploadImage(dallEImage, imagePath);
         return createImage(diary, imagePath, isSelected);

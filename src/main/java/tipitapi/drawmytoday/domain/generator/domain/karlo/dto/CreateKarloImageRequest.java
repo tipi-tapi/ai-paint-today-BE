@@ -24,6 +24,6 @@ public class CreateKarloImageRequest {
     private String returnType;
 
     public static CreateKarloImageRequest withUrl(String prompt) {
-        return new CreateKarloImageRequest(prompt, null, "png", 1, "url");
+        return new CreateKarloImageRequest(prompt, null, "webp", 1, "url");
     }
 }
