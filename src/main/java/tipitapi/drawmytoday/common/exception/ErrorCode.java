@@ -43,10 +43,16 @@ public enum ErrorCode {
     DIARY_DATE_ALREADY_EXISTS(409, "D004", "이미 일기를 그린 날짜입니다."),
 
     // Image
-    IMAGE_NOT_FOUND(404, "I001", "선택된 이미지를 찾을 수 없습니다."),
+    IMAGE_NOT_FOUND(404, "I001", "이미지를 찾을 수 없습니다."),
+    SELECTED_IMAGE_DELETION_DENIED(403, "I002", "대표 이미지는 삭제할 수 없습니다."),
+    DIARY_NEEDS_IMAGE(403, "I003", "일기는 최소 한 장의 이미지가 필요합니다."),
+    IMAGE_NOT_OWNER(403, "I004", "자신의 이미지에만 접근할 수 있습니다."),
 
     // Emotion
     EMOTION_NOT_FOUND(404, "E001", "감정을 찾을 수 없습니다."),
+
+    // Prompt
+    PROMPT_NOT_EXIST(500, "P001", "프롬프트가 존재하지 않습니다."),
 
     // R2
     R2_SERVICE_ERROR(500, "R001", "R2Exception 에러가 발생하였습니다."),
@@ -56,6 +62,9 @@ public enum ErrorCode {
     // DALL-E
     DALLE_REQUEST_FAIL(500, "DE001", "DALL-E 요청에 실패하였습니다."),
     DALLE_CONTENT_POLICY_VIOLATION(500, "DE002", "DALL-E의 컨텐츠 정책에 위배되었습니다."),
+
+    // Karlo
+    KARLO_REQUEST_FAIL(500, "K001", "Karlo 요청에 실패하였습니다."),
 
     // Image InputStream
     IMAGE_INPUT_STREAM_FAIL(500, "IIS001", "이미지 스트림을 가져오는데 실패하였습니다."),

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.converter.Language;
@@ -13,10 +14,12 @@ import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.Image;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
+import tipitapi.drawmytoday.domain.diary.dto.GetImageResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
@@ -27,6 +30,7 @@ import tipitapi.drawmytoday.domain.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -47,24 +51,38 @@ public class DiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         diary.setNotes(encryptor.decrypt(diary.getNotes()));
 
-        String imageUrl = r2PreSignedService.getCustomDomainUrl(
-            imageService.getImage(diary).getImageUrl());
+        List<Image> images = imageService.getLatestImages(diary);
+        String selectedImageUrl = images.stream()
+            .filter(Image::isSelected)
+            .findFirst()
+            .map(image -> r2PreSignedService.getCustomDomainUrl(image.getImageUrl()))
+            .orElseThrow(ImageNotFoundException::new);
+
+        List<GetImageResponse> sortedImages = images.stream()
+            .map(image ->
+                GetImageResponse.of(image.getImageId(), image.getCreatedAt(), image.isSelected(),
+                    r2PreSignedService.getCustomDomainUrl(image.getImageUrl())))
+            .collect(Collectors.toList());
 
         String emotionText = diary.getEmotion().getEmotionText(language);
 
-        Optional<Prompt> prompt = promptService.getPromptByDiaryId(diaryId);
-        String promptText = prompt.map(Prompt::getPromptText).orElse(null);
+        String promptText = promptService.getPromptByDiaryId(diaryId)
+            .map(Prompt::getPromptText).orElse(null);
 
-        return GetDiaryResponse.of(diary, imageUrl, emotionText, promptText);
+        return GetDiaryResponse.of(diary, selectedImageUrl, sortedImages, emotionText, promptText);
     }
 
+    @Transactional
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
-        User user = validateUserService.validateUserById(userId);
+        validateUserService.validateUserById(userId);
         LocalDateTime startMonth = DateUtils.getStartDate(year, month);
         LocalDateTime endMonth = DateUtils.getEndDate(year, month);
-        List<Diary> getDiaryList = diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
-            user.getUserId(), startMonth, endMonth);
-        return convertDiariesToResponse(getDiaryList);
+        List<GetMonthlyDiariesResponse> monthlyDiaries = diaryRepository.getMonthlyDiaries(
+            userId, startMonth, endMonth);
+
+        validateSelectedImageAndConvertUrl(monthlyDiaries);
+
+        return monthlyDiaries;
     }
 
     public GetDiaryExistByDateResponse getDiaryExistByDate(Long userId, int year, int month,
@@ -121,20 +139,24 @@ public class DiaryService {
         return GetDiaryLimitResponse.of(available, lastDiaryDate, ticketCreatedAt);
     }
 
-    private List<GetMonthlyDiariesResponse> convertDiariesToResponse(List<Diary> getDiaryList) {
-        return getDiaryList.stream()
-            .filter(diary -> {
-                if (diary.getImageList().isEmpty()) {
-                    throw new ImageNotFoundException();
+    private void validateSelectedImageAndConvertUrl(
+        List<GetMonthlyDiariesResponse> monthlyDiaries) {
+        for (int i = 0; i < monthlyDiaries.size(); i++) {
+            GetMonthlyDiariesResponse diaryResponse = monthlyDiaries.get(i);
+            if (diaryResponse.getImageUrl() == null) {
+                log.error("DiaryId가 {}인 일기에 해당하는 대표 이미지가 없습니다.", diaryResponse.getId());
+                Optional<Image> latestImage = imageService.getOneLatestImage(diaryResponse.getId());
+                if (latestImage.isPresent()) {
+                    latestImage.get().setSelected(true);
+                    diaryResponse.setImageUrl(
+                        r2PreSignedService.getCustomDomainUrl(latestImage.get().getImageUrl()));
+                } else {
+                    monthlyDiaries.remove(i--);
                 }
-                return true;
-            })
-            .map(diary -> {
-                String imageUrl = r2PreSignedService.getCustomDomainUrl(
-                    diary.getImageList().get(0).getImageUrl());
-                return GetMonthlyDiariesResponse.of(diary.getDiaryId(), imageUrl,
-                    diary.getDiaryDate());
-            })
-            .collect(Collectors.toList());
+            } else {
+                diaryResponse.setImageUrl(
+                    r2PreSignedService.getCustomDomainUrl(diaryResponse.getImageUrl()));
+            }
+        }
     }
 }

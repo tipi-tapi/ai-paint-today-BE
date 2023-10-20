@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
         description = "프로그라피 8기 4팀 TipiTapi의 오늘 하루를 그려줘 프로젝트의 API 문서입니다.",
         version = "v1"),
     servers = {
-        @Server(url = "https://choihyeok.site", description = "테스트 서버"),
+        @Server(url = "https://draw-my-today-dev.devstory.co.kr", description = "테스트 서버"),
         @Server(url = "https://draw-my-today.devstory.co.kr", description = "운영 서버")
     }
 )
@@ -115,6 +115,17 @@ public class SwaggerConfiguration {
         return GroupedOpenApi
             .builder()
             .group("관리자용 API")
+            .pathsToMatch(paths)
+            .build();
+    }
+
+    @Bean
+    public GroupedOpenApi imageOpenApi() {
+        String[] paths = {"/image/**"};
+
+        return GroupedOpenApi
+            .builder()
+            .group("일기 이미지 API")
             .pathsToMatch(paths)
             .build();
     }

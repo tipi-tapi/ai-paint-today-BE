@@ -27,16 +27,26 @@ public class GetDiaryAdminResponse {
     @Schema(description = "일기 작성 시간", requiredMode = RequiredMode.REQUIRED)
     private final LocalDateTime createdAt;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @Schema(description = "이미지 생성 시간", requiredMode = RequiredMode.REQUIRED)
+    private final LocalDateTime imageCreatedAt;
+
     @Schema(description = "일기 이미지 URL", requiredMode = RequiredMode.NOT_REQUIRED)
     private String imageURL;
 
+    @Schema(description = "평가 점수 (1~5 사이의 숫자)")
+    private final String review;
+
     @QueryProjection
     public GetDiaryAdminResponse(Long id, String imageURL, String prompt,
-        LocalDateTime createdAt) {
+        LocalDateTime createdAt, LocalDateTime imageCreatedAt, String review) {
         this.id = id;
         this.imageURL = imageURL;
         this.prompt = prompt;
         this.createdAt = createdAt;
+        this.imageCreatedAt = imageCreatedAt;
+        this.review = review;
     }
 
     public void updateImageUrl(String imageUrl) {

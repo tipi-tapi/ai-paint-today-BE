@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithId;
 import static tipitapi.drawmytoday.common.testdata.TestDiary.createDiaryWithIdAndCreatedAt;
@@ -15,6 +16,7 @@ import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +40,6 @@ import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.domain.diary.exception.DiaryNotFoundException;
-import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.domain.diary.exception.NotOwnerOfDiaryException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -69,6 +70,8 @@ class DiaryServiceTest {
     PromptService promptService;
     @Mock
     ValidateTicketService validateTicketService;
+    @Mock
+    ValidateImageService validateImageService;
     @InjectMocks
     DiaryService diaryService;
 
@@ -85,15 +88,14 @@ class DiaryServiceTest {
             void it_returns_diary() {
                 User user = createUserWithId(1L);
                 Diary diary = createDiaryWithId(1L, user, createEmotion());
-                Image image = createImage(diary);
+                List<Image> images = List.of(createImage(diary));
                 Language language = Language.ko;
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getImage(diary)).willReturn(image);
-                given(
-                    r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
-                ).willReturn("https://test.com");
+                given(imageService.getLatestImages(diary)).willReturn(images);
+                given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
+                    .willReturn("https://test.com");
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
 
@@ -108,16 +110,15 @@ class DiaryServiceTest {
                 User user = createUserWithId(1L);
                 Emotion emotion = createEmotion();
                 Diary diary = createDiaryWithId(1L, user, emotion);
-                Image image = createImage(diary);
+                List<Image> images = List.of(createImage(diary));
 
                 Language language = Language.en;
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getImage(diary)).willReturn(image);
-                given(
-                    r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
-                ).willReturn("https://test.com");
+                given(imageService.getLatestImages(diary)).willReturn(images);
+                given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
+                    .willReturn("https://test.com");
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
 
@@ -132,16 +133,15 @@ class DiaryServiceTest {
                 User user = createUserWithId(1L);
                 Emotion emotion = createEmotion();
                 Diary diary = createDiaryWithId(1L, user, emotion);
-                Image image = createImage(diary);
+                List<Image> images = List.of(createImage(diary));
 
                 Language language = Language.ko;
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getImage(diary)).willReturn(image);
-                given(
-                    r2PreSignedService.getPreSignedUrlForShare(any(String.class), any(Long.class))
-                ).willReturn("https://test.com");
+                given(imageService.getLatestImages(diary)).willReturn(images);
+                given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
+                    .willReturn("https://test.com");
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
 
@@ -238,37 +238,82 @@ class DiaryServiceTest {
         @DisplayName("주어진 유저의 일기가 존재할 경우")
         class if_diary_of_user_exists {
 
-            @Test
-            @DisplayName("일기에 해당하는 이미지가 없을 경우")
-            void it_returns_diaries_without_image() {
-                User user = createUserWithId(1L);
-                Diary diary = createDiaryWithId(1L, user, createEmotion());
-                given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
-                    any(Long.class), any(LocalDateTime.class), any(LocalDateTime.class)))
-                    .willReturn(List.of(diary));
+            @Nested
+            @DisplayName("일기에 해당하는 대표 이미지가 없을 경우")
+            class If_selected_image_not_exist {
 
-                assertThatThrownBy(() -> diaryService.getMonthlyDiaries(1L, 2023, 6))
-                    .isInstanceOf(ImageNotFoundException.class);
+                @Test
+                @DisplayName("가장 최신 이미지를 대표 이미지로 설정한 이후 해당 일기를 포함한 전체 일기를 반환한다.")
+                void change_latest_image_to_selected_image_then_return() {
+                    // given
+                    User user = createUserWithId(1L);
+                    Long diaryId = 2L;
+                    Diary diary = createDiaryWithId(diaryId, user, createEmotion());
+                    Image latestImage = createImage(diary);
+                    latestImage.setSelected(false);
+                    GetMonthlyDiariesResponse response = new GetMonthlyDiariesResponse(
+                        diaryId, null, LocalDateTime.of(2023, 6, 1, 0, 0));
+                    List<GetMonthlyDiariesResponse> responses = new ArrayList<>();
+                    responses.add(response);
+
+                    given(validateUserService.validateUserById(1L)).willReturn(user);
+                    given(diaryRepository.getMonthlyDiaries(any(Long.class),
+                        any(LocalDateTime.class), any(LocalDateTime.class)))
+                        .willReturn(responses);
+                    given(imageService.getOneLatestImage(eq(diaryId)))
+                        .willReturn(Optional.of(latestImage));
+
+                    // when
+                    List<GetMonthlyDiariesResponse> monthlyDiaries = diaryService.getMonthlyDiaries(
+                        1L, 2023, 6);
+
+                    // then
+                    assertThat(monthlyDiaries).hasSize(1);
+                    assertThat(latestImage.isSelected()).isTrue();
+                }
+
+                @Test
+                @DisplayName("가장 최신 이미지도 없을 경우 전체 일기 중 해당 일기는 반환하지 않는다.")
+                void If_latest_image_not_exist_then_return_diaries_without_image() {
+                    // given
+                    User user = createUserWithId(1L);
+                    Long diaryId = 2L;
+                    GetMonthlyDiariesResponse response = new GetMonthlyDiariesResponse(
+                        diaryId, null, LocalDateTime.of(2023, 6, 1, 0, 0));
+                    List<GetMonthlyDiariesResponse> responses = new ArrayList<>();
+                    responses.add(response);
+                    given(validateUserService.validateUserById(1L)).willReturn(user);
+                    given(diaryRepository.getMonthlyDiaries(any(Long.class),
+                        any(LocalDateTime.class), any(LocalDateTime.class))).willReturn(responses);
+                    given(imageService.getOneLatestImage(eq(diaryId))).willReturn(Optional.empty());
+
+                    // when
+                    List<GetMonthlyDiariesResponse> monthlyDiaries = diaryService.getMonthlyDiaries(
+                        1L, 2023, 6);
+
+                    // then
+                    assertThat(monthlyDiaries).hasSize(0);
+                }
             }
 
             @Test
             @DisplayName("일기들을 반환한다.")
             void it_returns_diaries() {
                 User user = createUserWithId(1L);
-                Diary diary = createDiaryWithId(1L, user, createEmotion());
-                createImage(diary);
+                Long diaryId = 2L;
+                GetMonthlyDiariesResponse response = new GetMonthlyDiariesResponse(
+                    diaryId, "imageUrl", LocalDateTime.of(2023, 6, 1, 0, 0));
+                List<GetMonthlyDiariesResponse> responses = new ArrayList<>();
+                responses.add(response);
                 given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(diaryRepository.findAllByUserUserIdAndDiaryDateBetween(
-                    any(Long.class), any(LocalDateTime.class), any(LocalDateTime.class)))
-                    .willReturn(List.of(diary));
+                given(diaryRepository.getMonthlyDiaries(any(Long.class), any(LocalDateTime.class),
+                    any(LocalDateTime.class))).willReturn(responses);
 
                 List<GetMonthlyDiariesResponse> getDiaryResponses = diaryService.getMonthlyDiaries(
-                    1L,
-                    2023, 6);
+                    1L, 2023, 6);
 
                 assertThat(getDiaryResponses).hasSize(1);
-                assertThat(getDiaryResponses.get(0).getId()).isEqualTo(diary.getDiaryId());
+                assertThat(getDiaryResponses.get(0).getId()).isEqualTo(diaryId);
             }
         }
     }

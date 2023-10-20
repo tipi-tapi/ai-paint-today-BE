@@ -35,7 +35,7 @@ public class R2Service {
         return PutObjectRequest.builder()
             .bucket(bucketName)
             .key(filePath)
-            .contentType("image/png")
+            .contentType("image/webp")
             .acl(PRIVATE).build();
     }
 }

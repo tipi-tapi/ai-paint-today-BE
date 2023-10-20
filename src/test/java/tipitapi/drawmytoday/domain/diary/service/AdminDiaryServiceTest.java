@@ -2,8 +2,6 @@ package tipitapi.drawmytoday.domain.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
@@ -47,18 +45,17 @@ class AdminDiaryServiceTest {
             diaries.add(new GetDiaryAdminResponse(1L,
                 "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/1.png",
                 "joyful , pink , canvas-textured, Oil Pastel, a crowded subway",
-                LocalDateTime.of(2023, 6, 16, 15, 0, 0)));
+                LocalDateTime.of(2023, 6, 16, 15, 0, 0), LocalDateTime.now(), "4"));
             diaries.add(new GetDiaryAdminResponse(2L,
                 "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/2.png",
                 "angry , purple , canvas-textured, Oil Pastel, school",
-                LocalDateTime.of(2023, 6, 17, 15, 0, 0)));
+                LocalDateTime.of(2023, 6, 17, 15, 0, 0), LocalDateTime.now(), null));
             given(
                 diaryRepository.getDiariesForMonitorAsPage(any(Pageable.class),
                     any(Direction.class), eq(1L)))
                 .willReturn(new PageImpl<>(diaries));
-            given(
-                r2PreSignedService.getPreSignedUrlForShare(anyString(), anyLong()))
-                .willReturn("https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/2.png");
+            given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
+                .willReturn("https://test.com");
 
             // when
             Page<GetDiaryAdminResponse> response = adminDiaryService.getDiaries(10, 0,

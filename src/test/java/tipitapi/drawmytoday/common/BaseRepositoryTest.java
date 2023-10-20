@@ -10,8 +10,10 @@ import tipitapi.drawmytoday.common.testdata.TestImage;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
+import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.diary.repository.ImageRepository;
+import tipitapi.drawmytoday.domain.diary.repository.PromptRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.repository.EmotionRepository;
 import tipitapi.drawmytoday.domain.user.domain.User;
@@ -29,6 +31,8 @@ public abstract class BaseRepositoryTest {
     protected EmotionRepository emotionRepository;
     @Autowired
     protected ImageRepository imageRepository;
+    @Autowired
+    protected PromptRepository promptRepository;
 
     protected User createUser() {
         return userRepository.save(TestUser.createUser());
@@ -49,6 +53,10 @@ public abstract class BaseRepositoryTest {
 
     protected Emotion createEmotion() {
         return emotionRepository.save(TestEmotion.createEmotion());
+    }
+
+    protected Prompt createPrompt(Diary diary, String promptText, boolean isSuccess) {
+        return promptRepository.save(Prompt.create(diary, promptText, isSuccess));
     }
 
 }

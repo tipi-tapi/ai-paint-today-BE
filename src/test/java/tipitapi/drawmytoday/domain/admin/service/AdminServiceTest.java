@@ -73,11 +73,11 @@ class AdminServiceTest {
                 diaries.add(new GetDiaryAdminResponse(1L,
                     "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/1.png",
                     "joyful , pink , canvas-textured, Oil Pastel, a crowded subway",
-                    LocalDateTime.of(2023, 6, 16, 15, 0, 0)));
+                    LocalDateTime.of(2023, 6, 16, 15, 0, 0), LocalDateTime.now(), "4"));
                 diaries.add(new GetDiaryAdminResponse(2L,
                     "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/2.png",
                     "angry , purple , canvas-textured, Oil Pastel, school",
-                    LocalDateTime.of(2023, 6, 17, 15, 0, 0)));
+                    LocalDateTime.of(2023, 6, 17, 15, 0, 0), LocalDateTime.now(), "3"));
                 given(adminDiaryService.getDiaries(any(Integer.class), any(Integer.class),
                     any(Direction.class), anyLong())).willReturn(new PageImpl<>(diaries));
 
