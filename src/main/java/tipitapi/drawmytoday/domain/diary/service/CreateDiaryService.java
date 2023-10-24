@@ -10,6 +10,7 @@ import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
+import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.exception.PromptNotExistException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -34,9 +35,7 @@ public class CreateDiaryService {
     private final ValidateTicketService validateTicketService;
     private final ImageGeneratorService karloService;
     private final PromptService promptService;
-    private final PromptTextService promptTextService;
     private final Encryptor encryptor;
-    private final String DUMMY_IMAGE_PATH = "test/dummy.png";
 
     @Transactional(noRollbackFor = {ImageGeneratorException.class})
     public CreateDiaryResponse createDiary(Long userId, Long emotionId, String keyword,
@@ -59,19 +58,20 @@ public class CreateDiaryService {
         return new CreateDiaryResponse(diary.getDiaryId());
     }
 
-    @Transactional
-    public CreateDiaryResponse createTestDiary(Long userId, Long emotionId, String keyword,
-        String notes, LocalDate diaryDate, LocalTime userTime) {
+    @Transactional(noRollbackFor = {ImageGeneratorException.class})
+    public CreateDiaryResponse createTestDiary(Long userId, CreateTestDiaryRequest request)
+        throws ImageGeneratorException {
+        LocalDate diaryDate = request.getDiaryDate();
         User user = validateUserService.validateAdminUserById(userId);
         validateDiaryService.validateExistsByDate(userId, diaryDate);
-        validateTicketService.findAndUseTicket(userId);
-        Emotion emotion = validateEmotionService.validateEmotionById(emotionId);
-        LocalDateTime diaryDateTime = diaryDate.atTime(userTime);
+        Emotion emotion = validateEmotionService.validateEmotionById(request.getEmotionId());
+        LocalDateTime diaryDateTime = diaryDate.atTime(request.getUserTime());
 
-        Diary diary = saveDiary(notes, user, emotion, diaryDateTime, true);
-        String prompt = promptTextService.createPromptText(emotion, keyword);
-        promptService.createPrompt(diary, prompt, true);
-        imageService.createImage(diary, DUMMY_IMAGE_PATH, true);
+        byte[] image = karloService.generateTestImage(request);
+
+        Diary diary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, true);
+        promptService.createPrompt(diary, request.getKarloParameter().getPrompt(), true);
+        imageService.uploadAndCreateImage(diary, image, true);
 
         return new CreateDiaryResponse(diary.getDiaryId());
     }

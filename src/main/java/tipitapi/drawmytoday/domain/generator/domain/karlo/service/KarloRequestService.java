@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest.KarloParameter;
 import tipitapi.drawmytoday.domain.generator.domain.karlo.dto.CreateKarloImageRequest;
 import tipitapi.drawmytoday.domain.generator.domain.karlo.dto.KarloUrlResponse;
 import tipitapi.drawmytoday.domain.generator.domain.karlo.exception.KarloRequestFailException;
@@ -40,6 +41,23 @@ class KarloRequestService {
         try {
             HttpEntity<CreateKarloImageRequest> request = getRequest(
                 CreateKarloImageRequest.withUrl(prompt));
+
+            String url = Optional.ofNullable(
+                    restTemplate.postForObject(karloImageCreateUrl, request, KarloUrlResponse.class)
+                ).orElseThrow(KarloRequestFailException::new)
+                .getUrl(0);
+            return new URL(url).openStream().readAllBytes();
+        } catch (HttpClientErrorException e) {
+            throw new KarloRequestFailException(e);
+        } catch (IOException e) {
+            throw new ImageInputStreamFailException();
+        }
+    }
+
+    byte[] getTestImageAsUrl(KarloParameter karloParameter) throws ImageGeneratorException {
+        try {
+            HttpEntity<CreateKarloImageRequest> request = getRequest(
+                CreateKarloImageRequest.test(karloParameter));
 
             String url = Optional.ofNullable(
                     restTemplate.postForObject(karloImageCreateUrl, request, KarloUrlResponse.class)
