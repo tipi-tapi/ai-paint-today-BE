@@ -2,6 +2,8 @@ package tipitapi.drawmytoday.domain.diary.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,8 +36,25 @@ public class TestDiaryController {
     @Operation(summary = "테스트 일기 생성", description = "테스트 일기를 생성합니다.(티켓 소모 x)")
     @ApiResponses(value = {
         @ApiResponse(
-            responseCode = "200",
-            description = "테스트 일기 생성 성공")
+            responseCode = "201",
+            description = "테스트 일기 생성 성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "U004 : 이미 그림일기를 그린 유저입니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "E001 : 감정을 찾을 수 없습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "409",
+            description = "D001 : 이미 일기를 그린 날짜입니다.",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "DE001 : DALL-E 이미지 생성에 실패하였습니다. \r\n "
+                + "IIS001 : 이미지 스트림을 가져오는데 실패하였습니다.",
+            content = @Content(schema = @Schema(hidden = true))),
     })
     @PostMapping("/test")
     public ResponseEntity<SuccessResponse<CreateDiaryResponse>> createTestDiary(
@@ -43,7 +62,7 @@ public class TestDiaryController {
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo) throws ImageGeneratorException {
         return SuccessResponse.of(createDiaryService.createTestDiary(
             tokenInfo.getUserId(), createTestDiaryRequest
-        )).asHttp(HttpStatus.OK);
+        )).asHttp(HttpStatus.CREATED);
     }
 
 }
