@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.domain.generator.domain.dalle.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +67,8 @@ public class DallEService implements ImageGeneratorService {
     }
 
     @Override
-    public byte[] generateTestImage(CreateTestDiaryRequest request) throws ImageGeneratorException {
+    public List<byte[]> generateTestImage(CreateTestDiaryRequest request)
+        throws ImageGeneratorException {
         throw new UnsupportedOperationException();
     }
 }

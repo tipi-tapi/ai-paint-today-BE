@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.domain.generator.domain.karlo.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,8 @@ class KarloService implements ImageGeneratorService {
 
     @Override
     @Transactional(noRollbackFor = ImageGeneratorException.class)
-    public byte[] generateTestImage(CreateTestDiaryRequest request) throws ImageGeneratorException {
+    public List<byte[]> generateTestImage(CreateTestDiaryRequest request)
+        throws ImageGeneratorException {
         KarloParameter param = request.getKarloParameter();
         try {
             return karloRequestService.getTestImageAsUrl(param);

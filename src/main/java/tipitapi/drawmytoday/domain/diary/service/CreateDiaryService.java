@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.domain.diary.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,11 +68,13 @@ public class CreateDiaryService {
         Emotion emotion = validateEmotionService.validateEmotionById(request.getEmotionId());
         LocalDateTime diaryDateTime = diaryDate.atTime(request.getUserTime());
 
-        byte[] image = karloService.generateTestImage(request);
+        List<byte[]> images = karloService.generateTestImage(request);
 
         Diary diary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, true);
         promptService.createPrompt(diary, request.getKarloParameter().getPrompt(), true);
-        imageService.uploadAndCreateImage(diary, image, true);
+        for (int i = 0; i < images.size(); i++) {
+            imageService.uploadAndCreateImage(diary, images.get(i), i == 0);
+        }
 
         return new CreateDiaryResponse(diary.getDiaryId());
     }
