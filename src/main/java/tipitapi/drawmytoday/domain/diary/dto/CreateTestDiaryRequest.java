@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
@@ -40,19 +42,22 @@ public class CreateTestDiaryRequest {
     @Schema(description = "현재 유저 시간", nullable = true, example = "12:00:00")
     private LocalTime userTime;
 
+    @Valid
     private KarloParameter karloParameter;
 
     @Getter
     public static class KarloParameter {
 
-        @Schema(description = "프롬프트", nullable = true)
+        @NotBlank
+        @Schema(description = "프롬프트", nullable = false)
         private String prompt;
 
         @Schema(description = "부정 프롬프트", nullable = true)
         private String negativePrompt;
 
         @Positive
-        @Schema(description = "이미지 개수", nullable = false)
+        @NotNull
+        @Schema(description = "이미지 개수. (양수여야 한다)", nullable = false)
         private Integer samples;
 
         @Schema(description = "이미지 생성 과정의 노이즈 제거 단계 수 (기본값: 25, 최소: 10, 최대 100)",
