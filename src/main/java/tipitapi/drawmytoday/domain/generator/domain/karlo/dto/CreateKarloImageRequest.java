@@ -24,11 +24,12 @@ public class CreateKarloImageRequest {
     private final String returnType;
     private final Integer priorNumInferenceSteps;
     private final Double priorGuidanceScale;
+    private final Long[] seed;
 
     @Builder
     public CreateKarloImageRequest(String prompt, String negativePrompt, String imageFormat,
         Integer samples, String returnType, Integer priorNumInferenceSteps,
-        Double priorGuidanceScale) {
+        Double priorGuidanceScale, Long[] seed) {
         this.prompt = prompt;
         this.negativePrompt = negativePrompt;
         this.imageFormat = imageFormat;
@@ -36,6 +37,7 @@ public class CreateKarloImageRequest {
         this.returnType = returnType;
         this.priorNumInferenceSteps = priorNumInferenceSteps;
         this.priorGuidanceScale = priorGuidanceScale;
+        this.seed = seed;
     }
 
     public static CreateKarloImageRequest withUrl(String prompt) {
@@ -56,6 +58,7 @@ public class CreateKarloImageRequest {
             .returnType("url")
             .priorNumInferenceSteps(param.getPriorNumInferenceSteps())
             .priorGuidanceScale(param.getPriorGuidanceScale())
+            .seed(param.getSeed())
             .build();
     }
 }

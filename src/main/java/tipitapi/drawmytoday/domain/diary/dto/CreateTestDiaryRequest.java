@@ -62,6 +62,10 @@ public class CreateTestDiaryRequest {
         @Schema(description = "이미지 생성 과정의 노이즈 제거 척도 (기본값: 5.0, 최소: 1.0, 최대: 20.0)",
             nullable = true)
         private Double priorGuidanceScale;
+
+        @Schema(description = "각 이미지 생성 작업에 사용할 시드(Seed) 값. "
+            + "생성할 이미지 수와 같은 길이의 배열이어야 함. 0 이상 4,294,967,295 이하 숫자로 구성", nullable = true)
+        private Long[] seed;
     }
 
     public LocalTime getUserTime() {
