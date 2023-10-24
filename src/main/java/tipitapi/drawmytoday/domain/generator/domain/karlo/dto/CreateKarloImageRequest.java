@@ -49,7 +49,7 @@ public class CreateKarloImageRequest {
             .build();
     }
 
-    public static CreateKarloImageRequest test(KarloParameter param) {
+    public static CreateKarloImageRequest createTestRequest(KarloParameter param) {
         return CreateKarloImageRequest.builder()
             .prompt(param.getPrompt())
             .negativePrompt(param.getNegativePrompt())

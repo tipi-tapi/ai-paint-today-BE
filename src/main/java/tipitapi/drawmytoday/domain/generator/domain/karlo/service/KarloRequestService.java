@@ -59,7 +59,7 @@ class KarloRequestService {
     List<byte[]> getTestImageAsUrl(KarloParameter karloParameter) throws ImageGeneratorException {
         try {
             HttpEntity<CreateKarloImageRequest> request = getRequest(
-                CreateKarloImageRequest.test(karloParameter));
+                CreateKarloImageRequest.createTestRequest(karloParameter));
 
             List<String> imageUrls = Optional.ofNullable(
                     restTemplate.postForObject(karloImageCreateUrl, request, KarloUrlResponse.class)
