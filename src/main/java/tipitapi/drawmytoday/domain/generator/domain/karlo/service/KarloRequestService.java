@@ -2,6 +2,8 @@ package tipitapi.drawmytoday.domain.generator.domain.karlo.service;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest.KarloParameter;
 import tipitapi.drawmytoday.domain.generator.domain.karlo.dto.CreateKarloImageRequest;
 import tipitapi.drawmytoday.domain.generator.domain.karlo.dto.KarloUrlResponse;
 import tipitapi.drawmytoday.domain.generator.domain.karlo.exception.KarloRequestFailException;
@@ -46,6 +49,28 @@ class KarloRequestService {
                 ).orElseThrow(KarloRequestFailException::new)
                 .getUrl(0);
             return new URL(url).openStream().readAllBytes();
+        } catch (HttpClientErrorException e) {
+            throw new KarloRequestFailException(e);
+        } catch (IOException e) {
+            throw new ImageInputStreamFailException();
+        }
+    }
+
+    List<byte[]> getTestImageAsUrl(KarloParameter karloParameter) throws ImageGeneratorException {
+        try {
+            HttpEntity<CreateKarloImageRequest> request = getRequest(
+                CreateKarloImageRequest.createTestRequest(karloParameter));
+
+            List<String> imageUrls = Optional.ofNullable(
+                    restTemplate.postForObject(karloImageCreateUrl, request, KarloUrlResponse.class)
+                ).orElseThrow(KarloRequestFailException::new)
+                .getUrls();
+
+            List<byte[]> images = new ArrayList<>();
+            for (String url : imageUrls) {
+                images.add(new URL(url).openStream().readAllBytes());
+            }
+            return images;
         } catch (HttpClientErrorException e) {
             throw new KarloRequestFailException(e);
         } catch (IOException e) {

@@ -1,9 +1,11 @@
 package tipitapi.drawmytoday.domain.generator.domain.dalle.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
+import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.service.PromptService;
 import tipitapi.drawmytoday.domain.diary.service.PromptTextService;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -62,5 +64,11 @@ public class DallEService implements ImageGeneratorService {
             throw (e instanceof DallEPolicyViolationException) ?
                 DallERequestFailException.violatePolicy() : e;
         }
+    }
+
+    @Override
+    public List<byte[]> generateTestImage(CreateTestDiaryRequest request)
+        throws ImageGeneratorException {
+        throw new UnsupportedOperationException();
     }
 }
