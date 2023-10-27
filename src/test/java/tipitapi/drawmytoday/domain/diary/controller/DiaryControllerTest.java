@@ -303,12 +303,12 @@ class DiaryControllerTest extends ControllerTestSetup {
         }
 
         @Nested
-        @DisplayName("정상 content값이 들어오고, test 쿼리 파라미터가")
-        class If_test_param_is {
+        @DisplayName("정상 content값이 들어온다면")
+        class If_test_param_is_normal {
 
             @Test
-            @DisplayName("없다면 요청한 유저의 일기를 생성한다.")
-            void non_than_create_diary() throws Exception {
+            @DisplayName("요청한 유저의 일기를 생성한다.")
+            void create_diary() throws Exception {
                 // given
                 Long diaryId = 1L;
                 given(createDiaryService.createDiary(
@@ -327,33 +327,6 @@ class DiaryControllerTest extends ControllerTestSetup {
                     .with(SecurityMockMvcRequestPostProcessors.csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody));
-
-                // then
-                result.andExpect(status().isCreated());
-            }
-
-            @Test
-            @DisplayName("true라면 테스트용 일기를 생성한다.")
-            void true_than_create_test_diary() throws Exception {
-                // given
-                Long testDiaryId = 1L;
-                given(createDiaryService.createTestDiary(
-                    REQUEST_USER_ID, emotionId, keyword, notes, diaryDate, userTime))
-                    .willReturn(new CreateDiaryResponse(testDiaryId));
-
-                // when
-                Map<String, Object> requestMap = new HashMap<>();
-                requestMap.put("emotionId", emotionId);
-                requestMap.put("keyword", keyword);
-                requestMap.put("notes", notes);
-                requestMap.put("diaryDate", diaryDate);
-                String requestBody = objectMapper.writeValueAsString(requestMap);
-
-                ResultActions result = mockMvc.perform(post(BASIC_URL)
-                    .with(SecurityMockMvcRequestPostProcessors.csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody)
-                    .queryParam("test", "true"));
 
                 // then
                 result.andExpect(status().isCreated());

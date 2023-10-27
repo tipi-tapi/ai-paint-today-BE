@@ -88,7 +88,7 @@ class ImageServiceTest {
             Long diaryId = 1L;
             Diary diary = createDiaryWithId(diaryId, createUser(), createEmotion());
             Image image = createImageWithId(1L, diary);
-            String imagePathRegex = "post/" + diaryId + "/\\d+_1.png";
+            String imagePathRegex = "post/" + diaryId + "/\\d+_1.webp";
 
             given(imageRepository.save(any(Image.class))).willReturn(image);
 

@@ -22,6 +22,12 @@ public class TestDiary {
         return diary;
     }
 
+    public static Diary createTestDiaryWithId(Long diaryId, User user, Emotion emotion) {
+        Diary diary = createTestDiary(user, emotion);
+        ReflectionTestUtils.setField(diary, "diaryId", diaryId);
+        return diary;
+    }
+
     public static Diary createDiaryWithDate(LocalDateTime diaryDate, User user, Emotion emotion) {
         Diary diary = createDiary(user, emotion);
         ReflectionTestUtils.setField(diary, "diaryDate", diaryDate);

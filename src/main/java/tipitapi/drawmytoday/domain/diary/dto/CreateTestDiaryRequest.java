@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.validator.ValidDiaryDate;
@@ -20,6 +21,7 @@ import tipitapi.drawmytoday.common.validator.ValidDiaryDate;
 @Getter
 @Schema(description = "태스트 일기 생성 Request")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class CreateTestDiaryRequest {
 
     @NotNull
@@ -46,6 +48,7 @@ public class CreateTestDiaryRequest {
     private KarloParameter karloParameter;
 
     @Getter
+    @AllArgsConstructor
     public static class KarloParameter {
 
         @NotBlank
