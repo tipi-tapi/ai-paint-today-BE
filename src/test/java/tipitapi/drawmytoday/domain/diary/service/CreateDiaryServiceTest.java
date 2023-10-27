@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -174,8 +175,7 @@ class CreateDiaryServiceTest {
             given(diaryRepository.save(any(Diary.class)))
                 .willReturn(testDiary);
             List<byte[]> images = IntStream.rangeClosed(1, samples)
-                .mapToObj(i -> new byte[1])
-                .toList();
+                .mapToObj(i -> new byte[1]).collect(Collectors.toList());
             given(imageGeneratorService.generateTestImage(any(CreateTestDiaryRequest.class)))
                 .willReturn(images);
 
