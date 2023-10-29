@@ -81,9 +81,8 @@ public class CreateTestDiaryRequest {
             nullable = true)
         private Double guidanceScale;
 
-        @Schema(description = "디코더를 통한 노이즈 제거 단계에서 사용할 스케줄러(Scheduler), 다음 중 하나\n"
-            + "decoder_ddim_v_prediction\n"
-            + "decoder_ddpm_v_prediction\n"
+        @Schema(description = "디코더를 통한 노이즈 제거 단계에서 사용할 스케줄러(Scheduler), 다음 중 하나"
+            + "decoder_ddim_v_prediction, decoder_ddpm_v_prediction "
             + "(기본값: decoder_ddim_v_prediction)", nullable = true)
         private String scheduler;
 
