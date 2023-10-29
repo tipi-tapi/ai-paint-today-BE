@@ -49,6 +49,7 @@ public class CreateTestDiaryRequest {
     private KarloParameter karloParameter;
 
     @Getter
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class KarloParameter {
 
@@ -89,6 +90,13 @@ public class CreateTestDiaryRequest {
         @Schema(description = "각 이미지 생성 작업에 사용할 시드(Seed) 값. "
             + "생성할 이미지 수와 같은 길이의 배열이어야 함. 0 이상 4,294,967,295 이하 숫자로 구성", nullable = true)
         private Long[] seed;
+
+        public String getScheduler() {
+            if (Objects.equals(scheduler, "decoder_ddpm_v_prediction")) {
+                return "decoder_ddpm_v_prediction";
+            }
+            return "decoder_ddim_v_prediction";
+        }
     }
 
     public LocalTime getUserTime() {
@@ -96,12 +104,5 @@ public class CreateTestDiaryRequest {
             return LocalTime.now();
         }
         return userTime;
-    }
-
-    public String getScheduler() {
-        if (Objects.equals(karloParameter.scheduler, "decoder_ddpm_v_prediction")) {
-            return "decoder_ddpm_v_prediction";
-        }
-        return "decoder_ddim_v_prediction";
     }
 }
