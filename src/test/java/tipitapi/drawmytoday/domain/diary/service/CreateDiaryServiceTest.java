@@ -162,7 +162,8 @@ class CreateDiaryServiceTest {
         void create_test_diary(int samples) throws Exception {
             // given
             KarloParameter karloParameter = new KarloParameter("prompt", "negativePrompt",
-                samples, 10, 10D, null);
+                samples, 10, 10D, 50, 5D,
+                "decoder_ddim_v_prediction", null);
             CreateTestDiaryRequest request = new CreateTestDiaryRequest(1L, "notes",
                 LocalDate.now(), LocalTime.now(), karloParameter);
             User user = TestUser.createAdminUserWithId(1L);

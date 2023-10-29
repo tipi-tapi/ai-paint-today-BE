@@ -190,6 +190,9 @@ class KarloRequestServiceTest {
                 2,
                 10,
                 50D,
+                50,
+                5D,
+                "decoder_ddim_v_prediction",
                 new Long[]{1L, 2L}
             );
         }

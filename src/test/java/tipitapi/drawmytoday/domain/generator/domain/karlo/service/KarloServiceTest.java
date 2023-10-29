@@ -82,8 +82,7 @@ class KarloServiceTest {
         @DisplayName("karlo 요청을 실패할 경우 fail prompt를 저장한다.")
         void karlo_request_fail_then_generateImage_fail() throws Exception {
             // given
-            KarloParameter karloParameter = new KarloParameter("prompt", "negativePrompt",
-                1, 10, 10D, null);
+            KarloParameter karloParameter = getKarloParameter();
             CreateTestDiaryRequest request = new CreateTestDiaryRequest(1L, "notes",
                 LocalDate.now(), LocalTime.now(), karloParameter);
             given(karloRequestService.getTestImageAsUrl(any(KarloParameter.class)))
@@ -100,8 +99,7 @@ class KarloServiceTest {
         @DisplayName("karlo 요청을 성공할 경우 이미지들을 반환한다.")
         void karlo_request_success_then_return_images() throws Exception {
             // given
-            KarloParameter karloParameter = new KarloParameter("prompt", "negativePrompt",
-                1, 10, 10D, null);
+            KarloParameter karloParameter = getKarloParameter();
             CreateTestDiaryRequest request = new CreateTestDiaryRequest(1L, "notes",
                 LocalDate.now(), LocalTime.now(), karloParameter);
             List<byte[]> images = List.of(new byte[0]);
@@ -114,6 +112,20 @@ class KarloServiceTest {
             // then
             verify(promptService, never()).createPrompt(any(String.class), eq(false));
             assertThat(returnImages).isEqualTo(images);
+        }
+
+        private KarloParameter getKarloParameter() {
+            return new KarloParameter(
+                "prompt",
+                "negativePrompt",
+                2,
+                10,
+                50D,
+                50,
+                5D,
+                "decoder_ddim_v_prediction",
+                new Long[]{1L, 2L}
+            );
         }
     }
 }
