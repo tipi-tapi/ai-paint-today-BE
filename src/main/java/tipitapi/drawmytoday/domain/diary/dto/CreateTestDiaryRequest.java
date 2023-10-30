@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Objects;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -48,6 +49,7 @@ public class CreateTestDiaryRequest {
     private KarloParameter karloParameter;
 
     @Getter
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class KarloParameter {
 
@@ -71,9 +73,29 @@ public class CreateTestDiaryRequest {
             nullable = true)
         private Double priorGuidanceScale;
 
+        @Schema(description = "디코더를 통한 노이즈 제거 단계  (기본값: 50, 최소: 10, 최대: 100)",
+            nullable = true)
+        private Integer numInferenceSteps;
+
+        @Schema(description = "디코더를 통한 노이즈 제거 척도 (기본값: 5.0, 최소: 1.0, 최대: 20.0)",
+            nullable = true)
+        private Double guidanceScale;
+
+        @Schema(description = "디코더를 통한 노이즈 제거 단계에서 사용할 스케줄러(Scheduler), 다음 중 하나"
+            + "decoder_ddim_v_prediction, decoder_ddpm_v_prediction "
+            + "(기본값: decoder_ddim_v_prediction)", nullable = true)
+        private String scheduler;
+
         @Schema(description = "각 이미지 생성 작업에 사용할 시드(Seed) 값. "
             + "생성할 이미지 수와 같은 길이의 배열이어야 함. 0 이상 4,294,967,295 이하 숫자로 구성", nullable = true)
         private Long[] seed;
+
+        public String getScheduler() {
+            if (Objects.equals(scheduler, "decoder_ddpm_v_prediction")) {
+                return "decoder_ddpm_v_prediction";
+            }
+            return "decoder_ddim_v_prediction";
+        }
     }
 
     public LocalTime getUserTime() {

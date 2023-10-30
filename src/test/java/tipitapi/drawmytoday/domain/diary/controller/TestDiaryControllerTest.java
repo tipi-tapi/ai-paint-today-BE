@@ -62,6 +62,9 @@ class TestDiaryControllerTest extends ControllerTestSetup {
         private final Integer samples = 3;
         private final Integer priorNumInferenceSteps = 10;
         private final Double priorGuidanceScale = 50D;
+        private final Integer numInferenceSteps = 50;
+        private final Double guidanceScale = 5D;
+        private final String scheduler = "decoder_ddim_v_prediction";
         private final Long[] seed = new Long[]{1L, 2L, 3L};
 
         @DisplayName("request body에 들어온 karloParam 중")
@@ -74,7 +77,8 @@ class TestDiaryControllerTest extends ControllerTestSetup {
             void it_returns_400_if_prompt_field_is_blank(String prompt) throws Exception {
                 // given
                 KarloParameter karloParameter = new KarloParameter(prompt, negativePrompt,
-                    samples, priorNumInferenceSteps, priorGuidanceScale, seed);
+                    samples, priorNumInferenceSteps, priorGuidanceScale, numInferenceSteps,
+                    guidanceScale, scheduler, seed);
                 requestMap.put("karloParameter", karloParameter);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
 
@@ -94,7 +98,8 @@ class TestDiaryControllerTest extends ControllerTestSetup {
             void it_returns_400_if_samples_not_positive(int samples) throws Exception {
                 // given
                 KarloParameter karloParameter = new KarloParameter(prompt, negativePrompt,
-                    samples, priorNumInferenceSteps, priorGuidanceScale, seed);
+                    samples, priorNumInferenceSteps, priorGuidanceScale, numInferenceSteps,
+                    guidanceScale, scheduler, seed);
                 requestMap.put("karloParameter", karloParameter);
                 String requestBody = objectMapper.writeValueAsString(requestMap);
 
@@ -117,7 +122,8 @@ class TestDiaryControllerTest extends ControllerTestSetup {
             given(createDiaryService.createTestDiary(anyLong(), any(CreateTestDiaryRequest.class)))
                 .willReturn(createDiaryResponse);
             KarloParameter karloParameter = new KarloParameter(prompt, negativePrompt,
-                samples, priorNumInferenceSteps, priorGuidanceScale, seed);
+                samples, priorNumInferenceSteps, priorGuidanceScale, numInferenceSteps,
+                guidanceScale, scheduler, seed);
             requestMap.put("karloParameter", karloParameter);
             String requestBody = objectMapper.writeValueAsString(requestMap);
 
