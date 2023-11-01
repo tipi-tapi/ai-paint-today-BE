@@ -14,7 +14,7 @@ import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
 public interface DiaryQueryRepository {
 
     Page<GetDiaryAdminResponse> getDiariesForMonitorAsPage(Pageable pageable,
-        Direction direction, Long emotionId);
+        Direction direction, Long emotionId, boolean withTest);
 
     Optional<Diary> getDiaryExistsByDiaryDate(Long userId, LocalDate diaryDate);
 

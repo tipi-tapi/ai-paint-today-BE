@@ -51,10 +51,13 @@ public class AdminController {
         @RequestParam(name = "direction", required = false, defaultValue = "DESC") Direction direction,
         @Parameter(name = "emotion", description = "필터링할 감정 ID", in = ParameterIn.QUERY)
         @RequestParam(name = "emotion", required = false) Long emotionId,
+        @Parameter(name = "with_test", description = "테스트용 일기 포함 여부", in = ParameterIn.QUERY)
+        @RequestParam(name = "with_test", required = false, defaultValue = "true") boolean withTest,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
-            adminService.getDiaries(tokenInfo.getUserId(), size, page, direction, emotionId)
+            adminService.getDiaries(tokenInfo.getUserId(), size, page, direction, emotionId,
+                withTest)
         ).asHttp(HttpStatus.OK);
     }
 }
