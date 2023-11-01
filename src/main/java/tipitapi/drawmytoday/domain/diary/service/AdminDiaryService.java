@@ -22,9 +22,9 @@ public class AdminDiaryService {
     private int imageExpiration;
 
     public Page<GetDiaryAdminResponse> getDiaries(int size, int page, Direction direction,
-        Long emotionId) {
+        Long emotionId, boolean test) {
         return diaryRepository.getDiariesForMonitorAsPage(
-                Pageable.ofSize(size).withPage(page), direction, emotionId)
+                Pageable.ofSize(size).withPage(page), direction, emotionId, test)
             .map(this::generatePresignedURL);
     }
 

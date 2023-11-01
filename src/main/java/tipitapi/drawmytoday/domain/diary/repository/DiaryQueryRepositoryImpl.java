@@ -31,9 +31,9 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
 
     @Override
     public Page<GetDiaryAdminResponse> getDiariesForMonitorAsPage(Pageable pageable,
-        Direction direction, Long emotionId) {
+        Direction direction, Long emotionId, boolean test) {
 
-        BooleanExpression withoutTest = diary.isTest.eq(false);
+        BooleanExpression withoutTest = test ? null : diary.isTest.eq(false);
         BooleanExpression withEmotion = null;
         if (emotionId != null) {
             Emotion filterEmotion = queryFactory.selectFrom(emotion)

@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.domain.diary.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
@@ -52,14 +53,14 @@ class AdminDiaryServiceTest {
                 LocalDateTime.of(2023, 6, 17, 15, 0, 0), LocalDateTime.now(), null));
             given(
                 diaryRepository.getDiariesForMonitorAsPage(any(Pageable.class),
-                    any(Direction.class), eq(1L)))
+                    any(Direction.class), eq(1L), anyBoolean()))
                 .willReturn(new PageImpl<>(diaries));
             given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
                 .willReturn("https://test.com");
 
             // when
             Page<GetDiaryAdminResponse> response = adminDiaryService.getDiaries(10, 0,
-                Direction.ASC, 1L);
+                Direction.ASC, 1L, true);
 
             // then
             assertThat(response.getContent().size()).isEqualTo(2);

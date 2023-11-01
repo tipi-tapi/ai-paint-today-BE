@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.domain.admin.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -59,7 +60,7 @@ class AdminControllerTest extends ControllerTestSetup {
                 "angry , blue , glass-textured, crayon, school",
                 LocalDateTime.now().minusDays(1), LocalDateTime.now(), "3"));
             given(adminService.getDiaries(anyLong(), anyInt(), anyInt(), any(Direction.class),
-                anyLong()))
+                anyLong(), eq(true)))
                 .willReturn(new PageImpl<>(diaries, pageable, 2));
 
             // when

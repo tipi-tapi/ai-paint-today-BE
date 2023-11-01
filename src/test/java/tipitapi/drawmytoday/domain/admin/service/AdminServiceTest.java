@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.domain.admin.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createAdminUserWithId;
@@ -53,7 +54,8 @@ class AdminServiceTest {
 
                 // when
                 // then
-                assertThatThrownBy(() -> adminService.getDiaries(1L, 10, 0, Direction.ASC, 1L))
+                assertThatThrownBy(
+                    () -> adminService.getDiaries(1L, 10, 0, Direction.ASC, 1L, true))
                     .isInstanceOf(UserAccessDeniedException.class);
             }
         }
@@ -79,11 +81,12 @@ class AdminServiceTest {
                     "angry , purple , canvas-textured, Oil Pastel, school",
                     LocalDateTime.of(2023, 6, 17, 15, 0, 0), LocalDateTime.now(), "3"));
                 given(adminDiaryService.getDiaries(any(Integer.class), any(Integer.class),
-                    any(Direction.class), anyLong())).willReturn(new PageImpl<>(diaries));
+                    any(Direction.class), anyLong(), anyBoolean())).willReturn(
+                    new PageImpl<>(diaries));
 
                 // when
                 Page<GetDiaryAdminResponse> response = adminService.getDiaries(1L, 10, 0,
-                    Direction.ASC, 1L);
+                    Direction.ASC, 1L, true);
 
                 // then
                 assertThat(response.getContent().size()).isEqualTo(2);
