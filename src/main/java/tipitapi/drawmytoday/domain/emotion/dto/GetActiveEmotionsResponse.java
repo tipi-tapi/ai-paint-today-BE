@@ -23,15 +23,19 @@ public class GetActiveEmotionsResponse {
     @Schema(description = "감정 색깔 HEX", requiredMode = RequiredMode.REQUIRED)
     private final String color;
 
-    public static GetActiveEmotionsResponse of(Long id, String name, String color) {
-        return new GetActiveEmotionsResponse(id, name, color);
+    @Schema(description = "감정 색깔 프롬프트값", requiredMode = RequiredMode.REQUIRED)
+    private final String colorPrompt;
+
+    public static GetActiveEmotionsResponse of(Long id, String name, String color,
+        String colorPrompt) {
+        return new GetActiveEmotionsResponse(id, name, color, colorPrompt);
     }
 
     public static List<GetActiveEmotionsResponse> buildWithEmotions(List<Emotion> emotions,
         Language language) {
         return emotions.stream()
             .map(e -> GetActiveEmotionsResponse.of(
-                e.getEmotionId(), getEmotionName(language, e), e.getColor()))
+                e.getEmotionId(), getEmotionName(language, e), e.getColor(), e.getColorPrompt()))
             .collect(
                 Collectors.toList());
     }
