@@ -38,15 +38,19 @@ public class GetDiaryAdminResponse {
     @Schema(description = "평가 점수 (1~5 사이의 숫자)")
     private final String review;
 
+    @Schema(description = "테스트 일기 여부", requiredMode = RequiredMode.REQUIRED)
+    private final boolean isTest;
+
     @QueryProjection
     public GetDiaryAdminResponse(Long id, String imageURL, String prompt,
-        LocalDateTime createdAt, LocalDateTime imageCreatedAt, String review) {
+        LocalDateTime createdAt, LocalDateTime imageCreatedAt, String review, boolean isTest) {
         this.id = id;
         this.imageURL = imageURL;
         this.prompt = prompt;
         this.createdAt = createdAt;
         this.imageCreatedAt = imageCreatedAt;
         this.review = review;
+        this.isTest = isTest;
     }
 
     public void updateImageUrl(String imageUrl) {

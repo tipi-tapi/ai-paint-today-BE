@@ -46,7 +46,7 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
 
         List<GetDiaryAdminResponse> content = queryFactory.select(
                 new QGetDiaryAdminResponse(diary.diaryId, image.imageUrl, prompt.promptText,
-                    diary.createdAt, image.createdAt, image.review))
+                    diary.createdAt, image.createdAt, image.review, diary.isTest))
             .from(diary)
             .leftJoin(image).on(diary.diaryId.eq(image.diary.diaryId))
             .leftJoin(prompt).on(diary.diaryId.eq(prompt.diary.diaryId))

@@ -303,11 +303,13 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                     Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
                         Pageable.ofSize(size).withPage(page), Direction.DESC, null, true);
 
-                    assertThat(response.get()
+                    Optional<GetDiaryAdminResponse> testDiaryResponse = response.get()
                         .filter(
                             diaryResponse -> Objects.equals(diaryResponse.getId(),
                                 diary.getDiaryId()))
-                        .findAny()).isPresent();
+                        .findAny();
+                    assertThat(testDiaryResponse).isPresent();
+                    assertThat(testDiaryResponse.get().isTest()).isTrue();
                 }
             }
         }
