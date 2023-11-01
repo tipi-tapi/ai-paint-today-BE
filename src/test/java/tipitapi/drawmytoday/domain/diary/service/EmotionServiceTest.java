@@ -80,6 +80,8 @@ public class EmotionServiceTest {
                 assertThat(emotions.get(0).getId()).isEqualTo(activeEmotion.getEmotionId());
                 assertThat(emotions).extracting(GetActiveEmotionsResponse::getId)
                     .isNotEqualTo(inActiveEmotion.getEmotionId());
+                assertThat(emotions).extracting(GetActiveEmotionsResponse::getColorPrompt)
+                    .contains(activeEmotion.getColorPrompt());
             }
         }
 
