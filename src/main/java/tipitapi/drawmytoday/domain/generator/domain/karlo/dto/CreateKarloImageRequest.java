@@ -50,6 +50,10 @@ public class CreateKarloImageRequest {
     public static CreateKarloImageRequest withUrl(String prompt) {
         return CreateKarloImageRequest.builder()
             .prompt(prompt)
+            .negativePrompt(
+                "photo, picture, camera, realistic, filim, movie, real, high quality, Scary, cruel, gross, sensational, solid color, not cute")
+            .numInferenceSteps(100)
+            .guidanceScale(20D)
             .imageFormat("webp")
             .samples(1)
             .returnType("url")
