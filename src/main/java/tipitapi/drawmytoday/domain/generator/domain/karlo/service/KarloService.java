@@ -1,9 +1,12 @@
 package tipitapi.drawmytoday.domain.generator.domain.karlo.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
+import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest;
+import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest.KarloParameter;
 import tipitapi.drawmytoday.domain.diary.service.PromptService;
 import tipitapi.drawmytoday.domain.diary.service.PromptTextService;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
@@ -42,6 +45,19 @@ class KarloService implements ImageGeneratorService {
             return new GeneratedImageAndPrompt(prompt.getPromptText(), image);
         } catch (ImageGeneratorException e) {
             promptService.createPrompt(prompt.getPromptText(), false);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional(noRollbackFor = ImageGeneratorException.class)
+    public List<byte[]> generateTestImage(CreateTestDiaryRequest request)
+        throws ImageGeneratorException {
+        KarloParameter param = request.getKarloParameter();
+        try {
+            return karloRequestService.getTestImageAsUrl(param);
+        } catch (ImageGeneratorException e) {
+            promptService.createPrompt(param.getPrompt(), false);
             throw e;
         }
     }

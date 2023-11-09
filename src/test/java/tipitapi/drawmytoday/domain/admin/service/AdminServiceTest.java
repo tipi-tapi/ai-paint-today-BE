@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.domain.admin.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createAdminUserWithId;
@@ -53,7 +54,8 @@ class AdminServiceTest {
 
                 // when
                 // then
-                assertThatThrownBy(() -> adminService.getDiaries(1L, 10, 0, Direction.ASC, 1L))
+                assertThatThrownBy(
+                    () -> adminService.getDiaries(1L, 10, 0, Direction.ASC, 1L, true))
                     .isInstanceOf(UserAccessDeniedException.class);
             }
         }
@@ -73,17 +75,18 @@ class AdminServiceTest {
                 diaries.add(new GetDiaryAdminResponse(1L,
                     "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/1.png",
                     "joyful , pink , canvas-textured, Oil Pastel, a crowded subway",
-                    LocalDateTime.of(2023, 6, 16, 15, 0, 0), LocalDateTime.now(), "4"));
+                    LocalDateTime.of(2023, 6, 16, 15, 0, 0), LocalDateTime.now(), "4", false));
                 diaries.add(new GetDiaryAdminResponse(2L,
                     "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/2.png",
                     "angry , purple , canvas-textured, Oil Pastel, school",
-                    LocalDateTime.of(2023, 6, 17, 15, 0, 0), LocalDateTime.now(), "3"));
+                    LocalDateTime.of(2023, 6, 17, 15, 0, 0), LocalDateTime.now(), "3", false));
                 given(adminDiaryService.getDiaries(any(Integer.class), any(Integer.class),
-                    any(Direction.class), anyLong())).willReturn(new PageImpl<>(diaries));
+                    any(Direction.class), anyLong(), anyBoolean())).willReturn(
+                    new PageImpl<>(diaries));
 
                 // when
                 Page<GetDiaryAdminResponse> response = adminService.getDiaries(1L, 10, 0,
-                    Direction.ASC, 1L);
+                    Direction.ASC, 1L, true);
 
                 // then
                 assertThat(response.getContent().size()).isEqualTo(2);

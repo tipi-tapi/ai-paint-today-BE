@@ -16,8 +16,7 @@ public class PromptTextService {
         return promptTextBuilder(
             emotion.getEmotionPrompt(),
             emotion.getColorPrompt(),
-            "canvas-textured",
-            "Oil Pastel",
+            "Impressionist oil painting",
             keyword);
     }
 

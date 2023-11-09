@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.domain.admin.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,13 +54,13 @@ class AdminControllerTest extends ControllerTestSetup {
             diaries.add(new GetDiaryAdminResponse(1L,
                 "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/1.png",
                 "happy , pink , canvas-textured, Oil Pastel, a crowded subway",
-                LocalDateTime.now().minusDays(5), LocalDateTime.now(), null));
+                LocalDateTime.now().minusDays(5), LocalDateTime.now(), null, false));
             diaries.add(new GetDiaryAdminResponse(2L,
                 "https://drawmytoday.s3.ap-northeast-2.amazonaws.com/2021-08-16/2.png",
                 "angry , blue , glass-textured, crayon, school",
-                LocalDateTime.now().minusDays(1), LocalDateTime.now(), "3"));
+                LocalDateTime.now().minusDays(1), LocalDateTime.now(), "3", false));
             given(adminService.getDiaries(anyLong(), anyInt(), anyInt(), any(Direction.class),
-                anyLong()))
+                anyLong(), eq(true)))
                 .willReturn(new PageImpl<>(diaries, pageable, 2));
 
             // when

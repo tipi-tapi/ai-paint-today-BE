@@ -169,23 +169,13 @@ public class DiaryController {
     @PostMapping()
     public ResponseEntity<SuccessResponse<CreateDiaryResponse>> createDiary(
         @RequestBody @Valid CreateDiaryRequest createDiaryRequest,
-        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo,
-        @Parameter(description = "테스트 여부", in = ParameterIn.QUERY)
-        @RequestParam(value = "test", required = false, defaultValue = "false") boolean test
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) throws ImageGeneratorException {
-        CreateDiaryResponse response;
-        if (test) {
-            response = createDiaryService.createTestDiary(tokenInfo.getUserId(),
-                createDiaryRequest.getEmotionId(),
-                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate(), createDiaryRequest.getUserTime());
-        } else {
-            response = createDiaryService.createDiary(tokenInfo.getUserId(),
-                createDiaryRequest.getEmotionId(),
-                createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-                createDiaryRequest.getDiaryDate(), createDiaryRequest.getUserTime());
-        }
-        return SuccessResponse.of(response).asHttp(HttpStatus.CREATED);
+        return SuccessResponse.of(createDiaryService.createDiary(tokenInfo.getUserId(),
+            createDiaryRequest.getEmotionId(),
+            createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
+            createDiaryRequest.getDiaryDate(), createDiaryRequest.getUserTime())
+        ).asHttp(HttpStatus.CREATED);
     }
 
     @Operation(summary = "일기 수정", description = "주어진 일기의 내용을 수정한다.")

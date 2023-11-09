@@ -245,7 +245,7 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                 int page = 0;
                 int size = 5;
                 Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
-                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null, true);
 
                 assertThat(response.getTotalElements()).isEqualTo(10);
                 assertThat(response.getContent().size()).isEqualTo(5);
@@ -256,27 +256,61 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
         }
 
         @Nested
-        @DisplayName("더미 이미지가 있을 경우")
-        class if_dummy_image_exist {
+        @DisplayName("테스트 일기가 있을 경우")
+        class if_test_diary_exist {
 
-            @Test
-            @DisplayName("더미 이미지를 제외한 일기 리스트를 반환한다.")
-            @Sql("GetDiariesForMonitorAsPageTest.sql")
-            void return_diary_list_excludes_dummy_image() {
-                User user = userRepository.save(TestUser.createUser());
-                Emotion emotion = emotionRepository.save(TestEmotion.createEmotion());
-                Diary diary = diaryRepository.save(TestDiary.createTestDiary(user, emotion));
-                imageRepository.save(TestImage.createImage(diary));
+            @Nested
+            @DisplayName("test 파라미터 값이 false일 경우")
+            class if_test_parameter_is_false {
 
-                int page = 0;
-                int size = 5;
-                Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
-                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
+                @Test
+                @DisplayName("테스트 일기를 제외한 일기 리스트를 반환한다.")
+                @Sql("GetDiariesForMonitorAsPageTest.sql")
+                void return_diary_list_excludes_test_diary() {
+                    User user = userRepository.save(TestUser.createUser());
+                    Emotion emotion = emotionRepository.save(TestEmotion.createEmotion());
+                    Diary diary = diaryRepository.save(TestDiary.createTestDiary(user, emotion));
+                    imageRepository.save(TestImage.createImage(diary));
 
-                assertThat(response.get()
-                    .filter(
-                        diaryResponse -> Objects.equals(diaryResponse.getId(), diary.getDiaryId()))
-                    .findAny()).isEmpty();
+                    int page = 0;
+                    int size = 5;
+                    Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                        Pageable.ofSize(size).withPage(page), Direction.DESC, null, false);
+
+                    assertThat(response.get()
+                        .filter(
+                            diaryResponse -> Objects.equals(diaryResponse.getId(),
+                                diary.getDiaryId()))
+                        .findAny()).isEmpty();
+                }
+            }
+
+            @Nested
+            @DisplayName("test 파라미터 값이 true일 경우")
+            class if_test_parameter_is_true {
+
+                @Test
+                @DisplayName("테스트 일기를 포함하여 일기 리스트를 반환한다.")
+                @Sql("GetDiariesForMonitorAsPageTest.sql")
+                void return_diary_list_with_test_diary() {
+                    User user = userRepository.save(TestUser.createUser());
+                    Emotion emotion = emotionRepository.save(TestEmotion.createEmotion());
+                    Diary diary = diaryRepository.save(TestDiary.createTestDiary(user, emotion));
+                    imageRepository.save(TestImage.createImage(diary));
+
+                    int page = 0;
+                    int size = 5;
+                    Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
+                        Pageable.ofSize(size).withPage(page), Direction.DESC, null, true);
+
+                    Optional<GetDiaryAdminResponse> testDiaryResponse = response.get()
+                        .filter(
+                            diaryResponse -> Objects.equals(diaryResponse.getId(),
+                                diary.getDiaryId()))
+                        .findAny();
+                    assertThat(testDiaryResponse).isPresent();
+                    assertThat(testDiaryResponse.get().isTest()).isTrue();
+                }
             }
         }
 
@@ -291,8 +325,9 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                 int page = 0;
                 int size = 5;
                 Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
-                    Pageable.ofSize(size).withPage(page), Direction.DESC, 1L);
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, 1L, true);
 
+                // 삭제 포함시 5개, 삭제 제외시 3개. 삭제된 일기를 포함하도록 개선될 경우 테스트 통과
                 assertThat(response.getTotalElements()).isEqualTo(5);
                 assertThat(response.getContent().size()).isEqualTo(5);
                 assertThat(response.getTotalPages()).isEqualTo(1);
@@ -307,8 +342,9 @@ class DiaryRepositoryTest extends BaseRepositoryTest {
                 int page = 0;
                 int size = 5;
                 Page<GetDiaryAdminResponse> response = diaryRepository.getDiariesForMonitorAsPage(
-                    Pageable.ofSize(size).withPage(page), Direction.DESC, null);
+                    Pageable.ofSize(size).withPage(page), Direction.DESC, null, true);
 
+                // 삭제 포함시 10개, 삭제 제외시 7개. 삭제된 일기를 포함하도록 개선될 경우 테스트 통과
                 assertThat(response.getTotalElements()).isEqualTo(10);
                 assertThat(response.getContent().size()).isEqualTo(5);
                 assertThat(response.getTotalPages()).isEqualTo(2);

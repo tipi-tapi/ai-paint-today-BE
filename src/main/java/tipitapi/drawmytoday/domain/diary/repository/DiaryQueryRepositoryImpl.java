@@ -31,9 +31,9 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
 
     @Override
     public Page<GetDiaryAdminResponse> getDiariesForMonitorAsPage(Pageable pageable,
-        Direction direction, Long emotionId) {
+        Direction direction, Long emotionId, boolean withTest) {
 
-        BooleanExpression withoutTest = diary.isTest.eq(false);
+        BooleanExpression withoutTest = withTest ? null : diary.isTest.eq(false);
         BooleanExpression withEmotion = null;
         if (emotionId != null) {
             Emotion filterEmotion = queryFactory.selectFrom(emotion)
@@ -46,7 +46,7 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
 
         List<GetDiaryAdminResponse> content = queryFactory.select(
                 new QGetDiaryAdminResponse(diary.diaryId, image.imageUrl, prompt.promptText,
-                    diary.createdAt, image.createdAt, image.review))
+                    diary.createdAt, image.createdAt, image.review, diary.isTest))
             .from(diary)
             .leftJoin(image).on(diary.diaryId.eq(image.diary.diaryId))
             .leftJoin(prompt).on(diary.diaryId.eq(prompt.diary.diaryId))
