@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.domain.diary.repository;
+package tipitapi.drawmytoday.domain.emotion.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,7 +15,6 @@ import tipitapi.drawmytoday.common.BaseRepositoryTest;
 import tipitapi.drawmytoday.common.config.QuerydslConfig;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
-import tipitapi.drawmytoday.domain.emotion.repository.EmotionRepository;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)

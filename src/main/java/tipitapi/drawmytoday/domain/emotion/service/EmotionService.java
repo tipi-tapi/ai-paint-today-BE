@@ -8,7 +8,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.common.cache.CacheConst;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionRequest;
 import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionResponse;
 import tipitapi.drawmytoday.domain.emotion.dto.GetActiveEmotionsResponse;
@@ -24,11 +23,11 @@ public class EmotionService {
     private final ValidateUserService validateUserService;
 
 
-    @Cacheable(value = CacheConst.ACTIVE_EMOTIONS, key = "#language")
-    public List<GetActiveEmotionsResponse> getActiveEmotions(Long userId, Language language) {
+    @Cacheable(CacheConst.ACTIVE_EMOTIONS)
+    public List<GetActiveEmotionsResponse> getActiveEmotions(Long userId) {
         validateUserService.validateUserById(userId);
         return GetActiveEmotionsResponse.buildWithEmotions(
-            emotionRepository.findAllActiveEmotions(), language);
+            emotionRepository.findAllActiveEmotions());
     }
 
     @Transactional
