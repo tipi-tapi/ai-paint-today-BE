@@ -33,7 +33,6 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionResponse;
 import tipitapi.drawmytoday.domain.emotion.dto.GetActiveEmotionsResponse;
 import tipitapi.drawmytoday.domain.emotion.service.EmotionService;
@@ -65,111 +64,29 @@ class EmotionControllerTest extends ControllerTestSetup {
     @DisplayName("getAllEmotions 메서드는")
     class GetAllEmotions {
 
-        @Nested
-        @DisplayName("lan 쿼리 파라미터가")
-        class LanguageQueryParameter {
+        @Test
+        @DisplayName("영어로 감정 목록을 반환한다.")
+        void en_than_return_english_emotion() throws Exception {
+            //given
+            String language = "en";
+            List<GetActiveEmotionsResponse> emotionResponses = GetActiveEmotionsResponse.buildWithEmotions(
+                List.of(createEmotion(), createEmotion()));
+            given(emotionService.getActiveEmotions(any(Long.class)))
+                .willReturn(emotionResponses);
 
-            @Test
-            @DisplayName("ko이면 한국어 감정을 반환한다.")
-            void ko_than_return_korean_emotion() throws Exception {
-                //given
-                String language = "ko";
-                List<GetActiveEmotionsResponse> emotionResponses = GetActiveEmotionsResponse.buildWithEmotions(
-                    List.of(createEmotion(), createEmotion()), Language.ko);
-                given(emotionService.getActiveEmotions(any(Long.class), any(Language.class)))
-                    .willReturn(emotionResponses);
+            //when
+            ResultActions result = mockMvc.perform(get(BASE_URL + "/all"));
 
-                //when
-                ResultActions result = mockMvc.perform(get(BASE_URL + "/all")
-                    .queryParam("language", language));
-
-                //then
-                result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data[0].id").value(emotionResponses.get(0).getId()))
-                    .andExpect(jsonPath("$.data[0].name").value(emotionResponses.get(0).getName()))
-                    .andExpect(
-                        jsonPath("$.data[0].color").value(emotionResponses.get(0).getColor()))
-                    .andExpect(jsonPath("$.data[1].id").value(emotionResponses.get(1).getId()))
-                    .andExpect(jsonPath("$.data[1].name").value(emotionResponses.get(1).getName()))
-                    .andExpect(
-                        jsonPath("$.data[1].color").value(emotionResponses.get(1).getColor()));
-            }
-
-            @Test
-            @DisplayName("en이면 영어 감정을 반환한다.")
-            void en_than_return_english_emotion() throws Exception {
-                //given
-                String language = "en";
-                List<GetActiveEmotionsResponse> emotionResponses = GetActiveEmotionsResponse.buildWithEmotions(
-                    List.of(createEmotion(), createEmotion()), Language.en);
-                given(emotionService.getActiveEmotions(any(Long.class), any(Language.class)))
-                    .willReturn(emotionResponses);
-
-                //when
-                ResultActions result = mockMvc.perform(get(BASE_URL + "/all")
-                    .queryParam("language", language));
-
-                //then
-                result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data[0].id").value(emotionResponses.get(0).getId()))
-                    .andExpect(jsonPath("$.data[0].name").value(emotionResponses.get(0).getName()))
-                    .andExpect(
-                        jsonPath("$.data[0].color").value(emotionResponses.get(0).getColor()))
-                    .andExpect(jsonPath("$.data[1].id").value(emotionResponses.get(1).getId()))
-                    .andExpect(jsonPath("$.data[1].name").value(emotionResponses.get(1).getName()))
-                    .andExpect(
-                        jsonPath("$.data[1].color").value(emotionResponses.get(1).getColor()));
-            }
-
-            @Test
-            @DisplayName("ko, en이 아니면 한국어 감정을 반환한다.")
-            void not_ko_and_en_than_return_korean_emotion() throws Exception {
-                //given
-                String language = "hello";
-                List<GetActiveEmotionsResponse> emotionResponses = GetActiveEmotionsResponse.buildWithEmotions(
-                    List.of(createEmotion(), createEmotion()), Language.ko);
-                given(emotionService.getActiveEmotions(any(Long.class), any(Language.class)))
-                    .willReturn(emotionResponses);
-
-                //when
-                ResultActions result = mockMvc.perform(get(BASE_URL + "/all")
-                    .queryParam("language", language));
-
-                //then
-                result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data[0].id").value(emotionResponses.get(0).getId()))
-                    .andExpect(jsonPath("$.data[0].name").value(emotionResponses.get(0).getName()))
-                    .andExpect(
-                        jsonPath("$.data[0].color").value(emotionResponses.get(0).getColor()))
-                    .andExpect(jsonPath("$.data[1].id").value(emotionResponses.get(1).getId()))
-                    .andExpect(jsonPath("$.data[1].name").value(emotionResponses.get(1).getName()))
-                    .andExpect(
-                        jsonPath("$.data[1].color").value(emotionResponses.get(1).getColor()));
-            }
-
-            @Test
-            @DisplayName("쿼리 파라미터가 없으면 한국어 감정을 반환한다.")
-            void not_query_parameter_than_return_korean_emotion() throws Exception {
-                //given
-                List<GetActiveEmotionsResponse> emotionResponses = GetActiveEmotionsResponse.buildWithEmotions(
-                    List.of(createEmotion(), createEmotion()), Language.ko);
-                given(emotionService.getActiveEmotions(any(Long.class), any(Language.class)))
-                    .willReturn(emotionResponses);
-
-                //when
-                ResultActions result = mockMvc.perform(get(BASE_URL + "/all"));
-
-                //then
-                result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data[0].id").value(emotionResponses.get(0).getId()))
-                    .andExpect(jsonPath("$.data[0].name").value(emotionResponses.get(0).getName()))
-                    .andExpect(
-                        jsonPath("$.data[0].color").value(emotionResponses.get(0).getColor()))
-                    .andExpect(jsonPath("$.data[1].id").value(emotionResponses.get(1).getId()))
-                    .andExpect(jsonPath("$.data[1].name").value(emotionResponses.get(1).getName()))
-                    .andExpect(
-                        jsonPath("$.data[1].color").value(emotionResponses.get(1).getColor()));
-            }
+            //then
+            result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].id").value(emotionResponses.get(0).getId()))
+                .andExpect(jsonPath("$.data[0].name").value(emotionResponses.get(0).getName()))
+                .andExpect(
+                    jsonPath("$.data[0].color").value(emotionResponses.get(0).getColor()))
+                .andExpect(jsonPath("$.data[1].id").value(emotionResponses.get(1).getId()))
+                .andExpect(jsonPath("$.data[1].name").value(emotionResponses.get(1).getName()))
+                .andExpect(
+                    jsonPath("$.data[1].color").value(emotionResponses.get(1).getColor()));
         }
     }
 

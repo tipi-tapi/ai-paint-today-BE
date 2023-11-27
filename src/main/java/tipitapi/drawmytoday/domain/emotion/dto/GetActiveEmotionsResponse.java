@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 
 @Getter
@@ -31,20 +30,10 @@ public class GetActiveEmotionsResponse {
         return new GetActiveEmotionsResponse(id, name, color, colorPrompt);
     }
 
-    public static List<GetActiveEmotionsResponse> buildWithEmotions(List<Emotion> emotions,
-        Language language) {
+    public static List<GetActiveEmotionsResponse> buildWithEmotions(List<Emotion> emotions) {
         return emotions.stream()
             .map(e -> GetActiveEmotionsResponse.of(
-                e.getEmotionId(), getEmotionName(language, e), e.getColor(), e.getColorPrompt()))
-            .collect(
-                Collectors.toList());
-    }
-
-    private static String getEmotionName(Language language, Emotion emotion) {
-        if (Language.ko.equals(language)) {
-            return emotion.getName();
-        } else {
-            return emotion.getEmotionPrompt();
-        }
+                e.getEmotionId(), e.getEmotionPrompt(), e.getColor(), e.getColorPrompt()))
+            .collect(Collectors.toList());
     }
 }
