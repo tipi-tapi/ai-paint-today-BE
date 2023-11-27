@@ -47,11 +47,10 @@ public class CreateKarloImageRequest {
         this.seed = seed;
     }
 
-    public static CreateKarloImageRequest withUrl(String prompt) {
+    public static CreateKarloImageRequest withUrl(String prompt, String negativePrompt) {
         return CreateKarloImageRequest.builder()
             .prompt(prompt)
-            .negativePrompt(
-                "photo, picture, camera, realistic, filim, movie, real, high quality, Scary, cruel, gross, sensational, solid color, not cute")
+            .negativePrompt(negativePrompt)
             .numInferenceSteps(100)
             .guidanceScale(20D)
             .imageFormat("webp")

@@ -32,12 +32,15 @@ class KarloRequestServiceTest {
 
     String karloImageCreateUrl = "karlo-api-url";
 
+    String negativePrompt = "negative-prompt";
+
     KarloRequestService karloRequestService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        this.karloRequestService = new KarloRequestService(restTemplate, karloImageCreateUrl);
+        this.karloRequestService = new KarloRequestService(restTemplate, karloImageCreateUrl,
+            negativePrompt);
     }
 
     @Nested
