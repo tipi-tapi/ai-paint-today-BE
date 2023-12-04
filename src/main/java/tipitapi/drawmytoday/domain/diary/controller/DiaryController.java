@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
@@ -64,12 +63,10 @@ public class DiaryController {
     @GetMapping("/{id}")
     public ResponseEntity<SuccessResponse<GetDiaryResponse>> getDiary(
         @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
-        @Parameter(description = "감정 반환 언어(ko/en)", in = ParameterIn.QUERY)
-        @RequestParam(name = "lan", required = false, defaultValue = "ko") Language language
-        , @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
-            diaryService.getDiary(tokenInfo.getUserId(), diaryId, language)
+            diaryService.getDiary(tokenInfo.getUserId(), diaryId)
         ).asHttp(HttpStatus.OK);
     }
 
