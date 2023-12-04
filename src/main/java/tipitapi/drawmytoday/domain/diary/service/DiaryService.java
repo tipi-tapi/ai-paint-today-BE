@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 import tipitapi.drawmytoday.common.utils.DateUtils;
 import tipitapi.drawmytoday.common.utils.Encryptor;
@@ -45,7 +44,7 @@ public class DiaryService {
     private final ValidateDiaryService validateDiaryService;
     private final ValidateTicketService validateTicketService;
 
-    public GetDiaryResponse getDiary(Long userId, Long diaryId, Language language) {
+    public GetDiaryResponse getDiary(Long userId, Long diaryId) {
         User user = validateUserService.validateUserById(userId);
 
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
@@ -64,7 +63,7 @@ public class DiaryService {
                     r2PreSignedService.getCustomDomainUrl(image.getImageUrl())))
             .collect(Collectors.toList());
 
-        String emotionText = diary.getEmotion().getEmotionText(language);
+        String emotionText = diary.getEmotion().getEmotionPrompt();
 
         String promptText = promptService.getPromptByDiaryId(diaryId)
             .map(Prompt::getPromptText).orElse(null);

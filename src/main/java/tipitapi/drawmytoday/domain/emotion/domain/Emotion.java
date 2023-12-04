@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 
 @Getter
@@ -53,9 +52,5 @@ public class Emotion extends BaseEntity {
     public static Emotion create(String name, String color, boolean isActive, String emotionPrompt,
         String colorPrompt) {
         return new Emotion(name, color, isActive, emotionPrompt, colorPrompt);
-    }
-
-    public String getEmotionText(Language language) {
-        return language == Language.ko ? name : emotionPrompt;
     }
 }

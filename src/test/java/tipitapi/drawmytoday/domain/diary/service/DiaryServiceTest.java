@@ -29,7 +29,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
@@ -87,9 +86,9 @@ class DiaryServiceTest {
             @DisplayName("일기를 반환한다.")
             void it_returns_diary() {
                 User user = createUserWithId(1L);
-                Diary diary = createDiaryWithId(1L, user, createEmotion());
+                Emotion emotion = createEmotion();
+                Diary diary = createDiaryWithId(1L, user, emotion);
                 List<Image> images = List.of(createImage(diary));
-                Language language = Language.ko;
 
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
@@ -99,55 +98,10 @@ class DiaryServiceTest {
                 given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
                 given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
 
-                GetDiaryResponse getDiaryResponse = diaryService.getDiary(1L, 1L, language);
+                GetDiaryResponse getDiaryResponse = diaryService.getDiary(1L, 1L);
 
                 assertThat(getDiaryResponse.getId()).isEqualTo(diary.getDiaryId());
-            }
-
-            @Test
-            @DisplayName("language가 en일 경우 emotion에 emotioPrompt를 반환한다.")
-            void if_lan_en_then_return_emotionPrompt() {
-                User user = createUserWithId(1L);
-                Emotion emotion = createEmotion();
-                Diary diary = createDiaryWithId(1L, user, emotion);
-                List<Image> images = List.of(createImage(diary));
-
-                Language language = Language.en;
-
-                given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getLatestImages(diary)).willReturn(images);
-                given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
-                    .willReturn("https://test.com");
-                given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
-                given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
-
-                GetDiaryResponse getDiaryResponse = diaryService.getDiary(1L, 1L, language);
-
                 assertThat(getDiaryResponse.getEmotion()).isEqualTo(emotion.getEmotionPrompt());
-            }
-
-            @Test
-            @DisplayName("language가 ko일 경우 emotion에 name을 반환한다.")
-            void if_lan_ko_then_return_name() {
-                User user = createUserWithId(1L);
-                Emotion emotion = createEmotion();
-                Diary diary = createDiaryWithId(1L, user, emotion);
-                List<Image> images = List.of(createImage(diary));
-
-                Language language = Language.ko;
-
-                given(validateUserService.validateUserById(1L)).willReturn(user);
-                given(validateDiaryService.validateDiaryById(1L, user)).willReturn(diary);
-                given(imageService.getLatestImages(diary)).willReturn(images);
-                given(r2PreSignedService.getCustomDomainUrl(any(String.class)))
-                    .willReturn("https://test.com");
-                given(encryptor.decrypt(diary.getNotes())).willReturn("decrypted notes");
-                given(promptService.getPromptByDiaryId(anyLong())).willReturn(Optional.empty());
-
-                GetDiaryResponse getDiaryResponse = diaryService.getDiary(1L, 1L, language);
-
-                assertThat(getDiaryResponse.getEmotion()).isEqualTo(emotion.getName());
             }
         }
 
@@ -159,12 +113,11 @@ class DiaryServiceTest {
             @DisplayName("DiaryNotFoundException 예외를 발생시킨다.")
             void it_throws_DiaryNotFoundException() {
                 User user = createUser();
-                Language language = Language.ko;
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user)).willThrow(
                     DiaryNotFoundException.class);
 
-                assertThatThrownBy(() -> diaryService.getDiary(1L, 1L, language))
+                assertThatThrownBy(() -> diaryService.getDiary(1L, 1L))
                     .isInstanceOf(DiaryNotFoundException.class);
             }
         }
@@ -177,12 +130,11 @@ class DiaryServiceTest {
             @DisplayName("NotOwnerOfDiaryException 예외를 발생시킨다.")
             void it_throws_NotOwnerOfDiaryException() {
                 User user = createUserWithId(1L);
-                Language language = Language.ko;
                 given(validateUserService.validateUserById(1L)).willReturn(user);
                 given(validateDiaryService.validateDiaryById(1L, user))
                     .willThrow(NotOwnerOfDiaryException.class);
 
-                assertThatThrownBy(() -> diaryService.getDiary(1L, 1L, language))
+                assertThatThrownBy(() -> diaryService.getDiary(1L, 1L))
                     .isInstanceOf(NotOwnerOfDiaryException.class);
             }
         }

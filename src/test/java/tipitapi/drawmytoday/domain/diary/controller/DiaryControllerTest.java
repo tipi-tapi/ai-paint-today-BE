@@ -30,7 +30,6 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.ResultActions;
 import tipitapi.drawmytoday.common.controller.ControllerTestSetup;
 import tipitapi.drawmytoday.common.controller.WithCustomUser;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.testdata.TestDiary;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.common.testdata.TestUser;
@@ -76,8 +75,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 long diaryId = 1L;
                 User user = TestUser.createUser();
                 Emotion emotion = TestEmotion.createEmotion();
-                Language language = Language.ko;
-                String emotionText = emotion.getEmotionText(language);
+                String emotionText = emotion.getEmotionPrompt();
                 Diary diary = TestDiary.createDiaryWithIdAndCreatedAt(
                     diaryId, LocalDateTime.now(), user, emotion);
                 String imageUrl = "imageUrl";
@@ -86,7 +84,7 @@ class DiaryControllerTest extends ControllerTestSetup {
                 String promptText = "promptText";
                 GetDiaryResponse getDiaryResponse = GetDiaryResponse.of(diary, imageUrl,
                     imageList, emotionText, promptText);
-                given(diaryService.getDiary(REQUEST_USER_ID, diaryId, language)).willReturn(
+                given(diaryService.getDiary(REQUEST_USER_ID, diaryId)).willReturn(
                     getDiaryResponse);
 
                 // when
