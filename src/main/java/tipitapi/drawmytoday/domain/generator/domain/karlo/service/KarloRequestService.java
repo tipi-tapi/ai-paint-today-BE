@@ -26,12 +26,15 @@ class KarloRequestService {
 
     private final RestTemplate restTemplate;
     private final String karloImageCreateUrl;
+    private final String negativePrompt;
     private final HttpHeaders requestHeader;
 
     public KarloRequestService(RestTemplate karloRestTemplate,
-        @Value("${kakao.karlo.image_generate_url}") String karloImageCreateUrl) {
+        @Value("${kakao.karlo.image_generate_url}") String karloImageCreateUrl,
+        @Value("${kakao.karlo.generate_image.negative_prompt}") String negativePrompt) {
         this.restTemplate = karloRestTemplate;
         this.karloImageCreateUrl = karloImageCreateUrl;
+        this.negativePrompt = negativePrompt;
         this.requestHeader = new HttpHeaders() {
             {
                 setContentType(MediaType.APPLICATION_JSON);
@@ -42,7 +45,7 @@ class KarloRequestService {
     byte[] getImageAsUrl(String prompt) throws ImageGeneratorException {
         try {
             HttpEntity<CreateKarloImageRequest> request = getRequest(
-                CreateKarloImageRequest.withUrl(prompt));
+                CreateKarloImageRequest.withUrl(prompt, negativePrompt));
 
             String url = Optional.ofNullable(
                     restTemplate.postForObject(karloImageCreateUrl, request, KarloUrlResponse.class)

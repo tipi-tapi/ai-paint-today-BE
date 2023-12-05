@@ -1,4 +1,4 @@
-package tipitapi.drawmytoday.domain.diary.service;
+package tipitapi.drawmytoday.domain.emotion.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,14 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.testdata.TestEmotion;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionRequest;
 import tipitapi.drawmytoday.domain.emotion.dto.CreateEmotionResponse;
 import tipitapi.drawmytoday.domain.emotion.dto.GetActiveEmotionsResponse;
 import tipitapi.drawmytoday.domain.emotion.repository.EmotionRepository;
-import tipitapi.drawmytoday.domain.emotion.service.EmotionService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.exception.UserNotFoundException;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
@@ -56,7 +54,7 @@ public class EmotionServiceTest {
                 given(validateUserService.validateUserById(1L)).willThrow(
                     new UserNotFoundException());
 
-                assertThatThrownBy(() -> emotionService.getActiveEmotions(1L, Language.ko))
+                assertThatThrownBy(() -> emotionService.getActiveEmotions(1L))
                     .isInstanceOf(UserNotFoundException.class);
             }
         }
@@ -75,7 +73,7 @@ public class EmotionServiceTest {
                 given(emotionRepository.findAllActiveEmotions()).willReturn(List.of(activeEmotion));
 
                 List<GetActiveEmotionsResponse> emotions =
-                    emotionService.getActiveEmotions(1L, Language.ko);
+                    emotionService.getActiveEmotions(1L);
 
                 assertThat(emotions.get(0).getId()).isEqualTo(activeEmotion.getEmotionId());
                 assertThat(emotions).extracting(GetActiveEmotionsResponse::getId)
@@ -98,7 +96,7 @@ public class EmotionServiceTest {
                 given(emotionRepository.findAllActiveEmotions()).willReturn(List.of(activeEmotion));
 
                 List<GetActiveEmotionsResponse> emotions =
-                    emotionService.getActiveEmotions(1L, Language.en);
+                    emotionService.getActiveEmotions(1L);
 
                 assertThat(emotions.get(0).getName()).isEqualTo(activeEmotion.getEmotionPrompt());
             }

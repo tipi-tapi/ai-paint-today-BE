@@ -2,7 +2,6 @@ package tipitapi.drawmytoday.domain.emotion.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -17,9 +16,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import tipitapi.drawmytoday.common.converter.Language;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
@@ -51,12 +48,10 @@ public class EmotionController {
     })
     @GetMapping("/all")
     public ResponseEntity<SuccessResponse<List<GetActiveEmotionsResponse>>> getAllEmotions(
-        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo,
-        @Parameter(description = "반환 언어(ko/en)", in = ParameterIn.QUERY)
-        @RequestParam(name = "lan", required = false, defaultValue = "ko") Language language
+        @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
-            emotionService.getActiveEmotions(tokenInfo.getUserId(), language)
+            emotionService.getActiveEmotions(tokenInfo.getUserId())
         ).asHttp(HttpStatus.OK);
     }
 

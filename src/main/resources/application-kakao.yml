@@ -3,3 +3,7 @@ kakao:
         key: ${KAKAO_API_KEY}
     karlo:
         image_generate_url: ${KARLO_API_URL}
+        generate_image:
+            negative_prompt: ${KARLO_NEGATIVE_PROMPT}
+            style:
+                default: ${KARLO_DEFAULT_STYLE}

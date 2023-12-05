@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.domain.diary.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -9,6 +10,13 @@ import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 @Transactional(readOnly = true)
 public class PromptTextService {
 
+    private final String defaultStyle;
+
+    public PromptTextService(
+        @Value("${kakao.karlo.generate_image.style.default}") String defaultStyle) {
+        this.defaultStyle = defaultStyle;
+    }
+
     public String createPromptText(Emotion emotion, String keyword) {
         if (!StringUtils.hasText(keyword)) {
             keyword = "portrait";
@@ -16,7 +24,7 @@ public class PromptTextService {
         return promptTextBuilder(
             emotion.getEmotionPrompt(),
             emotion.getColorPrompt(),
-            "Impressionist oil painting",
+            defaultStyle,
             keyword);
     }
 
