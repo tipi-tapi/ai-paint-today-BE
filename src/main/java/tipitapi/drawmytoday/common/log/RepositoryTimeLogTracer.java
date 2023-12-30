@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Aspect
 @Component
-public class RepositoryTimeLogTrace {
+public class RepositoryTimeLogTracer {
 
     @Around("execution(* tipitapi.drawmytoday.domain.*.repository.*Repository.*(..)) "
         + "&& !execution(* tipitapi.drawmytoday.domain.*.repository.*Impl.*(..))")
