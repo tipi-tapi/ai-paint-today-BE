@@ -6,88 +6,181 @@
     <property name="FILE_LOG_PATTERN"
       value="[%d{yy-MM-dd HH:mm:ss.SSS}] [%blue(%X{request_id})] %green([%thread]) %highlight(%-5level) %boldWhite([%C.%M:%yellow(%L)]) - %msg%n"/>
 
-    <property name="LOG_PATH" value="./logs"/>
-
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_INFO">
+    <appender class="ch.qos.logback.core.ConsoleAppender" name="DEFAULT_CONSOLE">
         <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/info-%d{yyyy-MM}.log</fileNamePattern>
-            <maxHistory>12</maxHistory>
-            <totalSizeCap>100MB</totalSizeCap>
-        </rollingPolicy>
     </appender>
 
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_WARN">
-        <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
+    <appender class="ch.qos.logback.core.ConsoleAppender" name="JSON_CONSOLE">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+                <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+                <appendLineSeparator>true</appendLineSeparator>
+                <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                    <prettyPrint>false</prettyPrint>
+                </jsonFormatter>
+            </layout>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>WARN</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/warn-%d{yyyy-MM}.log</fileNamePattern>
-            <maxHistory>12</maxHistory>
-            <totalSizeCap>100MB</totalSizeCap>
-        </rollingPolicy>
-    </appender>
-
-    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE_ERROR">
-        <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-        </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ERROR</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/error-%d{yyyy-MM}.log</fileNamePattern>
-            <maxHistory>12</maxHistory>
-            <totalSizeCap>100MB</totalSizeCap>
-        </rollingPolicy>
     </appender>
 
     <springProfile name="develop">
-
-        <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
-            <encoder>
-                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-            </encoder>
-        </appender>
-
+        <property name="LOG_PATH" value="./logs"/>
         <root level="INFO">
-            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="DEFAULT_CONSOLE"/>
         </root>
     </springProfile>
 
     <springProfile name="test">
-
-        <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
-            <encoder>
-                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        <property name="LOG_PATH" value="/app/logs"/>
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
+          name="TEST_JSON_FILE_INFO">
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+                    <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+                    <appendLineSeparator>true</appendLineSeparator>
+                    <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                        <prettyPrint>false</prettyPrint>
+                    </jsonFormatter>
+                </layout>
             </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>INFO</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/json-info-%d{yyyy-MM}.log</fileNamePattern>
+                <maxHistory>12</maxHistory>
+                <totalSizeCap>100MB</totalSizeCap>
+            </rollingPolicy>
         </appender>
-
-        <root level="DEBUG">
-            <appender-ref ref="STDOUT"/>
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
+          name="TEST_JSON_FILE_WARN">
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+                    <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+                    <appendLineSeparator>true</appendLineSeparator>
+                    <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                        <prettyPrint>false</prettyPrint>
+                    </jsonFormatter>
+                </layout>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>WARN</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/json-warn-%d{yyyy-MM}.log</fileNamePattern>
+                <maxHistory>12</maxHistory>
+                <totalSizeCap>100MB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
+          name="TEST_JSON_FILE_ERROR">
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+                    <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+                    <appendLineSeparator>true</appendLineSeparator>
+                    <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                        <prettyPrint>false</prettyPrint>
+                    </jsonFormatter>
+                </layout>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/json-error-%d{yyyy-MM}.log
+                </fileNamePattern>
+                <maxHistory>12</maxHistory>
+                <totalSizeCap>100MB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="DEFAULT_CONSOLE"/>
+            <appender-ref ref="TEST_JSON_FILE_INFO"/>
+            <appender-ref ref="TEST_JSON_FILE_WARN"/>
+            <appender-ref ref="TEST_JSON_FILE_ERROR"/>
         </root>
     </springProfile>
 
     <springProfile name="prod">
-        <property name="LOG_PATH" value="~/SpringServer/log"/>
+        <property name="LOG_PATH" value="/home/ubuntu/SpringServer/logs"/>
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
+          name="PROD_JSON_FILE_INFO">
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+                    <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+                    <appendLineSeparator>true</appendLineSeparator>
+                    <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                        <prettyPrint>false</prettyPrint>
+                    </jsonFormatter>
+                </layout>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>INFO</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/json-info-%d{yyyy-MM}.log</fileNamePattern>
+                <maxHistory>12</maxHistory>
+                <totalSizeCap>100MB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
+          name="PROD_JSON_FILE_WARN">
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+                    <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+                    <appendLineSeparator>true</appendLineSeparator>
+                    <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                        <prettyPrint>false</prettyPrint>
+                    </jsonFormatter>
+                </layout>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>WARN</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/json-warn-%d{yyyy-MM}.log</fileNamePattern>
+                <maxHistory>12</maxHistory>
+                <totalSizeCap>100MB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
+          name="PROD_JSON_FILE_ERROR">
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+                    <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+                    <appendLineSeparator>true</appendLineSeparator>
+                    <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                        <prettyPrint>false</prettyPrint>
+                    </jsonFormatter>
+                </layout>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/%d{yyyy-MM}/json-error-%d{yyyy-MM}.log
+                </fileNamePattern>
+                <maxHistory>12</maxHistory>
+                <totalSizeCap>100MB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
         <root level="INFO">
-            <appender-ref ref="FILE_INFO"/>
-            <appender-ref ref="FILE_WARN"/>
-            <appender-ref ref="FILE_ERROR"/>
+            <appender-ref ref="PROD_JSON_FILE_INFO"/>
+            <appender-ref ref="PROD_JSON_FILE_WARN"/>
+            <appender-ref ref="PROD_JSON_FILE_ERROR"/>
         </root>
     </springProfile>
 </configuration>
