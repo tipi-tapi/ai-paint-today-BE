@@ -13,9 +13,6 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    configureEach {
-        exclude group: "org.apache.logging.log4j", module: "log4j-to-slf4j"
-    }
 }
 
 repositories {
@@ -36,7 +33,6 @@ dependencies {
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
     // logback 설정
-    implementation 'ch.qos.logback:logback-classic:1.2.12'
     implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
     implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
