@@ -83,6 +83,7 @@ jobs:
                     r2.credentials.access-key: ${{ secrets.R2_ACCESS_KEY_ID }}
                     r2.bucket: ${{ secrets.R2_BUCKET_NAME }}
                     r2.account-id: ${{ secrets.R2_ACCOUNT_ID }}
+                    r2.custom-domain: ${{ secrets.R2_CUSTOM_DOMAIN }}
 
             -   name: application-kakao.yml setting
                 uses: microsoft/variable-substitution@v1

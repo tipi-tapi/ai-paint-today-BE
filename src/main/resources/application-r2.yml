@@ -4,3 +4,4 @@ r2:
         access-key: ${R2_ACCESS_KEY_ID}
     bucket: ${R2_BUCKET_NAME}
     account-id: ${R2_ACCOUNT_ID}
+    custom-domain: ${R2_CUSTOM_DOMAIN}
