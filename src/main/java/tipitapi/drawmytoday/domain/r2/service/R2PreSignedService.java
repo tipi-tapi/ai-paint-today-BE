@@ -19,6 +19,8 @@ public class R2PreSignedService {
     private final S3Presigner s3Presigner;
     @Value("${r2.bucket}")
     private String bucketName;
+    @Value("${r2.custom-domain}")
+    private String customDomain;
 
     /*
      * S3 이미지 조회용 pre-signed URL 발급 메서드
@@ -43,6 +45,6 @@ public class R2PreSignedService {
     }
 
     public String getCustomDomainUrl(String objectKey) {
-        return "https://choihyeok.site/" + objectKey;
+        return "https://" + customDomain + "/" + objectKey;
     }
 }
