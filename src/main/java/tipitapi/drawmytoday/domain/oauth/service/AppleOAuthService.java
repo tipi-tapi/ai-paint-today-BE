@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -46,6 +47,8 @@ public class AppleOAuthService {
     private final UserService userService;
     private final AuthRepository authRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final List<String> revokeFailedCodes = List.of("invalid_request", "invalid_client",
+        "invalid_grant", "unauthorized_client", "unsupported_grant_type", "invalid_scope");
 
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request, RequestAppleLogin requestAppleLogin) {
@@ -68,6 +71,11 @@ public class AppleOAuthService {
         return ResponseJwtToken.of(jwtAccessToken, jwtRefreshToken);
     }
 
+    /**
+     * revoke token시 error response 명세
+     *
+     * @see "https://developer.apple.com/documentation/sign_in_with_apple/errorresponse"
+     */
     @Transactional
     public void deleteAccount(User user) {
         Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
@@ -85,8 +93,14 @@ public class AppleOAuthService {
 
         String url = properties.getDeleteAccountUrl();
         String response = restTemplate.postForObject(url, request, String.class);
+
         if (response != null) {
-            throw new BusinessException(OAUTH_SERVER_FAILED);
+            revokeFailedCodes.stream()
+                .filter(response::contains)
+                .findAny()
+                .ifPresent(code -> {
+                    throw new BusinessException(OAUTH_SERVER_FAILED, new Throwable(response));
+                });
         }
 
         user.deleteUser();
