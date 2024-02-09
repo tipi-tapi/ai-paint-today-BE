@@ -11,7 +11,8 @@ public class DiaryDateValidator implements ConstraintValidator<ValidDiaryDate, L
         if (value == null) {
             return true;
         }
-        return !value.isAfter(LocalDate.now());
+        LocalDate serverDate = LocalDate.now().plusDays(1);
+        return !value.isAfter(serverDate);
     }
 
 }
