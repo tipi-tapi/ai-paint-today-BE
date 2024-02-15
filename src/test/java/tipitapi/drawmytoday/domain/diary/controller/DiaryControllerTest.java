@@ -447,7 +447,7 @@ class DiaryControllerTest extends ControllerTestSetup {
 
             // then
             result.andExpect(status().isCreated());
-            verify(createDiaryService).regenerateDiaryImage(REQUEST_USER_ID, diaryId);
+            verify(createDiaryService).regenerateDiaryImage(REQUEST_USER_ID, diaryId, request);
         }
     }
 }

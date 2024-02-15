@@ -19,6 +19,7 @@ import tipitapi.drawmytoday.domain.emotion.service.ValidateEmotionService;
 import tipitapi.drawmytoday.domain.generator.dto.GeneratedImageAndPrompt;
 import tipitapi.drawmytoday.domain.generator.exception.ImageGeneratorException;
 import tipitapi.drawmytoday.domain.generator.service.ImageGeneratorService;
+import tipitapi.drawmytoday.domain.generator.service.TextGeneratorService;
 import tipitapi.drawmytoday.domain.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
@@ -34,6 +35,7 @@ public class CreateDiaryService {
     private final ValidateEmotionService validateEmotionService;
     private final ValidateDiaryService validateDiaryService;
     private final ValidateTicketService validateTicketService;
+    private final TextGeneratorService gptService;
     private final ImageGeneratorService karloService;
     private final PromptService promptService;
     private final Encryptor encryptor;
@@ -80,14 +82,29 @@ public class CreateDiaryService {
     }
 
     @Transactional(noRollbackFor = {ImageGeneratorException.class})
-    public void regenerateDiaryImage(Long userId, Long diaryId) throws ImageGeneratorException {
+    public void regenerateDiaryImage(Long userId, Long diaryId, String diaryNote)
+        throws ImageGeneratorException {
         User user = validateUserService.validateUserById(userId);
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         validateTicketService.findAndUseTicket(userId);
 
-        Prompt prompt = promptService.getPromptByDiaryId(diaryId)
-            .orElseThrow(PromptNotExistException::new);
-        GeneratedImageAndPrompt generated = karloService.generateImage(prompt);
+        GeneratedImageAndPrompt generated = null;
+        if (diaryNote.isEmpty()) {
+            Prompt prompt = promptService.getPromptByDiaryId(diaryId)
+                .orElseThrow(PromptNotExistException::new);
+            generated = karloService.generateImage(prompt);
+        } else {
+            String keyword = gptService.generateKeyword(diaryNote);
+            Emotion emotion = validateEmotionService.validateEmotionById(
+                diary.getEmotion().getEmotionId());
+            generated = karloService.generateImage(emotion, keyword);
+
+            String prompt = generated.getPrompt();
+            byte[] dallEImage = generated.getImage();
+
+            promptService.createPrompt(diary, prompt, true);
+            imageService.uploadAndCreateImage(diary, dallEImage, true);
+        }
 
         imageService.unSelectAllImage(diary.getDiaryId());
         imageService.uploadAndCreateImage(diary, generated.getImage(), true);

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class ImageGenerateRestTemplateConfig {
+public class RestTemplateConfig {
 
     @Value("${openai.api.key}")
     private String openaiApiKey;

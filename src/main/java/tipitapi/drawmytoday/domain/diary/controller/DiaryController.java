@@ -32,6 +32,7 @@ import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
+import tipitapi.drawmytoday.domain.diary.dto.RegenerateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.dto.UpdateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
@@ -256,9 +257,11 @@ public class DiaryController {
     @PostMapping("/{id}/regenerate")
     public ResponseEntity<Void> regenerateDiaryImage(
         @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
+        @RequestBody(required = false) RegenerateDiaryRequest request
     ) throws ImageGeneratorException {
-        createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId);
+        String diary = request == null ? "" : request.getDiary();
+        createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId, diary);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
