@@ -49,12 +49,12 @@ public class CreateDiaryService {
         LocalDateTime diaryDateTime = diaryDate.atTime(userTime);
 
         GeneratedImageAndPrompt generated = karloService.generateImage(emotion, keyword);
-        String prompt = generated.getPrompt();
-        byte[] dallEImage = generated.getImage();
+        String promptText = generated.getPrompt();
+        byte[] image = generated.getImage();
 
         Diary diary = saveDiary(notes, user, emotion, diaryDateTime, false);
-        promptService.createPrompt(diary, prompt, true);
-        imageService.uploadAndCreateImage(diary, dallEImage, true);
+        Prompt prompt = promptService.createPrompt(promptText, true);
+        imageService.uploadAndCreateImage(diary, prompt, image, true);
 
         return new CreateDiaryResponse(diary.getDiaryId());
     }
@@ -71,9 +71,9 @@ public class CreateDiaryService {
         List<byte[]> images = karloService.generateTestImage(request);
 
         Diary diary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, true);
-        promptService.createPrompt(diary, request.getKarloParameter().getPrompt(), true);
+        Prompt prompt = promptService.createPrompt(request.getKarloParameter().getPrompt(), true);
         for (int i = 0; i < images.size(); i++) {
-            imageService.uploadAndCreateImage(diary, images.get(i), i == 0);
+            imageService.uploadAndCreateImage(diary, prompt, images.get(i), i == 0);
         }
 
         return new CreateDiaryResponse(diary.getDiaryId());
@@ -90,7 +90,8 @@ public class CreateDiaryService {
         GeneratedImageAndPrompt generated = karloService.generateImage(prompt);
 
         imageService.unSelectAllImage(diary.getDiaryId());
-        imageService.uploadAndCreateImage(diary, generated.getImage(), true);
+        // TODO: feature/293 브랜치에서 변경 필요
+        imageService.uploadAndCreateImage(diary, null, generated.getImage(), true);
     }
 
     private Diary saveDiary(String notes, User user, Emotion emotion, LocalDateTime diaryDate,

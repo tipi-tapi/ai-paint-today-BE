@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
+import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.exception.DiaryNeedsImageException;
 import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.domain.diary.exception.SelectedImageDeletionDeniedException;
@@ -39,15 +40,16 @@ public class ImageService {
         return imageRepository.findRecentByDiary(diaryId);
     }
 
-    public Image createImage(Diary diary, String imagePath, boolean isSelected) {
-        return imageRepository.save(Image.create(diary, imagePath, isSelected));
+    public Image createImage(Diary diary, Prompt prompt, String imagePath, boolean isSelected) {
+        return imageRepository.save(Image.create(diary, prompt, imagePath, isSelected));
     }
 
-    public Image uploadAndCreateImage(Diary diary, byte[] dallEImage, boolean isSelected) {
+    public Image uploadAndCreateImage(Diary diary, Prompt prompt, byte[] dallEImage,
+        boolean isSelected) {
         String imagePath = String.format(profile + "/post/%d/%s_%d.webp", diary.getDiaryId(),
             new Date().getTime(), 1);
         r2Service.uploadImage(dallEImage, imagePath);
-        return createImage(diary, imagePath, isSelected);
+        return createImage(diary, prompt, imagePath, isSelected);
     }
 
     @Transactional
