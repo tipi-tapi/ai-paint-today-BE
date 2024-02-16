@@ -12,7 +12,6 @@ import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest;
-import tipitapi.drawmytoday.domain.diary.exception.PromptNotExistException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.service.ValidateEmotionService;
@@ -85,13 +84,13 @@ public class CreateDiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         validateTicketService.findAndUseTicket(userId);
 
-        Prompt prompt = promptService.getPromptByDiaryId(diaryId)
-            .orElseThrow(PromptNotExistException::new);
-        GeneratedImageAndPrompt generated = karloService.generateImage(prompt);
-
-        imageService.unSelectAllImage(diary.getDiaryId());
         // TODO: feature/293 브랜치에서 변경 필요
-        imageService.uploadAndCreateImage(diary, null, generated.getImage(), true);
+//        Prompt prompt = promptService.getPromptByDiaryId(diaryId)
+//            .orElseThrow(PromptNotExistException::new);
+//        GeneratedImageAndPrompt generated = karloService.generateImage(prompt);
+//
+//        imageService.unSelectAllImage(diary.getDiaryId());
+//        imageService.uploadAndCreateImage(diary, null, generated.getImage(), true);
     }
 
     private Diary saveDiary(String notes, User user, Emotion emotion, LocalDateTime diaryDate,

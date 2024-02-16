@@ -47,9 +47,9 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
         List<GetDiaryAdminResponse> content = queryFactory.select(
                 new QGetDiaryAdminResponse(diary.diaryId, image.imageUrl, prompt.promptText,
                     diary.createdAt, image.createdAt, image.review, diary.isTest))
-            .from(diary)
-            .leftJoin(image).on(diary.diaryId.eq(image.diary.diaryId))
-            .leftJoin(prompt).on(diary.diaryId.eq(prompt.diary.diaryId))
+            .from(image)
+            .leftJoin(diary).on(diary.diaryId.eq(image.diary.diaryId))
+            .leftJoin(prompt).on(image.prompt.promptId.eq(prompt.promptId))
             .where(withoutTest, withEmotion)
             .orderBy(direction.isAscending() ? image.createdAt.asc() : image.createdAt.desc())
             .offset(pageable.getOffset())
