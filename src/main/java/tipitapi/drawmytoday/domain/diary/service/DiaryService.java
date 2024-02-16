@@ -51,11 +51,12 @@ public class DiaryService {
         diary.setNotes(encryptor.decrypt(diary.getNotes()));
 
         List<Image> images = imageService.getLatestImages(diary);
-        String selectedImageUrl = images.stream()
+        Image selectedImage = images.stream()
             .filter(Image::isSelected)
             .findFirst()
-            .map(image -> r2PreSignedService.getCustomDomainUrl(image.getImageUrl()))
             .orElseThrow(ImageNotFoundException::new);
+        String selectedImageUrl = r2PreSignedService.getCustomDomainUrl(
+            selectedImage.getImageUrl());
 
         List<GetImageResponse> sortedImages = images.stream()
             .map(image ->
@@ -65,7 +66,7 @@ public class DiaryService {
 
         String emotionText = diary.getEmotion().getEmotionPrompt();
 
-        String promptText = promptService.getPromptByDiaryId(diaryId)
+        String promptText = promptService.getPromptByImageId(selectedImage.getImageId())
             .map(Prompt::getPromptText).orElse(null);
 
         return GetDiaryResponse.of(diary, selectedImageUrl, sortedImages, emotionText, promptText);

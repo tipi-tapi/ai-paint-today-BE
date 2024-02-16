@@ -18,8 +18,8 @@ public class PromptService {
         return promptRepository.save(Prompt.create(prompt, isSuccess));
     }
 
-    public Optional<Prompt> getPromptByDiaryId(Long diaryId) {
-        return promptRepository.findAllByDiaryDiaryIdAndIsSuccessTrue(diaryId)
+    public Optional<Prompt> getPromptByImageId(Long imageId) {
+        return promptRepository.findAllSuccessPromptByImageId(imageId)
             .stream().findFirst();
     }
 }
