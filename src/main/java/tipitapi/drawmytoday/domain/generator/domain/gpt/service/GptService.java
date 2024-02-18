@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +43,7 @@ public class GptService implements TextGeneratorService {
             validIsSuccessfulRequest(responseEntity);
             return responseEntity.getBody().getChoices()[0].getMessage().getContent();
         } catch (RestClientException e) {
-            log.warn("GPT chat completions 요청에 실패했습니다. status code: {}, message: {}",
-                responseEntity.getStatusCode(), e.getMessage());
+            log.warn("GPT chat completions 요청에 실패했습니다. message: {}", e.getMessage());
             throw new GptRequestFailException(e);
         }
     }
@@ -65,10 +65,9 @@ public class GptService implements TextGeneratorService {
     private HttpEntity<GptChatCompletionsRequest> createChatCompletionsRequest(
         String diaryNote) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");
+        headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         GptChatCompletionsRequest bodyEntity = GptChatCompletionsRequest.createFirstMessage(
             gptChatCompletionsPrompt, diaryNote);
-        HttpEntity<GptChatCompletionsRequest> httpEntity = new HttpEntity<>(bodyEntity, headers);
-        return httpEntity;
+        return new HttpEntity<>(bodyEntity, headers);
     }
 }

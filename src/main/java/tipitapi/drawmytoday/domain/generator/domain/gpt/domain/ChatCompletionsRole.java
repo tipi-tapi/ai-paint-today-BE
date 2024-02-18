@@ -1,17 +1,15 @@
 package tipitapi.drawmytoday.domain.generator.domain.gpt.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum ChatCompletionsRole {
-    SYSTEM("system"),
-    USER("user"),
-    ASSISTANT("assistant");
+    @JsonProperty("system")
+    system,
+    @JsonProperty("user")
+    user,
+    @JsonProperty("assistant")
+    assistant;
 
-    private final String role;
-
-    ChatCompletionsRole(String role) {
-        this.role = role;
-    }
-
-    public String getRole() {
-        return role;
+    ChatCompletionsRole() {
     }
 }

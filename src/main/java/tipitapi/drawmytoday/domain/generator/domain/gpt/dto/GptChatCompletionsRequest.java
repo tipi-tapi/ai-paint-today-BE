@@ -21,7 +21,7 @@ public class GptChatCompletionsRequest {
     private GptChatCompletionsRequest(String gptChatCompletionsPrompt) {
         this.model = "gpt-3.5-turbo";
         List<Message> messages = new ArrayList<>();
-        messages.add(new Message(ChatCompletionsRole.SYSTEM, gptChatCompletionsPrompt));
+        messages.add(new Message(ChatCompletionsRole.system, gptChatCompletionsPrompt));
         this.messages = messages;
     }
 
@@ -33,6 +33,6 @@ public class GptChatCompletionsRequest {
     }
 
     private void addUserMessage(String userMessage) {
-        this.messages.add(new Message(ChatCompletionsRole.USER, userMessage));
+        this.messages.add(new Message(ChatCompletionsRole.user, userMessage));
     }
 }
