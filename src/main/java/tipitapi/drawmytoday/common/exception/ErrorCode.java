@@ -78,7 +78,10 @@ public enum ErrorCode {
     REST_CLIENT_FAILED(500, "R001", "외부로의 REST 통신에 실패하였습니다."),
 
     // Ticket
-    VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다.");
+    VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다."),
+
+    // Apple
+    APPLE_EMAIL_NOT_FOUND(400, "A001", "애플 소셜서버로부터 이메일을 받지 못했습니다.");
 
 
     private final int status;

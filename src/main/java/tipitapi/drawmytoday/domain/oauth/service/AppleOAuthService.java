@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.domain.oauth.service;
 
+import static tipitapi.drawmytoday.common.exception.ErrorCode.APPLE_EMAIL_NOT_FOUND;
 import static tipitapi.drawmytoday.common.exception.ErrorCode.OAUTH_SERVER_FAILED;
 import static tipitapi.drawmytoday.common.exception.ErrorCode.PARSING_ERROR;
 
@@ -55,6 +56,10 @@ public class AppleOAuthService {
         OAuthAccessToken oAuthAccessToken = getAccessToken(request);
         AppleIdToken appleIdToken = getAppleIdToken(requestAppleLogin.getIdToken());
 
+        if (appleIdToken.getEmail() == null) {
+            throw new BusinessException(APPLE_EMAIL_NOT_FOUND);
+        }
+
         User user = validateUserService.validateRegisteredUserByEmail(
             appleIdToken.getEmail(), SocialCode.APPLE);
 
@@ -88,9 +93,6 @@ public class AppleOAuthService {
 
         String url = properties.getDeleteAccountUrl();
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-
-        log.info("userId: {} 애플 회원탈퇴 response 정보: status code: {}, body: {}",
-            user.getUserId(), response.getStatusCode(), response.getBody());
 
         if (response.getStatusCode() != HttpStatus.OK) {
             throw new BusinessException(OAUTH_SERVER_FAILED, new Throwable(response.getBody()));
