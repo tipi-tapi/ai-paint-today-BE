@@ -73,6 +73,7 @@ jobs:
                 env:
                     openai.api.key: ${{ secrets.OPENAI_API_KEY }}
                     openai.dalle.url: ${{ secrets.DALLE_API_URL }}
+                    openai.gpt.chat_completions_prompt: ${{ secrets.GPT_CHAT_COMPLETIONS_PROMPT }}
 
             -   name: application-r2.yml setting
                 uses: microsoft/variable-substitution@v1
