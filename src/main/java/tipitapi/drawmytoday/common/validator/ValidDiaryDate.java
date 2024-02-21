@@ -13,7 +13,7 @@ import javax.validation.Constraint;
 @Documented
 public @interface ValidDiaryDate {
 
-    String message() default "미래의 날짜는 입력할 수 없습니다.";
+    String message() default "내일보더 먼 날짜는 입력할 수 없습니다.";
 
     Class[] groups() default {};
 
