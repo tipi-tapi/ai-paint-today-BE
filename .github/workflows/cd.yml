@@ -6,7 +6,6 @@ on:
 
 env:
     APPLICATION_PATH: ./src/main/resources/application.yml
-    PROD_PATH: ./src/main/resources/application-prod.yml
     OAUTH_PATH: ./src/main/resources/application-oauth.yml
     AWS_PATH: ./src/main/resources/application-aws.yml
     OPENAI_PATH: ./src/main/resources/application-openai.yml
@@ -28,12 +27,6 @@ jobs:
                 env:
                     encryptor.secret.key: ${{ secrets.ENCRYPTOR_SECRET_KEY }}
                     presigned-image.expiration.admin-diaries: ${{ secrets.PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES }}
-
-            -   name: application-prod.yml setting
-                uses: microsoft/variable-substitution@v1
-                with:
-                    files: ${{ env.PROD_PATH }}
-                env:
                     spring.datasource.url: ${{ secrets.RDS_URL }}
                     spring.datasource.username: ${{ secrets.RDS_USERNAME }}
                     spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
