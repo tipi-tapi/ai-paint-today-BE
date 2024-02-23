@@ -13,3 +13,17 @@ server:
     tomcat:
         mbeanregistry:
             enabled: true
+
+---
+spring.config.activate.on-profile: prod1
+
+management:
+    server:
+        port: 9292
+
+---
+spring.config.activate.on-profile: prod2
+
+management:
+    server:
+        port: 9293
