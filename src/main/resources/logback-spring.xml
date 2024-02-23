@@ -24,7 +24,7 @@
         </encoder>
     </appender>
 
-    <springProfile name="develop">
+    <springProfile name="local">
         <property name="LOG_PATH" value="./logs"/>
         <root level="INFO">
             <appender-ref ref="DEFAULT_CONSOLE"/>
