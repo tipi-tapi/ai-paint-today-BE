@@ -108,7 +108,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="prod">
+    <springProfile name="prod1, prod2">
         <property name="LOG_PATH" value="/home/ubuntu/SpringServer/logs"/>
         <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
           name="PROD_JSON_FILE_INFO">
