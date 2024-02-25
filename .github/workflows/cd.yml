@@ -2,7 +2,7 @@ name: main branch cd
 
 on:
     push:
-        branches: [ "main" ]
+        branches: [ "main", "feature/290" ]
 
 env:
     APPLICATION_PATH: ./src/main/resources/application.yml
@@ -125,5 +125,5 @@ jobs:
                     key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
                     port: 22
                     script: |
-                        cd SpringServer
-                        ./start.sh
+                        cd SpringServer/deploy
+                        ./deploy.sh
