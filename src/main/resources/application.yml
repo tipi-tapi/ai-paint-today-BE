@@ -54,7 +54,25 @@ spring:
         org.hibernate.SQL: debug
 
 ---
-spring.config.activate.on-profile: prod1, prod2
+spring.config.activate.on-profile: prod1
+server.port: 8081
+
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url:
+        username:
+        password:
+
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        open-in-view: false
+        hibernate:
+            ddl-auto: validate
+
+---
+spring.config.activate.on-profile: prod2
+server.port: 8082
 
 spring:
     datasource:
