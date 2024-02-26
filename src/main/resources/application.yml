@@ -60,9 +60,9 @@ server.port: 8081
 spring:
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url:
-        username:
-        password:
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
 
     jpa:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
@@ -77,9 +77,9 @@ server.port: 8082
 spring:
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url:
-        username:
-        password:
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
 
     jpa:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
