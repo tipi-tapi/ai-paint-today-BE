@@ -2,7 +2,7 @@ name: main branch cd
 
 on:
     push:
-        branches: [ "main", "feature/290" ]
+        branches: [ "main" ]
 
 jobs:
     deploy:
