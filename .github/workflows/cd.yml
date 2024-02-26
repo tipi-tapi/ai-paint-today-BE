@@ -56,7 +56,7 @@ jobs:
                         touch .env
                         
                         add_env_var() {
-                            echo "$1=$2" >> ./.env
+                            echo "export $1=$2" >> ./.env
                         }
                         
                         add_env_var "KAKAO_API_KEY" "${{ secrets.KAKAO_API_KEY }}"
