@@ -46,7 +46,7 @@ spring:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
         open-in-view: false
         hibernate:
-            ddl-auto: update
+            ddl-auto: validate
             format_sql: true
         show-sql: true
 
