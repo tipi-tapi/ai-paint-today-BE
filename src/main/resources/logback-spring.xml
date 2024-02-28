@@ -24,14 +24,14 @@
         </encoder>
     </appender>
 
-    <springProfile name="develop">
+    <springProfile name="local">
         <property name="LOG_PATH" value="./logs"/>
         <root level="INFO">
             <appender-ref ref="DEFAULT_CONSOLE"/>
         </root>
     </springProfile>
 
-    <springProfile name="test">
+    <springProfile name="develop">
         <property name="LOG_PATH" value="/app/logs"/>
         <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
           name="TEST_JSON_FILE_INFO">
@@ -108,7 +108,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="prod">
+    <springProfile name="prod1, prod2">
         <property name="LOG_PATH" value="/home/ubuntu/SpringServer/logs"/>
         <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
           name="PROD_JSON_FILE_INFO">

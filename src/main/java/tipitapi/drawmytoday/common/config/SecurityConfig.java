@@ -31,6 +31,7 @@ public class SecurityConfig {
         "/oauth2/refresh",
         "/oauth2/expiredJwt",
         "/health/server",
+        "/health/profile",
         "/actuator/**"
     };
 
