@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthCheckController {
 
     private final Environment env;
-    private final String[] availableProfiles = {"loc", "test", "prod"};
+    private final String[] availableProfiles = {"local", "develop", "prod"};
 
     @Operation(summary = "서버 생존 여부 체크용", description = "서버가 살아있는지 체크합니다.")
     @ApiResponse(responseCode = "204", description = "서버 생존")
