@@ -17,8 +17,11 @@ import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest.KarloParamet
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateKarloImageRequest {
 
+    private final String version;
     private final String prompt;
     private final String negativePrompt;
+    private final Integer width;
+    private final Integer height;
     private final String imageFormat;
     private final Integer samples;
     private final String returnType;
@@ -30,12 +33,15 @@ public class CreateKarloImageRequest {
     private final Long[] seed;
 
     @Builder
-    public CreateKarloImageRequest(String prompt, String negativePrompt, String imageFormat,
-        Integer samples, String returnType, Integer priorNumInferenceSteps,
-        Double priorGuidanceScale, Integer numInferenceSteps, Double guidanceScale,
-        String scheduler, Long[] seed) {
+    public CreateKarloImageRequest(String version, String prompt, String negativePrompt,
+        Integer width, Integer height, String imageFormat, Integer samples, String returnType,
+        Integer priorNumInferenceSteps, Double priorGuidanceScale, Integer numInferenceSteps,
+        Double guidanceScale, String scheduler, Long[] seed) {
+        this.version = version;
         this.prompt = prompt;
         this.negativePrompt = negativePrompt;
+        this.width = width;
+        this.height = height;
         this.imageFormat = imageFormat;
         this.samples = samples;
         this.returnType = returnType;
@@ -49,8 +55,11 @@ public class CreateKarloImageRequest {
 
     public static CreateKarloImageRequest withUrl(String prompt, String negativePrompt) {
         return CreateKarloImageRequest.builder()
+            .version("v2.0")
             .prompt(prompt)
             .negativePrompt(negativePrompt)
+            .width(512)
+            .height(512)
             .numInferenceSteps(100)
             .guidanceScale(20D)
             .imageFormat("webp")
@@ -61,8 +70,11 @@ public class CreateKarloImageRequest {
 
     public static CreateKarloImageRequest createTestRequest(KarloParameter param) {
         return CreateKarloImageRequest.builder()
+            .version("v2.0")
             .prompt(param.getPrompt())
             .negativePrompt(param.getNegativePrompt())
+            .width(512)
+            .height(512)
             .imageFormat("webp")
             .samples(param.getSamples())
             .returnType("url")
