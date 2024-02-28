@@ -31,7 +31,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="test">
+    <springProfile name="develop">
         <property name="LOG_PATH" value="/app/logs"/>
         <appender class="ch.qos.logback.core.rolling.RollingFileAppender"
           name="TEST_JSON_FILE_INFO">

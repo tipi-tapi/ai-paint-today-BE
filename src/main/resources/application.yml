@@ -33,7 +33,7 @@ spring:
     logging.level:
         org.hibernate.SQL: debug
 ---
-spring.config.activate.on-profile: test
+spring.config.activate.on-profile: develop
 
 spring:
     datasource:
