@@ -8,3 +8,81 @@ encryptor:
 presigned-image:
     expiration:
         admin-diaries: ${PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES}
+
+---
+spring.config.activate.on-profile: local
+
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/draw_my_today_db?serverTimezone=UTC&characterEncoding=UTF-8
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        open-in-view: false
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                format_sql: true
+                show_sql: true
+                dialect: org.hibernate.dialect.MySQLDialect
+
+    logging.level:
+        org.hibernate.SQL: debug
+---
+spring.config.activate.on-profile: develop
+
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        open-in-view: false
+        hibernate:
+            ddl-auto: validate
+            format_sql: true
+        show-sql: true
+
+    logging.level:
+        org.hibernate.SQL: debug
+
+---
+spring.config.activate.on-profile: prod1
+server.port: 8081
+
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: ${RDS_URL}
+        username: ${RDS_USERNAME}
+        password: ${RDS_PASSWORD}
+
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        open-in-view: false
+        hibernate:
+            ddl-auto: validate
+
+---
+spring.config.activate.on-profile: prod2
+server.port: 8082
+
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: ${RDS_URL}
+        username: ${RDS_USERNAME}
+        password: ${RDS_PASSWORD}
+
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        open-in-view: false
+        hibernate:
+            ddl-auto: validate

@@ -4,15 +4,6 @@ on:
     push:
         branches: [ "main" ]
 
-env:
-    APPLICATION_PATH: ./src/main/resources/application.yml
-    PROD_PATH: ./src/main/resources/application-prod.yml
-    OAUTH_PATH: ./src/main/resources/application-oauth.yml
-    AWS_PATH: ./src/main/resources/application-aws.yml
-    OPENAI_PATH: ./src/main/resources/application-openai.yml
-    R2_PATH: ./src/main/resources/application-r2.yml
-    KAKAO_PATH: ./src/main/resources/application-kakao.yml
-
 jobs:
     deploy:
         runs-on: ubuntu-latest
@@ -20,81 +11,6 @@ jobs:
         steps:
             -   name: checkout
                 uses: actions/checkout@v3
-
-            -   name: application.yml setting
-                uses: microsoft/variable-substitution@v1
-                with:
-                    files: ${{ env.APPLICATION_PATH }}
-                env:
-                    encryptor.secret.key: ${{ secrets.ENCRYPTOR_SECRET_KEY }}
-                    presigned-image.expiration.admin-diaries: ${{ secrets.PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES }}
-
-            -   name: application-prod.yml setting
-                uses: microsoft/variable-substitution@v1
-                with:
-                    files: ${{ env.PROD_PATH }}
-                env:
-                    spring.datasource.url: ${{ secrets.RDS_URL }}
-                    spring.datasource.username: ${{ secrets.RDS_USERNAME }}
-                    spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
-
-            -   name: application-oauth.yml setting
-                uses: microsoft/variable-substitution@v1
-                with:
-                    files: ${{ env.OAUTH_PATH }}
-                env:
-                    oauth2.google.client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
-                    oauth2.google.client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-                    oauth2.google.token-url: ${{ secrets.GOOGLE_TOKEN_URL }}
-                    oauth2.google.user-info-url: ${{ secrets.GOOGLE_USER_INFO_URL }}
-                    oauth2.google.redirect-uri: ${{ secrets.GOOGLE_REDIRECT_URI }}
-                    oauth2.google.delete-account-url: ${{ secrets.GOOGLE_DELETE_ACCOUNT_URL }}
-                    oauth2.apple.ios.client-id: ${{ secrets.APPLE_IOS_CLIENT_ID }}
-                    oauth2.apple.ios.team-id: ${{ secrets.APPLE_IOS_TEAM_ID }}
-                    oauth2.apple.ios.key-id: ${{ secrets.APPLE_IOS_KEY_ID }}
-                    oauth2.apple.ios.private-key: ${{ secrets.APPLE_IOS_PRIVATE_KEY }}
-                    oauth2.apple.ios.token-url: ${{ secrets.APPLE_IOS_TOKEN_URL }}
-                    oauth2.apple.ios.delete-account-url: ${{ secrets.APPLE_IOS_DELETE_ACCOUNT_URL }}
-                    jwt.secret: ${{ secrets.JWT_SECRET }}
-
-            -   name: application-aws.yml setting
-                uses: microsoft/variable-substitution@v1
-                with:
-                    files: ${{ env.AWS_PATH }}
-                env:
-                    cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                    cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                    cloud.aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
-
-            -   name: application-openai.yml setting
-                uses: microsoft/variable-substitution@v1
-                with:
-                    files: ${{ env.OPENAI_PATH }}
-                env:
-                    openai.api.key: ${{ secrets.OPENAI_API_KEY }}
-                    openai.dalle.url: ${{ secrets.DALLE_API_URL }}
-                    openai.gpt.chat_completions_prompt: ${{ secrets.GPT_CHAT_COMPLETIONS_PROMPT }}
-
-            -   name: application-r2.yml setting
-                uses: microsoft/variable-substitution@v1
-                with:
-                    files: ${{ env.R2_PATH }}
-                env:
-                    r2.credentials.secret-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-                    r2.credentials.access-key: ${{ secrets.R2_ACCESS_KEY_ID }}
-                    r2.bucket: ${{ secrets.R2_BUCKET_NAME }}
-                    r2.account-id: ${{ secrets.R2_ACCOUNT_ID }}
-                    r2.custom-domain: ${{ secrets.R2_CUSTOM_DOMAIN }}
-
-            -   name: application-kakao.yml setting
-                uses: microsoft/variable-substitution@v1
-                with:
-                    files: ${{ env.KAKAO_PATH }}
-                env:
-                    kakao.api.key: ${{ secrets.KAKAO_API_KEY }}
-                    kakao.karlo.image_generate_url: ${{ secrets.KARLO_API_URL }}
-                    kakao.karlo.generate_image.negative_prompt: ${{ secrets.KARLO_NEGATIVE_PROMPT }}
-                    kakao.karlo.generate_image.style.default: ${{ secrets.KARLO_DEFAULT_STYLE }}
 
             -   name: Set up JDK 11
                 uses: actions/setup-java@v3
@@ -133,5 +49,47 @@ jobs:
                     key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
                     port: 22
                     script: |
-                        cd SpringServer
-                        ./start.sh
+                        set -e
+                        
+                        cd SpringServer/deploy
+                        rm -f .env
+                        touch .env
+                        
+                        add_env_var() {
+                            echo "export $1='$2'" >> ./.env
+                        }
+                        
+                        add_env_var "KAKAO_API_KEY" "${{ secrets.KAKAO_API_KEY }}"
+                        add_env_var "KARLO_API_URL" "${{ secrets.KARLO_API_URL }}"
+                        add_env_var "KARLO_NEGATIVE_PROMPT" "${{ secrets.KARLO_NEGATIVE_PROMPT }}"
+                        add_env_var "KARLO_DEFAULT_STYLE" "${{ secrets.KARLO_DEFAULT_STYLE }}"
+                        add_env_var "R2_SECRET_ACCESS_KEY" "${{ secrets.R2_SECRET_ACCESS_KEY }}"
+                        add_env_var "R2_ACCESS_KEY_ID" "${{ secrets.R2_ACCESS_KEY_ID }}"
+                        add_env_var "R2_BUCKET_NAME" "${{ secrets.R2_BUCKET_NAME }}"
+                        add_env_var "R2_ACCOUNT_ID" "${{ secrets.R2_ACCOUNT_ID }}"
+                        add_env_var "R2_CUSTOM_DOMAIN" "${{ secrets.R2_CUSTOM_DOMAIN }}"
+                        add_env_var "OPENAI_API_KEY" "${{ secrets.OPENAI_API_KEY }}"
+                        add_env_var "DALLE_API_URL" "${{ secrets.DALLE_API_URL }}"
+                        add_env_var "AWS_SECRET_ACCESS_KEY" "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+                        add_env_var "AWS_ACCESS_KEY_ID" "${{ secrets.AWS_ACCESS_KEY_ID }}"
+                        add_env_var "AWS_S3_BUCKET" "${{ secrets.AWS_S3_BUCKET }}"
+                        add_env_var "GOOGLE_CLIENT_ID" "${{ secrets.GOOGLE_CLIENT_ID }}"
+                        add_env_var "GOOGLE_CLIENT_SECRET" "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+                        add_env_var "GOOGLE_TOKEN_URL" "${{ secrets.GOOGLE_TOKEN_URL }}"
+                        add_env_var "GOOGLE_USER_INFO_URL" "${{ secrets.GOOGLE_USER_INFO_URL }}"
+                        add_env_var "GOOGLE_REDIRECT_URI" "${{ secrets.GOOGLE_REDIRECT_URI }}"
+                        add_env_var "GOOGLE_DELETE_ACCOUNT_URL" "${{ secrets.GOOGLE_DELETE_ACCOUNT_URL }}"
+                        add_env_var "APPLE_IOS_CLIENT_ID" "${{ secrets.APPLE_IOS_CLIENT_ID }}"
+                        add_env_var "APPLE_IOS_TEAM_ID" "${{ secrets.APPLE_IOS_TEAM_ID }}"
+                        add_env_var "APPLE_IOS_KEY_ID" "${{ secrets.APPLE_IOS_KEY_ID }}"
+                        add_env_var "APPLE_IOS_PRIVATE_KEY" "${{ secrets.APPLE_IOS_PRIVATE_KEY }}"
+                        add_env_var "APPLE_IOS_TOKEN_URL" "${{ secrets.APPLE_IOS_TOKEN_URL }}"
+                        add_env_var "APPLE_IOS_DELETE_ACCOUNT_URL" "${{ secrets.APPLE_IOS_DELETE_ACCOUNT_URL }}"
+                        add_env_var "JWT_SECRET" "${{ secrets.JWT_SECRET }}"
+                        add_env_var "ENCRYPTOR_SECRET_KEY" "${{ secrets.ENCRYPTOR_SECRET_KEY }}"
+                        add_env_var "PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES" "${{ secrets.PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES }}"
+                        add_env_var "RDS_URL" "${{ secrets.RDS_URL }}"
+                        add_env_var "RDS_USERNAME" "${{ secrets.RDS_USERNAME }}"
+                        add_env_var "RDS_PASSWORD" "${{ secrets.RDS_PASSWORD }}"
+                        
+                        ./deploy.sh
