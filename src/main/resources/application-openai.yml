@@ -3,3 +3,5 @@ openai:
         key: ${OPENAI_API_KEY}
     dalle:
         url: ${DALLE_API_URL}
+    gpt:
+        chat_completions_prompt: ${GPT_CHAT_COMPLETIONS_PROMPT}

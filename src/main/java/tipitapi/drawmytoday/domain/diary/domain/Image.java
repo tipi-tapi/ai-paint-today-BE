@@ -10,10 +10,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.SQLDelete;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 
 @SQLDelete(sql = "UPDATE image SET deleted_at = current_timestamp WHERE image_id = ?")
@@ -32,6 +32,11 @@ public class Image extends BaseEntity {
     private Diary diary;
 
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prompt_id", nullable = false)
+    private Prompt prompt;
+
+    @NotNull
     @Column(nullable = false)
     private String imageUrl;
 
@@ -42,15 +47,16 @@ public class Image extends BaseEntity {
 
     private LocalDateTime deletedAt;
 
-    private Image(Diary diary, String imageUrl, boolean isSelected) {
+    private Image(Diary diary, Prompt prompt, String imageUrl, boolean isSelected) {
         this.diary = diary;
         diary.getImageList().add(this);
+        this.prompt = prompt;
         this.imageUrl = imageUrl;
         this.isSelected = isSelected;
     }
 
-    public static Image create(Diary diary, String imageUrl, boolean isSelected) {
-        return new Image(diary, imageUrl, isSelected);
+    public static Image create(Diary diary, Prompt prompt, String imageUrl, boolean isSelected) {
+        return new Image(diary, prompt, imageUrl, isSelected);
     }
 
     public void setSelected(boolean isSelected) {
