@@ -5,18 +5,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.generator.exception.TextGeneratorException;
+import tipitapi.drawmytoday.domain.generator.service.TextGeneratorService;
 
 @Service
 @Transactional(readOnly = true)
 public class PromptTextService {
 
     private final String defaultStyle;
+    private final TextGeneratorService gptService;
 
     public PromptTextService(
-        @Value("${kakao.karlo.generate_image.style.default}") String defaultStyle) {
+        @Value("${kakao.karlo.generate_image.style.default}") String defaultStyle,
+        TextGeneratorService gptService) {
         this.defaultStyle = defaultStyle;
+        this.gptService = gptService;
     }
 
+    @Deprecated
     public String createPromptText(Emotion emotion, String keyword) {
         if (!StringUtils.hasText(keyword)) {
             keyword = "portrait";
@@ -26,6 +32,24 @@ public class PromptTextService {
             emotion.getColorPrompt(),
             defaultStyle,
             keyword);
+    }
+
+    public String createPromptTextWithGpt(Emotion emotion, String diaryNote) {
+        String prompt = null;
+        if (!StringUtils.hasText(diaryNote)) {
+            prompt = "portrait";
+        } else {
+            try {
+                prompt = gptService.generatePrompt(diaryNote);
+            } catch (TextGeneratorException e) {
+                prompt = diaryNote;
+            }
+        }
+        return promptTextBuilder(
+            emotion.getEmotionPrompt(),
+            emotion.getColorPrompt(),
+            defaultStyle,
+            prompt);
     }
 
     private String promptTextBuilder(String... prompts) {
@@ -40,9 +64,6 @@ public class PromptTextService {
         }
         if (sb.length() == 0) {
             return "";
-        }
-        if (sb.length() > 1000) {
-            return sb.substring(0, 1000);
         }
         return sb.toString();
     }

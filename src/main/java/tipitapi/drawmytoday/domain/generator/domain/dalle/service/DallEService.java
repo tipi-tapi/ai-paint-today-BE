@@ -67,6 +67,11 @@ public class DallEService implements ImageGeneratorService {
     }
 
     @Override
+    public byte[] generateImage(String promptText) throws ImageGeneratorException {
+        return new byte[0];
+    }
+
+    @Override
     public List<byte[]> generateTestImage(CreateTestDiaryRequest request)
         throws ImageGeneratorException {
         throw new UnsupportedOperationException();

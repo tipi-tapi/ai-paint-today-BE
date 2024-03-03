@@ -32,8 +32,9 @@ public class GptService implements TextGeneratorService {
         this.gptChatCompletionsPrompt = gptChatCompletionsPrompt;
     }
 
+    @Override
     @Transactional(noRollbackFor = TextGeneratorException.class)
-    public String generateKeyword(String diaryNote) {
+    public String generatePrompt(String diaryNote) {
         HttpEntity<GptChatCompletionsRequest> httpEntity = createChatCompletionsRequest(diaryNote);
         ResponseEntity<GptChatCompletionsResponse> responseEntity = null;
         try {
