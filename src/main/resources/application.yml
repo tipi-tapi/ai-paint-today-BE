@@ -9,6 +9,9 @@ presigned-image:
     expiration:
         admin-diaries: ${PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES}
 
+server:
+    shutdown: graceful
+
 ---
 spring.config.activate.on-profile: local
 
