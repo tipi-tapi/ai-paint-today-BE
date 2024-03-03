@@ -2,6 +2,10 @@ spring:
     profiles:
         active: ${profile}
         include: oauth, aws, openai, actuator, r2, kakao
+    datasource:
+        hikari:
+            maximum-pool-size: 15
+            
 encryptor:
     secret:
         key: ${ENCRYPTOR_SECRET_KEY}
