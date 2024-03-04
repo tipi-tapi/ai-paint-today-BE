@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.domain.PromptGeneratorResult;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
-import tipitapi.drawmytoday.domain.generator.api.gpt.domain.Message;
+import tipitapi.drawmytoday.domain.generator.domain.TextGeneratorContent;
 import tipitapi.drawmytoday.domain.generator.exception.TextGeneratorException;
 import tipitapi.drawmytoday.domain.generator.service.TextGeneratorService;
 
@@ -41,7 +41,7 @@ public class PromptTextService {
 
     public Prompt createPromptUsingGpt(Emotion emotion, String diaryNote) {
         String promptText;
-        List<Message> gptResult = null;
+        List<? extends TextGeneratorContent> gptResult = null;
         if (!StringUtils.hasText(diaryNote)) {
             promptText = "portrait";
         } else {

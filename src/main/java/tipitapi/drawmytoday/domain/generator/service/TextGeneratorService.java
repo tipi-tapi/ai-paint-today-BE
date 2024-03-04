@@ -1,9 +1,9 @@
 package tipitapi.drawmytoday.domain.generator.service;
 
 import java.util.List;
-import tipitapi.drawmytoday.domain.generator.api.gpt.domain.Message;
+import tipitapi.drawmytoday.domain.generator.domain.TextGeneratorContent;
 
 public interface TextGeneratorService {
 
-    List<Message> generatePrompt(String keyword);
+    List<? extends TextGeneratorContent> generatePrompt(String keyword);
 }
