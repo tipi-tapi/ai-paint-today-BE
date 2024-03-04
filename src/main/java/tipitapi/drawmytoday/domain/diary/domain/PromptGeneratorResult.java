@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PromptGeneratorResult {
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private PromptGeneratorType promptGeneratorType;
     private String promptGeneratorContent;
