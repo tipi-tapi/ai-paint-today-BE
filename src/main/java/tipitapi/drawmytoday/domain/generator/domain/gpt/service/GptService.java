@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.domain.generator.domain.gpt.service;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import tipitapi.drawmytoday.domain.generator.domain.gpt.domain.Message;
 import tipitapi.drawmytoday.domain.generator.domain.gpt.dto.GptChatCompletionsRequest;
 import tipitapi.drawmytoday.domain.generator.domain.gpt.dto.GptChatCompletionsResponse;
 import tipitapi.drawmytoday.domain.generator.domain.gpt.exception.GptRequestFailException;
@@ -34,7 +36,7 @@ public class GptService implements TextGeneratorService {
 
     @Override
     @Transactional(noRollbackFor = TextGeneratorException.class)
-    public String generatePrompt(String diaryNote) {
+    public List<Message> generatePrompt(String diaryNote) {
         HttpEntity<GptChatCompletionsRequest> httpEntity = createChatCompletionsRequest(diaryNote);
         ResponseEntity<GptChatCompletionsResponse> responseEntity = null;
         try {
@@ -42,7 +44,9 @@ public class GptService implements TextGeneratorService {
                 chatCompletionsUrl, httpEntity, GptChatCompletionsResponse.class);
 
             validIsSuccessfulRequest(responseEntity);
-            return responseEntity.getBody().getChoices()[0].getMessage().getContent();
+            List<Message> messages = httpEntity.getBody().getMessages();
+            messages.add(responseEntity.getBody().getChoices()[0].getMessage());
+            return messages;
         } catch (RestClientException e) {
             log.warn("GPT chat completions 요청에 실패했습니다. message: {}", e.getMessage());
             throw new GptRequestFailException(e);

@@ -49,18 +49,17 @@ public class CreateDiaryService {
         Emotion emotion = validateEmotionService.validateEmotionById(request.getEmotionId());
         LocalDateTime diaryDateTime = diaryDate.atTime(request.getUserTime());
 
-        String promptText;
+        Prompt prompt;
         if (StringUtils.hasText(request.getTranslatedNotes())) {
-            promptText = promptTextService.createPromptTextWithGpt(emotion,
-                request.getTranslatedNotes());
+            prompt = promptTextService.createPromptUsingGpt(emotion, request.getTranslatedNotes());
         } else {
-            promptText = promptTextService.createPromptText(emotion, request.getKeyword());
+            prompt = promptTextService.createPrompt(emotion, request.getKeyword());
         }
 
-        byte[] image = karloService.generateImage(promptText);
+        byte[] image = karloService.generateImage(prompt);
 
+        prompt.imageGeneratorSuccess();
         Diary diary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, false);
-        Prompt prompt = promptService.createPrompt(promptText, true);
         imageService.uploadAndCreateImage(diary, prompt, image, true);
 
         return new CreateDiaryResponse(diary.getDiaryId());
@@ -104,11 +103,11 @@ public class CreateDiaryService {
         throws ImageGeneratorException {
         Emotion emotion = validateEmotionService.validateEmotionById(
             diary.getEmotion().getEmotionId());
-        String promptText = promptTextService.createPromptText(emotion, diaryNote);
+        Prompt prompt = promptTextService.createPromptUsingGpt(emotion, diaryNote);
 
-        byte[] image = karloService.generateImage(promptText);
+        byte[] image = karloService.generateImage(prompt);
 
-        Prompt prompt = promptService.createPrompt(promptText, true);
+        prompt.imageGeneratorSuccess();
         imageService.unSelectAllImage(diary.getDiaryId());
         imageService.uploadAndCreateImage(diary, prompt, image, true);
     }
@@ -119,7 +118,7 @@ public class CreateDiaryService {
         Prompt prompt = promptService.getPromptByImageId(imageId)
             .orElseThrow(PromptNotExistException::new);
 
-        byte[] image = karloService.generateImage(prompt.getPromptText());
+        byte[] image = karloService.generateImage(prompt);
 
         imageService.unSelectAllImage(diary.getDiaryId());
         imageService.uploadAndCreateImage(diary, prompt, image, true);

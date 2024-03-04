@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest.KarloParameter;
 import tipitapi.drawmytoday.domain.diary.service.PromptService;
@@ -21,12 +22,12 @@ class KarloService implements ImageGeneratorService {
 
     @Override
     @Transactional(noRollbackFor = ImageGeneratorException.class)
-    public byte[] generateImage(String promptText) throws ImageGeneratorException {
+    public byte[] generateImage(Prompt prompt) throws ImageGeneratorException {
         try {
-            promptText = validatePromptText(promptText);
+            String promptText = substringPromptText(prompt.getPromptText());
             return karloRequestService.getImageAsUrl(promptText);
         } catch (ImageGeneratorException e) {
-            promptService.createPrompt(promptText, false);
+            promptService.savePrompt(prompt);
             throw e;
         }
     }
@@ -44,7 +45,7 @@ class KarloService implements ImageGeneratorService {
         }
     }
 
-    private String validatePromptText(String promptText) {
+    private String substringPromptText(String promptText) {
         if (promptText.length() > KARLO_MAX_PROMPT_LENGTH) {
             return promptText.substring(0, KARLO_MAX_PROMPT_LENGTH);
         }

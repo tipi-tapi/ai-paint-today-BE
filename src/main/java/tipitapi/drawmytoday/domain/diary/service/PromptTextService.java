@@ -1,10 +1,14 @@
 package tipitapi.drawmytoday.domain.diary.service;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import tipitapi.drawmytoday.domain.diary.domain.Prompt;
+import tipitapi.drawmytoday.domain.diary.domain.PromptGeneratorResult;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
+import tipitapi.drawmytoday.domain.generator.domain.gpt.domain.Message;
 import tipitapi.drawmytoday.domain.generator.exception.TextGeneratorException;
 import tipitapi.drawmytoday.domain.generator.service.TextGeneratorService;
 
@@ -23,33 +27,39 @@ public class PromptTextService {
     }
 
     @Deprecated
-    public String createPromptText(Emotion emotion, String keyword) {
+    public Prompt createPrompt(Emotion emotion, String keyword) {
         if (!StringUtils.hasText(keyword)) {
             keyword = "portrait";
         }
-        return promptTextBuilder(
+        String finalPromptText = promptTextBuilder(
             emotion.getEmotionPrompt(),
             emotion.getColorPrompt(),
             defaultStyle,
             keyword);
+        return Prompt.create(finalPromptText);
     }
 
-    public String createPromptTextWithGpt(Emotion emotion, String diaryNote) {
-        String prompt = null;
+    public Prompt createPromptUsingGpt(Emotion emotion, String diaryNote) {
+        String promptText;
+        List<Message> gptResult = null;
         if (!StringUtils.hasText(diaryNote)) {
-            prompt = "portrait";
+            promptText = "portrait";
         } else {
             try {
-                prompt = gptService.generatePrompt(diaryNote);
+                gptResult = gptService.generatePrompt(diaryNote);
+                promptText = gptResult.get(gptResult.size() - 1).getContent();
             } catch (TextGeneratorException e) {
-                prompt = diaryNote;
+                promptText = diaryNote;
             }
         }
-        return promptTextBuilder(
+
+        String finalPromptText = promptTextBuilder(
             emotion.getEmotionPrompt(),
             emotion.getColorPrompt(),
             defaultStyle,
-            prompt);
+            promptText);
+        PromptGeneratorResult result = PromptGeneratorResult.createGpt3Result(gptResult);
+        return Prompt.create(result, finalPromptText);
     }
 
     private String promptTextBuilder(String... prompts) {
