@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.domain.PromptGeneratorResult;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
-import tipitapi.drawmytoday.domain.generator.domain.gpt.domain.Message;
+import tipitapi.drawmytoday.domain.generator.api.gpt.domain.Message;
 import tipitapi.drawmytoday.domain.generator.exception.TextGeneratorException;
 import tipitapi.drawmytoday.domain.generator.service.TextGeneratorService;
 
