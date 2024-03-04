@@ -1,6 +1,7 @@
 package tipitapi.drawmytoday.domain.diary.domain;
 
 import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,10 +11,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
-import org.hibernate.annotations.SQLDelete;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
 
 @SQLDelete(sql = "UPDATE image SET deleted_at = current_timestamp WHERE image_id = ?")
@@ -32,7 +33,7 @@ public class Image extends BaseEntity {
     private Diary diary;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "prompt_id", nullable = false)
     private Prompt prompt;
 

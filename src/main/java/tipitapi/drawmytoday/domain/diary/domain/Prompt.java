@@ -1,6 +1,7 @@
 package tipitapi.drawmytoday.domain.diary.domain;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,19 +21,31 @@ public class Prompt extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long promptId;
 
+    @Embedded
+    private PromptGeneratorResult promptGeneratorResult;
+
     @NotNull
-    @Column(length = 1100)
+    @Column(length = 3000)
     private String promptText;
 
     @NotNull
     private boolean isSuccess;
 
-    private Prompt(String promptText, boolean isSuccess) {
+    private Prompt(PromptGeneratorResult promptGeneratorResult, String promptText) {
+        this.promptGeneratorResult = promptGeneratorResult;
         this.promptText = promptText;
-        this.isSuccess = isSuccess;
+        this.isSuccess = false;
     }
 
-    public static Prompt create(String promptText, boolean isSuccess) {
-        return new Prompt(promptText, isSuccess);
+    public static Prompt create(PromptGeneratorResult promptGeneratorResult, String promptText) {
+        return new Prompt(promptGeneratorResult, promptText);
+    }
+
+    public static Prompt create(String promptText) {
+        return new Prompt(PromptGeneratorResult.createNoUse(), promptText);
+    }
+
+    public void imageGeneratorSuccess() {
+        this.isSuccess = true;
     }
 }
