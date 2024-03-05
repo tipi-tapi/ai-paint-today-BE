@@ -41,15 +41,18 @@ public class PromptTextService {
 
     public Prompt createPromptUsingGpt(Emotion emotion, String diaryNote) {
         String promptText;
-        List<? extends TextGeneratorContent> gptResult = null;
+        PromptGeneratorResult result = null;
         if (!StringUtils.hasText(diaryNote)) {
             promptText = "portrait";
         } else {
             try {
-                gptResult = gptService.generatePrompt(diaryNote);
+                List<? extends TextGeneratorContent> gptResult = gptService.generatePrompt(
+                    diaryNote);
                 promptText = gptResult.get(gptResult.size() - 1).getContent();
+                result = PromptGeneratorResult.createGpt3Result(gptResult);
             } catch (TextGeneratorException e) {
                 promptText = diaryNote;
+                result = PromptGeneratorResult.createNoUse();
             }
         }
 
@@ -58,7 +61,6 @@ public class PromptTextService {
             emotion.getColorPrompt(),
             defaultStyle,
             promptText);
-        PromptGeneratorResult result = PromptGeneratorResult.createGpt3Result(gptResult);
         return Prompt.create(result, finalPromptText);
     }
 
