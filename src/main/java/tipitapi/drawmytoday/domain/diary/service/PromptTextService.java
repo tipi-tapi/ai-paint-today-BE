@@ -1,5 +1,7 @@
 package tipitapi.drawmytoday.domain.diary.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,12 +20,15 @@ public class PromptTextService {
 
     private final String defaultStyle;
     private final TextGeneratorService gptService;
+    private final ObjectMapper objectMapper;
 
     public PromptTextService(
         @Value("${kakao.karlo.generate_image.style.default}") String defaultStyle,
-        TextGeneratorService gptService) {
+        TextGeneratorService gptService,
+        ObjectMapper objectMapper) {
         this.defaultStyle = defaultStyle;
         this.gptService = gptService;
+        this.objectMapper = objectMapper;
     }
 
     @Deprecated
@@ -46,13 +51,16 @@ public class PromptTextService {
             promptText = "portrait";
         } else {
             try {
-                List<? extends TextGeneratorContent> gptResult = gptService.generatePrompt(
-                    diaryNote);
+                List<? extends TextGeneratorContent> gptResult =
+                    gptService.generatePrompt(diaryNote);
+                String content = objectMapper.writeValueAsString(gptResult);
                 promptText = gptResult.get(gptResult.size() - 1).getContent();
-                result = PromptGeneratorResult.createGpt3Result(gptResult);
+                result = PromptGeneratorResult.createGpt3Result(content);
             } catch (TextGeneratorException e) {
                 promptText = diaryNote;
                 result = PromptGeneratorResult.createNoUse();
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("GPT 결과를 JSON으로 변환하는데 실패했습니다.", e);
             }
         }
 
