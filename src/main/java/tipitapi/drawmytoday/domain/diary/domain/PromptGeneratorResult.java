@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,6 +18,7 @@ public class PromptGeneratorResult {
     @NotNull
     @Enumerated(EnumType.STRING)
     private PromptGeneratorType promptGeneratorType;
+    @Type(type = "text")
     private String promptGeneratorContent;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
