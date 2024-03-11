@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.domain.generator.api.gpt.domain.Message;
@@ -37,6 +38,7 @@ public class GptService implements TextGeneratorService {
     @Override
     @Transactional(noRollbackFor = TextGeneratorException.class)
     public List<Message> generatePrompt(String diaryNote) {
+        Assert.hasText(diaryNote, "일기 내용이 없습니다.");
         HttpEntity<GptChatCompletionsRequest> httpEntity = createChatCompletionsRequest(diaryNote);
         ResponseEntity<GptChatCompletionsResponse> responseEntity = null;
         try {

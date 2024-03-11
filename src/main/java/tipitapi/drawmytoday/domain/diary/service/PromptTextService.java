@@ -47,21 +47,16 @@ public class PromptTextService {
     public Prompt createPromptUsingGpt(Emotion emotion, String diaryNote) {
         String promptText;
         PromptGeneratorResult result = null;
-        if (!StringUtils.hasText(diaryNote)) {
-            promptText = "portrait";
-        } else {
-            try {
-                List<? extends TextGeneratorContent> gptResult =
-                    gptService.generatePrompt(diaryNote);
-                String content = objectMapper.writeValueAsString(gptResult);
-                promptText = gptResult.get(gptResult.size() - 1).getContent();
-                result = PromptGeneratorResult.createGpt3Result(content);
-            } catch (TextGeneratorException e) {
-                promptText = diaryNote;
-                result = PromptGeneratorResult.createNoUse();
-            } catch (JsonProcessingException e) {
-                throw new IllegalArgumentException("GPT 결과를 JSON으로 변환하는데 실패했습니다.", e);
-            }
+        try {
+            List<? extends TextGeneratorContent> gptResult = gptService.generatePrompt(diaryNote);
+            String content = objectMapper.writeValueAsString(gptResult);
+            promptText = gptResult.get(gptResult.size() - 1).getContent();
+            result = PromptGeneratorResult.createGpt3Result(content);
+        } catch (TextGeneratorException e) {
+            promptText = diaryNote;
+            result = PromptGeneratorResult.createNoUse();
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("GPT 결과를 JSON으로 변환하는데 실패했습니다.", e);
         }
 
         String finalPromptText = promptTextBuilder(
