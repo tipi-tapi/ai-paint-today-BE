@@ -13,7 +13,6 @@ import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest;
-import tipitapi.drawmytoday.domain.diary.exception.PromptNotExistException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.service.ValidateEmotionService;
@@ -34,6 +33,7 @@ public class CreateDiaryService {
     private final ValidateEmotionService validateEmotionService;
     private final ValidateDiaryService validateDiaryService;
     private final ValidateTicketService validateTicketService;
+    private final ValidatePromptService validatePromptService;
     private final ImageGeneratorService karloService;
     private final PromptService promptService;
     private final Encryptor encryptor;
@@ -115,8 +115,7 @@ public class CreateDiaryService {
     private void regenerateDiaryImageWithPreviousPrompt(Diary diary)
         throws ImageGeneratorException {
         Long imageId = diary.getSelectedImage().getImageId();
-        Prompt prompt = promptService.getPromptByImageId(imageId)
-            .orElseThrow(PromptNotExistException::new);
+        Prompt prompt = validatePromptService.validatePromptByImageId(imageId);
 
         byte[] image = karloService.generateImage(prompt);
 
