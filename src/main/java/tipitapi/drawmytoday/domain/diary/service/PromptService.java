@@ -28,8 +28,7 @@ public class PromptService {
     }
 
     public Optional<Prompt> getPromptByImageId(Long imageId) {
-        return promptRepository.findAllSuccessPromptByImageId(imageId)
-            .stream().findFirst();
+        return promptRepository.findByImageId(imageId);
     }
 
     public Prompt savePrompt(Prompt prompt) {
