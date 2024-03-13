@@ -19,6 +19,11 @@ public class ValidateTicketService {
         return ticketRepository.findValidTicket(userId);
     }
 
+    public void validateTicket(Long userId) {
+        findValidTicket(userId)
+            .orElseThrow(ValidTicketNotExistsException::new);
+    }
+
     @Transactional
     public void findAndUseTicket(Long userId) {
         ticketRepository.findValidTicket(userId)

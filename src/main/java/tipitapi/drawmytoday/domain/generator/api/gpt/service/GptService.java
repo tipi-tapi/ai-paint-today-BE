@@ -11,7 +11,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -20,12 +19,10 @@ import tipitapi.drawmytoday.domain.generator.api.gpt.domain.Message;
 import tipitapi.drawmytoday.domain.generator.api.gpt.dto.GptChatCompletionsRequest;
 import tipitapi.drawmytoday.domain.generator.api.gpt.dto.GptChatCompletionsResponse;
 import tipitapi.drawmytoday.domain.generator.api.gpt.exception.GptRequestFailException;
-import tipitapi.drawmytoday.domain.generator.exception.TextGeneratorException;
 import tipitapi.drawmytoday.domain.generator.service.TextGeneratorService;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
 public class GptService implements TextGeneratorService {
 
     private final RestTemplate openaiRestTemplate;
@@ -46,7 +43,6 @@ public class GptService implements TextGeneratorService {
     }
 
     @Override
-    @Transactional(noRollbackFor = TextGeneratorException.class)
     public List<Message> generatePrompt(String diaryNote, int maxLength) {
         Assert.hasText(diaryNote, "일기 내용이 없습니다.");
 
@@ -57,7 +53,6 @@ public class GptService implements TextGeneratorService {
     }
 
     @Override
-    @Transactional(noRollbackFor = TextGeneratorException.class)
     public List<Message> regeneratePrompt(String diaryNote, Prompt prompt) {
         Assert.hasText(diaryNote, "일기 내용이 없습니다.");
 

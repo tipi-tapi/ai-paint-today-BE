@@ -18,6 +18,7 @@ public class PromptService {
      * 테스트용 일기 생성 로직 수정 시 Deprecated 처리
      */
     @Deprecated
+    @Transactional
     public Prompt createPrompt(String promptText, boolean isSuccess) {
         if (isSuccess) {
             Prompt prompt = Prompt.create(promptText);
@@ -31,6 +32,7 @@ public class PromptService {
         return promptRepository.findByImageId(imageId);
     }
 
+    @Transactional
     public Prompt savePrompt(Prompt prompt) {
         return promptRepository.save(prompt);
     }

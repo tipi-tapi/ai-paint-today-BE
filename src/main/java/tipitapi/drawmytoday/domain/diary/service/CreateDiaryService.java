@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
@@ -23,7 +23,6 @@ import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CreateDiaryService {
 
@@ -38,15 +37,18 @@ public class CreateDiaryService {
     private final PromptService promptService;
     private final Encryptor encryptor;
     private final PromptTextService promptTextService;
+    private final TransactionTemplate readTransactionTemplate;
+    private final TransactionTemplate writeTransactionTemplate;
 
-    @Transactional(noRollbackFor = {ImageGeneratorException.class})
     public CreateDiaryResponse createDiary(Long userId, CreateDiaryRequest request)
         throws ImageGeneratorException {
         LocalDate diaryDate = request.getDiaryDate();
         User user = validateUserService.validateUserById(userId);
-        validateDiaryService.validateExistsByDate(userId, diaryDate);
-        validateTicketService.findAndUseTicket(userId);
-        Emotion emotion = validateEmotionService.validateEmotionById(request.getEmotionId());
+        Emotion emotion = readTransactionTemplate.execute(status -> {
+            validateDiaryService.validateExistsByDate(userId, diaryDate);
+            validateTicketService.validateTicket(userId);
+            return validateEmotionService.validateEmotionById(request.getEmotionId());
+        });
         LocalDateTime diaryDateTime = diaryDate.atTime(request.getUserTime());
 
         Prompt prompt;
@@ -60,43 +62,57 @@ public class CreateDiaryService {
         byte[] image = karloService.generateImage(prompt);
 
         prompt.imageGeneratorSuccess();
-        Diary diary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, false);
-        imageService.uploadAndCreateImage(diary, prompt, image, true);
+        Diary diary = writeTransactionTemplate.execute(status -> {
+            try {
+                Diary newDiary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, false);
+                imageService.uploadAndCreateImage(newDiary, prompt, image, true);
+                validateTicketService.findAndUseTicket(userId);
+                return newDiary;
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw e;
+            }
+        });
 
         return new CreateDiaryResponse(diary.getDiaryId());
     }
 
-    @Transactional(noRollbackFor = {ImageGeneratorException.class})
     public CreateDiaryResponse createTestDiary(Long userId, CreateTestDiaryRequest request)
         throws ImageGeneratorException {
         LocalDate diaryDate = request.getDiaryDate();
-        User user = validateUserService.validateAdminUserById(userId);
-        validateDiaryService.validateExistsByDate(userId, diaryDate);
-        Emotion emotion = validateEmotionService.validateEmotionById(request.getEmotionId());
+        User user = validateUserService.validateUserById(userId);
+        Emotion emotion = readTransactionTemplate.execute(status -> {
+            validateDiaryService.validateExistsByDate(userId, diaryDate);
+            return validateEmotionService.validateEmotionById(request.getEmotionId());
+        });
         LocalDateTime diaryDateTime = diaryDate.atTime(request.getUserTime());
 
         List<byte[]> images = karloService.generateTestImage(request);
 
-        Diary diary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, true);
-        Prompt prompt = promptService.createPrompt(request.getKarloParameter().getPrompt(), true);
-        for (int i = 0; i < images.size(); i++) {
-            imageService.uploadAndCreateImage(diary, prompt, images.get(i), i == 0);
-        }
+        Diary diary = writeTransactionTemplate.execute(status -> {
+            try {
+                Diary newDiary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, false);
+                Prompt prompt = promptService.createPrompt(request.getKarloParameter().getPrompt(),
+                    true);
+                for (int i = 0; i < images.size(); i++) {
+                    imageService.uploadAndCreateImage(newDiary, prompt, images.get(i), i == 0);
+                }
+                return newDiary;
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw e;
+            }
+        });
 
         return new CreateDiaryResponse(diary.getDiaryId());
     }
 
-    @Transactional(noRollbackFor = {ImageGeneratorException.class})
     public void regenerateDiaryImage(Long userId, Long diaryId, String diaryNote)
         throws ImageGeneratorException {
-        User user = validateUserService.validateUserById(userId);
-        Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
-        validateTicketService.findAndUseTicket(userId);
-
         if (isNewVersion(diaryNote)) {
-            regenerateDiaryImageWithNewPrompt(diary, diaryNote);
+            regenerateDiaryImageWithNewPrompt(userId, diaryId, diaryNote);
         } else {
-            regenerateDiaryImageWithPreviousPrompt(diary);
+            regenerateDiaryImageWithPreviousPrompt(userId, diaryId);
         }
     }
 
@@ -104,12 +120,24 @@ public class CreateDiaryService {
         return StringUtils.hasText(diaryNote);
     }
 
-    private void regenerateDiaryImageWithNewPrompt(Diary diary, String diaryNote)
+    private void regenerateDiaryImageWithNewPrompt(Long userId, Long diaryId, String diaryNote)
         throws ImageGeneratorException {
-        Emotion emotion = validateEmotionService.validateEmotionById(
-            diary.getEmotion().getEmotionId());
-        Prompt prompt = validatePromptService.validatePromptByImageId(
-            diary.getSelectedImage().getImageId());
+
+        Diary[] diaryWrapper = new Diary[1];
+        Emotion[] emotionWrapper = new Emotion[1];
+        Prompt[] promptWrapper = new Prompt[1];
+        readTransactionTemplate.executeWithoutResult(status -> {
+            User user = validateUserService.validateUserById(userId);
+            diaryWrapper[0] = validateDiaryService.validateDiaryById(diaryId, user);
+            validateTicketService.validateTicket(userId);
+            emotionWrapper[0] = validateEmotionService.validateEmotionById(
+                diaryWrapper[0].getEmotion().getEmotionId());
+            promptWrapper[0] = validatePromptService.validatePromptByImageId(
+                diaryWrapper[0].getSelectedImage().getImageId());
+        });
+        Diary diary = diaryWrapper[0];
+        Emotion emotion = emotionWrapper[0];
+        Prompt prompt = promptWrapper[0];
 
         String promptGeneratorContent = prompt.getPromptGeneratorResult()
             .getPromptGeneratorContent();
@@ -121,20 +149,47 @@ public class CreateDiaryService {
 
         byte[] image = karloService.generateImage(prompt);
 
-        prompt.imageGeneratorSuccess();
-        imageService.unSelectAllImage(diary.getDiaryId());
-        imageService.uploadAndCreateImage(diary, prompt, image, true);
+        Prompt finalPrompt = prompt;
+        writeTransactionTemplate.executeWithoutResult(status -> {
+            try {
+                finalPrompt.imageGeneratorSuccess();
+                imageService.unSelectAllImage(diary.getDiaryId());
+                imageService.uploadAndCreateImage(diary, finalPrompt, image, true);
+                validateTicketService.findAndUseTicket(userId);
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw e;
+            }
+        });
     }
 
-    private void regenerateDiaryImageWithPreviousPrompt(Diary diary)
+    private void regenerateDiaryImageWithPreviousPrompt(Long userId, Long diaryId)
         throws ImageGeneratorException {
-        Long imageId = diary.getSelectedImage().getImageId();
-        Prompt prompt = validatePromptService.validatePromptByImageId(imageId);
+        Diary[] diaryWrapper = new Diary[1];
+        Prompt[] promptWrapper = new Prompt[1];
+        readTransactionTemplate.executeWithoutResult(status -> {
+            User user = validateUserService.validateUserById(userId);
+            diaryWrapper[0] = validateDiaryService.validateDiaryById(diaryId, user);
+            validateTicketService.validateTicket(userId);
+            Long imageId = diaryWrapper[0].getSelectedImage().getImageId();
+            promptWrapper[0] = validatePromptService.validatePromptByImageId(imageId);
+        });
+        Diary diary = diaryWrapper[0];
+        Prompt prompt = promptWrapper[0];
 
         byte[] image = karloService.generateImage(prompt);
 
-        imageService.unSelectAllImage(diary.getDiaryId());
-        imageService.uploadAndCreateImage(diary, prompt, image, true);
+        writeTransactionTemplate.executeWithoutResult(status -> {
+            try {
+                imageService.unSelectAllImage(diary.getDiaryId());
+                Prompt newPrompt = validatePromptService.validatePromptById(prompt.getPromptId());
+                imageService.uploadAndCreateImage(diary, newPrompt, image, true);
+                validateTicketService.findAndUseTicket(userId);
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw e;
+            }
+        });
     }
 
     private Diary saveDiary(String notes, User user, Emotion emotion, LocalDateTime diaryDate,

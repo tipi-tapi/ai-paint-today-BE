@@ -18,4 +18,9 @@ public class ValidatePromptService {
         return promptRepository.findByImageId(imageId)
             .orElseThrow(PromptNotFoundException::new);
     }
+
+    public Prompt validatePromptById(Long promptId) {
+        return promptRepository.findById(promptId)
+            .orElseThrow(PromptNotFoundException::new);
+    }
 }
