@@ -110,7 +110,12 @@ public class CreateDiaryService {
             diary.getEmotion().getEmotionId());
         Prompt prompt = validatePromptService.validatePromptByImageId(
             diary.getSelectedImage().getImageId());
-        prompt = promptTextService.regeneratePromptUsingGpt(emotion, diaryNote, prompt);
+
+        if (prompt.getPromptGeneratorResult().getPromptGeneratorContent() == null) {
+            prompt = promptTextService.generatePromptUsingGpt(emotion, diaryNote);
+        } else {
+            prompt = promptTextService.regeneratePromptUsingGpt(emotion, diaryNote, prompt);
+        }
 
         byte[] image = karloService.generateImage(prompt);
 
