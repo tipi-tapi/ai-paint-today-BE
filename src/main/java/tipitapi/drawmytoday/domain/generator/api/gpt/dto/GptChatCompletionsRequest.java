@@ -18,6 +18,11 @@ public class GptChatCompletionsRequest {
     private final String model;
     private final List<Message> messages;
 
+    public GptChatCompletionsRequest() {
+        this.model = "gpt-3.5-turbo";
+        this.messages = new ArrayList<>();
+    }
+
     private GptChatCompletionsRequest(String gptChatCompletionsPrompt) {
         this.model = "gpt-3.5-turbo";
         List<Message> messages = new ArrayList<>();
@@ -32,7 +37,19 @@ public class GptChatCompletionsRequest {
         return request;
     }
 
+    public static GptChatCompletionsRequest createRegenerateMessage(
+        List<Message> previousGptMessages, String gptRegeneratePrompt) {
+        GptChatCompletionsRequest request = new GptChatCompletionsRequest();
+        request.addPreviousGptMessages(previousGptMessages);
+        request.addUserMessage(gptRegeneratePrompt);
+        return request;
+    }
+
     private void addUserMessage(String userMessage) {
         this.messages.add(new Message(ChatCompletionsRole.user, userMessage));
+    }
+
+    private void addPreviousGptMessages(List<Message> previousGptMessages) {
+        this.messages.addAll(previousGptMessages);
     }
 }

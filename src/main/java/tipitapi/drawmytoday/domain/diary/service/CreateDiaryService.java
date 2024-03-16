@@ -50,8 +50,9 @@ public class CreateDiaryService {
         LocalDateTime diaryDateTime = diaryDate.atTime(request.getUserTime());
 
         Prompt prompt;
-        if (StringUtils.hasText(request.getTranslatedNotes())) {
-            prompt = promptTextService.createPromptUsingGpt(emotion, request.getTranslatedNotes());
+        if (isNewVersion(request.getTranslatedNotes())) {
+            prompt = promptTextService.generatePromptUsingGpt(emotion,
+                request.getTranslatedNotes());
         } else {
             prompt = promptTextService.createPrompt(emotion, request.getKeyword());
         }
@@ -92,18 +93,24 @@ public class CreateDiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         validateTicketService.findAndUseTicket(userId);
 
-        if (StringUtils.hasText(diaryNote)) {
+        if (isNewVersion(diaryNote)) {
             regenerateDiaryImageWithNewPrompt(diary, diaryNote);
         } else {
             regenerateDiaryImageWithPreviousPrompt(diary);
         }
     }
 
+    private boolean isNewVersion(String diaryNote) {
+        return StringUtils.hasText(diaryNote);
+    }
+
     private void regenerateDiaryImageWithNewPrompt(Diary diary, String diaryNote)
         throws ImageGeneratorException {
         Emotion emotion = validateEmotionService.validateEmotionById(
             diary.getEmotion().getEmotionId());
-        Prompt prompt = promptTextService.createPromptUsingGpt(emotion, diaryNote);
+        Prompt prompt = validatePromptService.validatePromptByImageId(
+            diary.getSelectedImage().getImageId());
+        prompt = promptTextService.regeneratePromptUsingGpt(emotion, diaryNote, prompt);
 
         byte[] image = karloService.generateImage(prompt);
 
