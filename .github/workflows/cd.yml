@@ -92,5 +92,6 @@ jobs:
                         add_env_var "RDS_USERNAME" "${{ secrets.RDS_USERNAME }}"
                         add_env_var "RDS_PASSWORD" "${{ secrets.RDS_PASSWORD }}"
                         add_env_var "GPT_CHAT_COMPLETIONS_PROMPT" "${{ secrets.GPT_CHAT_COMPLETIONS_PROMPT }}"
+                        add_env_var "GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT" "${{ secrets.GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT }}"
                         
                         ./deploy.sh
