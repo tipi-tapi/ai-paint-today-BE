@@ -1,6 +1,5 @@
 package tipitapi.drawmytoday.domain.diary.domain;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -18,7 +17,6 @@ public class PromptGeneratorResult {
     private PromptGeneratorType promptGeneratorType;
     @Type(type = "text")
     private String promptGeneratorContent;
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private PromptGeneratorResult(PromptGeneratorType promptGeneratorType,
         String promptGeneratorContent) {
@@ -31,7 +29,7 @@ public class PromptGeneratorResult {
     }
 
     public static PromptGeneratorResult createNoUse() {
-        return new PromptGeneratorResult(PromptGeneratorType.NONE, "");
+        return new PromptGeneratorResult(PromptGeneratorType.NONE, null);
     }
 
     public PromptGeneratorType getPromptGeneratorType() {
