@@ -1,5 +1,6 @@
 package tipitapi.drawmytoday.domain.oauth.service;
 
+import static tipitapi.drawmytoday.common.exception.ErrorCode.APPLE_EMAIL_NOT_FOUND;
 import static tipitapi.drawmytoday.common.exception.ErrorCode.OAUTH_SERVER_FAILED;
 import static tipitapi.drawmytoday.common.exception.ErrorCode.PARSING_ERROR;
 
@@ -7,11 +8,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ import tipitapi.drawmytoday.domain.user.domain.User;
 import tipitapi.drawmytoday.domain.user.service.UserService;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -47,13 +50,15 @@ public class AppleOAuthService {
     private final UserService userService;
     private final AuthRepository authRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final List<String> revokeFailedCodes = List.of("invalid_request", "invalid_client",
-        "invalid_grant", "unauthorized_client", "unsupported_grant_type", "invalid_scope");
 
     @Transactional
     public ResponseJwtToken login(HttpServletRequest request, RequestAppleLogin requestAppleLogin) {
         OAuthAccessToken oAuthAccessToken = getAccessToken(request);
         AppleIdToken appleIdToken = getAppleIdToken(requestAppleLogin.getIdToken());
+
+        if (appleIdToken.getEmail() == null) {
+            throw new BusinessException(APPLE_EMAIL_NOT_FOUND);
+        }
 
         User user = validateUserService.validateRegisteredUserByEmail(
             appleIdToken.getEmail(), SocialCode.APPLE);
@@ -71,11 +76,6 @@ public class AppleOAuthService {
         return ResponseJwtToken.of(jwtAccessToken, jwtRefreshToken);
     }
 
-    /**
-     * revoke token시 error response 명세
-     *
-     * @see "https://developer.apple.com/documentation/sign_in_with_apple/errorresponse"
-     */
     @Transactional
     public void deleteAccount(User user) {
         Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
@@ -92,15 +92,10 @@ public class AppleOAuthService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
         String url = properties.getDeleteAccountUrl();
-        String response = restTemplate.postForObject(url, request, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
-        if (response != null) {
-            revokeFailedCodes.stream()
-                .filter(response::contains)
-                .findAny()
-                .ifPresent(code -> {
-                    throw new BusinessException(OAUTH_SERVER_FAILED, new Throwable(response));
-                });
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new BusinessException(OAUTH_SERVER_FAILED, new Throwable(response.getBody()));
         }
 
         user.deleteUser();
