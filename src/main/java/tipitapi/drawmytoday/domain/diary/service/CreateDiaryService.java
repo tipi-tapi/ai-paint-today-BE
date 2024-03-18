@@ -111,7 +111,9 @@ public class CreateDiaryService {
         Prompt prompt = validatePromptService.validatePromptByImageId(
             diary.getSelectedImage().getImageId());
 
-        if (prompt.getPromptGeneratorResult().getPromptGeneratorContent() == null) {
+        String promptGeneratorContent = prompt.getPromptGeneratorResult()
+            .getPromptGeneratorContent();
+        if (promptGeneratorContent == null || promptGeneratorContent.isBlank()) {
             prompt = promptTextService.generatePromptUsingGpt(emotion, diaryNote);
         } else {
             prompt = promptTextService.regeneratePromptUsingGpt(emotion, diaryNote, prompt);
