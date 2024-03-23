@@ -17,6 +17,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryNoteAndPromptResponse;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
+import tipitapi.drawmytoday.domain.diary.domain.PromptGeneratorResult;
 import tipitapi.drawmytoday.domain.diary.repository.PromptRepository;
 import tipitapi.drawmytoday.domain.diary.service.AdminDiaryService;
 import tipitapi.drawmytoday.domain.generator.api.gpt.domain.ChatCompletionsRole;
@@ -96,7 +97,8 @@ public class AdminService {
                     log.error("GPT Message를 JSON으로 변환하는데 실패했습니다.", e);
                     throw new RuntimeException(e);
                 }
-                prompt.getPromptGeneratorResult().updatePromptGeneratorContent(gptResponses);
+                PromptGeneratorResult result = PromptGeneratorResult.createGpt3Result(gptResponses);
+                prompt.updatePromptGeneratorResult(result);
             }
         });
         return responses.size();

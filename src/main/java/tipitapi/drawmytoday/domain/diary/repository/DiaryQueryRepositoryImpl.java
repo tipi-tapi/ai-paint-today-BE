@@ -94,8 +94,8 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
         return queryFactory.select(
                 new QGetDiaryNoteAndPromptResponse(prompt.promptId, diary.notes, prompt.promptText))
             .from(prompt)
-            .leftJoin(image).on(prompt.promptId.eq(image.prompt.promptId))
-            .leftJoin(diary).on(image.diary.diaryId.eq(diary.diaryId))
+            .join(image).on(prompt.promptId.eq(image.prompt.promptId))
+            .join(diary).on(image.diary.diaryId.eq(diary.diaryId))
             .where(prompt.promptGeneratorResult.promptGeneratorContent.isNull())
             .where(prompt.promptText.notLike("%, portrait"))
             .limit(10L)
