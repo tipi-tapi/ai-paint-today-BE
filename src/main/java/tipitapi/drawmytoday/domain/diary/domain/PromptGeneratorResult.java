@@ -39,4 +39,8 @@ public class PromptGeneratorResult {
     public String getPromptGeneratorContent() {
         return promptGeneratorContent;
     }
+
+    public void updatePromptGeneratorContent(String promptGeneratorContent) {
+        this.promptGeneratorContent = promptGeneratorContent;
+    }
 }

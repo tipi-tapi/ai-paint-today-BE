@@ -18,7 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.support.PageableExecutionUtils;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
+import tipitapi.drawmytoday.domain.admin.dto.GetDiaryNoteAndPromptResponse;
 import tipitapi.drawmytoday.domain.admin.dto.QGetDiaryAdminResponse;
+import tipitapi.drawmytoday.domain.admin.dto.QGetDiaryNoteAndPromptResponse;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
 import tipitapi.drawmytoday.domain.diary.dto.QGetMonthlyDiariesResponse;
@@ -84,6 +86,19 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
                 .and(diary.user.userId.eq(userId)))
             .orderBy(diary.diaryDate.asc())
             .groupBy(diary.diaryId)
+            .fetch();
+    }
+
+    @Override
+    public List<GetDiaryNoteAndPromptResponse> getDiaryNoteAndPrompt() {
+        return queryFactory.select(
+                new QGetDiaryNoteAndPromptResponse(prompt.promptId, diary.notes, prompt.promptText))
+            .from(prompt)
+            .leftJoin(image).on(prompt.promptId.eq(image.prompt.promptId))
+            .leftJoin(diary).on(image.diary.diaryId.eq(diary.diaryId))
+            .where(prompt.promptGeneratorResult.promptGeneratorContent.isNull())
+            .where(prompt.promptText.notLike("%, portrait"))
+            .limit(10L)
             .fetch();
     }
 }
