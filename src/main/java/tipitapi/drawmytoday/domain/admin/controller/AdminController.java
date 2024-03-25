@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.util.stream.LongStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort.Direction;
@@ -59,5 +60,17 @@ public class AdminController {
             adminService.getDiaries(tokenInfo.getUserId(), size, page, direction, emotionId,
                 withTest)
         ).asHttp(HttpStatus.OK);
+    }
+
+    @Operation(summary = "GPT Generator Content 추가")
+    @GetMapping("/add-gpt-generator-content")
+    public ResponseEntity<Integer> addGptGeneratorContent(
+        @AuthUser JwtTokenInfo jwtTokenInfo,
+        @RequestParam(value = "reputation", required = false, defaultValue = "1") Long reputation
+    ) {
+        int addedCount = LongStream.range(0, reputation).
+            mapToObj(i -> adminService.addGptGeneratorContent(jwtTokenInfo.getUserId())).
+            reduce(0, Integer::sum);
+        return ResponseEntity.ok(addedCount);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
+import tipitapi.drawmytoday.domain.admin.dto.GetDiaryNoteAndPromptResponse;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
 
@@ -20,4 +21,6 @@ public interface DiaryQueryRepository {
 
     List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, LocalDateTime startMonth,
         LocalDateTime endMonth);
+
+    List<GetDiaryNoteAndPromptResponse> getDiaryNoteAndPrompt();
 }

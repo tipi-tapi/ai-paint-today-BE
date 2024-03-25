@@ -48,4 +48,8 @@ public class Prompt extends BaseEntity {
     public void imageGeneratorSuccess() {
         this.isSuccess = true;
     }
+
+    public void updatePromptGeneratorResult(PromptGeneratorResult promptGeneratorResult) {
+        this.promptGeneratorResult = promptGeneratorResult;
+    }
 }
