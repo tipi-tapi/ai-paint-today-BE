@@ -13,7 +13,6 @@ import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest;
-import tipitapi.drawmytoday.domain.diary.exception.PromptNotExistException;
 import tipitapi.drawmytoday.domain.diary.repository.DiaryRepository;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.emotion.service.ValidateEmotionService;
@@ -34,6 +33,7 @@ public class CreateDiaryService {
     private final ValidateEmotionService validateEmotionService;
     private final ValidateDiaryService validateDiaryService;
     private final ValidateTicketService validateTicketService;
+    private final ValidatePromptService validatePromptService;
     private final ImageGeneratorService karloService;
     private final PromptService promptService;
     private final Encryptor encryptor;
@@ -50,8 +50,9 @@ public class CreateDiaryService {
         LocalDateTime diaryDateTime = diaryDate.atTime(request.getUserTime());
 
         Prompt prompt;
-        if (StringUtils.hasText(request.getTranslatedNotes())) {
-            prompt = promptTextService.createPromptUsingGpt(emotion, request.getTranslatedNotes());
+        if (isNewVersion(request.getTranslatedNotes())) {
+            prompt = promptTextService.generatePromptUsingGpt(emotion,
+                request.getTranslatedNotes());
         } else {
             prompt = promptTextService.createPrompt(emotion, request.getKeyword());
         }
@@ -92,18 +93,31 @@ public class CreateDiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
         validateTicketService.findAndUseTicket(userId);
 
-        if (StringUtils.hasText(diaryNote)) {
+        if (isNewVersion(diaryNote)) {
             regenerateDiaryImageWithNewPrompt(diary, diaryNote);
         } else {
             regenerateDiaryImageWithPreviousPrompt(diary);
         }
     }
 
+    private boolean isNewVersion(String diaryNote) {
+        return StringUtils.hasText(diaryNote);
+    }
+
     private void regenerateDiaryImageWithNewPrompt(Diary diary, String diaryNote)
         throws ImageGeneratorException {
         Emotion emotion = validateEmotionService.validateEmotionById(
             diary.getEmotion().getEmotionId());
-        Prompt prompt = promptTextService.createPromptUsingGpt(emotion, diaryNote);
+        Prompt prompt = validatePromptService.validatePromptByImageId(
+            diary.getSelectedImage().getImageId());
+
+        String promptGeneratorContent = prompt.getPromptGeneratorResult()
+            .getPromptGeneratorContent();
+        if (promptGeneratorContent == null || promptGeneratorContent.isBlank()) {
+            prompt = promptTextService.generatePromptUsingGpt(emotion, diaryNote);
+        } else {
+            prompt = promptTextService.regeneratePromptUsingGpt(emotion, diaryNote, prompt);
+        }
 
         byte[] image = karloService.generateImage(prompt);
 
@@ -115,8 +129,7 @@ public class CreateDiaryService {
     private void regenerateDiaryImageWithPreviousPrompt(Diary diary)
         throws ImageGeneratorException {
         Long imageId = diary.getSelectedImage().getImageId();
-        Prompt prompt = promptService.getPromptByImageId(imageId)
-            .orElseThrow(PromptNotExistException::new);
+        Prompt prompt = validatePromptService.validatePromptByImageId(imageId);
 
         byte[] image = karloService.generateImage(prompt);
 
