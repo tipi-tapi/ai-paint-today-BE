@@ -68,9 +68,9 @@ public class AdminController {
         @AuthUser JwtTokenInfo jwtTokenInfo,
         @RequestParam(value = "reputation", required = false, defaultValue = "1") Long reputation
     ) {
-        int added = LongStream.range(0, reputation).
+        int addedCount = LongStream.range(0, reputation).
             mapToObj(i -> adminService.addGptGeneratorContent(jwtTokenInfo.getUserId())).
             reduce(0, Integer::sum);
-        return ResponseEntity.ok(added);
+        return ResponseEntity.ok(addedCount);
     }
 }
