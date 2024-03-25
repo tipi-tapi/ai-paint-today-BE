@@ -14,12 +14,25 @@ public class PromptService {
 
     private final PromptRepository promptRepository;
 
-    public Prompt createPrompt(String prompt, boolean isSuccess) {
-        return promptRepository.save(Prompt.create(prompt, isSuccess));
+    /**
+     * 테스트용 일기 생성 로직 수정 시 Deprecated 처리
+     */
+    @Deprecated
+    public Prompt createPrompt(String promptText, boolean isSuccess) {
+        if (isSuccess) {
+            Prompt prompt = Prompt.create(promptText);
+            prompt.imageGeneratorSuccess();
+            return promptRepository.save(prompt);
+        }
+        return promptRepository.save(Prompt.create(promptText));
     }
 
     public Optional<Prompt> getPromptByImageId(Long imageId) {
         return promptRepository.findAllSuccessPromptByImageId(imageId)
             .stream().findFirst();
+    }
+
+    public Prompt savePrompt(Prompt prompt) {
+        return promptRepository.save(prompt);
     }
 }
