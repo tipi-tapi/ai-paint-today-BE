@@ -63,7 +63,7 @@ public class GptService implements TextGeneratorService {
 
         String gptContent = prompt.getPromptGeneratorResult().getPromptGeneratorContent();
         List<Message> previousGptMessages = parsingGptContent(gptContent);
-        String gptRegeneratePrompt = this.gptRegeneratePrompt + "\n\n" + diaryNote;
+        String gptRegeneratePrompt = diaryNote + "\n\n" + this.gptRegeneratePrompt;
         GptChatCompletionsRequest newGptChatCompletionsRequest = GptChatCompletionsRequest.createRegenerateMessage(
             previousGptMessages, gptRegeneratePrompt);
         HttpEntity<GptChatCompletionsRequest> httpEntity = createChatCompletionsRequest(
@@ -89,8 +89,10 @@ public class GptService implements TextGeneratorService {
                 chatCompletionsUrl, httpEntity, GptChatCompletionsResponse.class);
 
             validIsSuccessfulRequest(responseEntity);
+            Message responseMessage = responseEntity.getBody().getChoices()[0].getMessage();
+            responseMessage.clampContent();
             List<Message> messages = httpEntity.getBody().getMessages();
-            messages.add(responseEntity.getBody().getChoices()[0].getMessage());
+            messages.add(responseMessage);
             return messages;
         } catch (RestClientException e) {
             log.warn("GPT chat completions 요청에 실패했습니다. message: {}", e.getMessage());
