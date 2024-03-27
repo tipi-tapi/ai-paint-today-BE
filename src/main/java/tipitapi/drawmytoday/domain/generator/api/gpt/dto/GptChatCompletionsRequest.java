@@ -1,6 +1,8 @@
 package tipitapi.drawmytoday.domain.generator.api.gpt.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -13,10 +15,13 @@ import tipitapi.drawmytoday.domain.generator.api.gpt.domain.Message;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GptChatCompletionsRequest {
 
     private final String model;
     private final List<Message> messages;
+    private final int maxTokens = 100;
+    private final float temperature = 0;
 
     public GptChatCompletionsRequest() {
         this.model = "gpt-3.5-turbo";
