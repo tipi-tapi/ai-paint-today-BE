@@ -15,7 +15,7 @@ import tipitapi.drawmytoday.domain.generator.service.TranslateTextService;
 @RequiredArgsConstructor
 public class GoogleTranslatorService implements TranslateTextService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate googleTranslateRestTemplate;
     private final ObjectMapper objectMapper;
     private static final String GOOGLE_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single";
 
@@ -23,7 +23,7 @@ public class GoogleTranslatorService implements TranslateTextService {
     public String translateAutoToEnglish(String text) {
         String translatedText = null;
         try {
-            String jsonResult = restTemplate.getForObject(
+            String jsonResult = googleTranslateRestTemplate.getForObject(
                 GOOGLE_TRANSLATE_URL + "?client=gtx&sl=auto&tl=en&dt=t&dt=bd&dj=1&source=icon&q="
                     + text, String.class);
             JsonNode rootNode = objectMapper.readTree(jsonResult);
