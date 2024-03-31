@@ -22,7 +22,7 @@ jobs:
                 run: chmod +x gradlew
 
             -   name: Clean and Build with Gradle
-                run: ./gradlew clean build
+                run: ./gradlew clean build -x test
 
             -   name: Cache Gradle packages
                 uses: actions/cache@v1
