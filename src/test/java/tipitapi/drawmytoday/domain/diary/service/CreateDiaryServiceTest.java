@@ -212,7 +212,8 @@ class CreateDiaryServiceTest {
 
             //when
             //then
-            assertThatThrownBy(() -> createDiaryService.regenerateDiaryImage(userId, diaryId))
+            assertThatThrownBy(() -> createDiaryService.regenerateDiaryImage(userId, diaryId,
+                request))
                 .isInstanceOf(PromptNotExistException.class);
         }
 
@@ -237,7 +238,7 @@ class CreateDiaryServiceTest {
                 .willReturn(new GeneratedImageAndPrompt(promptText, image));
 
             //when
-            createDiaryService.regenerateDiaryImage(userId, diaryId);
+            createDiaryService.regenerateDiaryImage(userId, diaryId, request);
 
             //then
             verify(validateTicketService).findAndUseTicket(eq(userId));

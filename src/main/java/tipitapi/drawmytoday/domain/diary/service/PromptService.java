@@ -4,7 +4,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.repository.PromptRepository;
 
@@ -15,16 +14,24 @@ public class PromptService {
 
     private final PromptRepository promptRepository;
 
-    public Prompt createPrompt(Diary diary, String prompt, boolean isSuccess) {
-        return promptRepository.save(Prompt.create(diary, prompt, isSuccess));
+    /**
+     * 테스트용 일기 생성 로직 수정 시 Deprecated 처리
+     */
+    @Deprecated
+    public Prompt createPrompt(String promptText, boolean isSuccess) {
+        if (isSuccess) {
+            Prompt prompt = Prompt.create(promptText);
+            prompt.imageGeneratorSuccess();
+            return promptRepository.save(prompt);
+        }
+        return promptRepository.save(Prompt.create(promptText));
     }
 
-    public Prompt createPrompt(String prompt, boolean isSuccess) {
-        return promptRepository.save(Prompt.create(prompt, isSuccess));
+    public Optional<Prompt> getPromptByImageId(Long imageId) {
+        return promptRepository.findByImageId(imageId);
     }
 
-    public Optional<Prompt> getPromptByDiaryId(Long diaryId) {
-        return promptRepository.findAllByDiaryDiaryIdAndIsSuccessTrue(diaryId)
-            .stream().findFirst();
+    public Prompt savePrompt(Prompt prompt) {
+        return promptRepository.save(prompt);
     }
 }

@@ -1,6 +1,7 @@
 package tipitapi.drawmytoday.domain.diary.domain;
 
 import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,6 +33,11 @@ public class Image extends BaseEntity {
     private Diary diary;
 
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "prompt_id", nullable = false)
+    private Prompt prompt;
+
+    @NotNull
     @Column(nullable = false)
     private String imageUrl;
 
@@ -42,15 +48,16 @@ public class Image extends BaseEntity {
 
     private LocalDateTime deletedAt;
 
-    private Image(Diary diary, String imageUrl, boolean isSelected) {
+    private Image(Diary diary, Prompt prompt, String imageUrl, boolean isSelected) {
         this.diary = diary;
         diary.getImageList().add(this);
+        this.prompt = prompt;
         this.imageUrl = imageUrl;
         this.isSelected = isSelected;
     }
 
-    public static Image create(Diary diary, String imageUrl, boolean isSelected) {
-        return new Image(diary, imageUrl, isSelected);
+    public static Image create(Diary diary, Prompt prompt, String imageUrl, boolean isSelected) {
+        return new Image(diary, prompt, imageUrl, isSelected);
     }
 
     public void setSelected(boolean isSelected) {

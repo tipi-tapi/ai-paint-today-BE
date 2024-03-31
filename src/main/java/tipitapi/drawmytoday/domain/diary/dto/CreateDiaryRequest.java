@@ -25,8 +25,11 @@ public class CreateDiaryRequest {
     @Schema(description = "감정 ID")
     private Long emotionId;
 
-    @Schema(description = "일기 키워드", nullable = true)
+    @Schema(description = "일기 키워드(deprecated)", nullable = true)
     private String keyword;
+
+    @Schema(description = "번역된 일기", nullable = true)
+    private String translatedNotes;
 
     @Size(max = 6010)
     @Schema(description = "일기 내용", nullable = true)

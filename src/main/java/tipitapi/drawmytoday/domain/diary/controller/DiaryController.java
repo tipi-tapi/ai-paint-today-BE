@@ -8,34 +8,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import java.util.List;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tipitapi.drawmytoday.common.resolver.AuthUser;
 import tipitapi.drawmytoday.common.response.SuccessResponse;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenInfo;
-import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryRequest;
-import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
-import tipitapi.drawmytoday.domain.diary.dto.GetDiaryExistByDateResponse;
-import tipitapi.drawmytoday.domain.diary.dto.GetDiaryLimitResponse;
-import tipitapi.drawmytoday.domain.diary.dto.GetDiaryResponse;
-import tipitapi.drawmytoday.domain.diary.dto.GetLastCreationResponse;
-import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
-import tipitapi.drawmytoday.domain.diary.dto.UpdateDiaryRequest;
+import tipitapi.drawmytoday.domain.diary.dto.*;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
 import tipitapi.drawmytoday.domain.generator.exception.ImageGeneratorException;
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/diary")
@@ -168,10 +153,8 @@ public class DiaryController {
         @RequestBody @Valid CreateDiaryRequest createDiaryRequest,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) throws ImageGeneratorException {
-        return SuccessResponse.of(createDiaryService.createDiary(tokenInfo.getUserId(),
-            createDiaryRequest.getEmotionId(),
-            createDiaryRequest.getKeyword(), createDiaryRequest.getNotes(),
-            createDiaryRequest.getDiaryDate(), createDiaryRequest.getUserTime())
+        return SuccessResponse.of(
+            createDiaryService.createDiary(tokenInfo.getUserId(), createDiaryRequest)
         ).asHttp(HttpStatus.CREATED);
     }
 
@@ -256,9 +239,11 @@ public class DiaryController {
     @PostMapping("/{id}/regenerate")
     public ResponseEntity<Void> regenerateDiaryImage(
         @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
+        @RequestBody(required = false) RegenerateDiaryRequest request
     ) throws ImageGeneratorException {
-        createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId);
+        String diary = request == null ? "" : request.getDiary();
+        createDiaryService.regenerateDiaryImage(tokenInfo.getUserId(), diaryId, diary);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

@@ -52,7 +52,7 @@ public enum ErrorCode {
     EMOTION_NOT_FOUND(404, "E001", "감정을 찾을 수 없습니다."),
 
     // Prompt
-    PROMPT_NOT_EXIST(500, "P001", "프롬프트가 존재하지 않습니다."),
+    PROMPT_NOT_FOUND(404, "P001", "프롬프트를 찾을 수 없습니다."),
 
     // R2
     R2_SERVICE_ERROR(500, "R001", "R2Exception 에러가 발생하였습니다."),
@@ -66,6 +66,9 @@ public enum ErrorCode {
     // Karlo
     KARLO_REQUEST_FAIL(500, "K001", "Karlo 요청에 실패하였습니다."),
 
+    // GPT
+    GPT_REQUEST_FAIL(500, "G001", "GPT 요청에 실패하였습니다."),
+
     // Image InputStream
     IMAGE_INPUT_STREAM_FAIL(500, "IIS001", "이미지 스트림을 가져오는데 실패하였습니다."),
 
@@ -78,7 +81,10 @@ public enum ErrorCode {
     REST_CLIENT_FAILED(500, "R001", "외부로의 REST 통신에 실패하였습니다."),
 
     // Ticket
-    VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다.");
+    VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다."),
+
+    // Apple
+    APPLE_EMAIL_NOT_FOUND(400, "A001", "애플 소셜서버로부터 이메일을 받지 못했습니다.");
 
 
     private final int status;
