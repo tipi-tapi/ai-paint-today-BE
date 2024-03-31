@@ -3,9 +3,10 @@ package tipitapi.drawmytoday.domain.admin.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,35 +52,33 @@ public class AdminService {
         validateUserService.validateAdminUserById(userId);
         List<GetDiaryNoteAndPromptResponse> responses = adminDiaryService.getDiaryNoteAndPrompt();
         ExecutorService executor = Executors.newFixedThreadPool(10);
-        CountDownLatch latch = new CountDownLatch(responses.size());
-        for (int i = 0; i < responses.size(); i++) {
-            GetDiaryNoteAndPromptResponse response = responses.get(i);
-            int finalI = i;
-            executor.execute(() -> {
+        AtomicInteger count = new AtomicInteger(responses.size());
+
+        CompletableFuture<?>[] futures = responses.stream()
+            .map(response -> CompletableFuture.runAsync(() -> {
                 try {
                     String translatedNotes = translateTextService.translateAutoToEnglish(
                         response.getNotes());
                     response.updateNotes(translatedNotes);
                 } catch (Exception e) {
                     log.error("번역 API 예외가 발생했습니다.", e);
-                    responses.remove(finalI);
-                } finally {
-                    latch.countDown();
+                    count.decrementAndGet();
                 }
-            });
-        }
+            }, executor))
+            .toArray(CompletableFuture[]::new);
+
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures);
 
         try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            allFutures.join();
+        } catch (Exception e) {
             log.error("작업이 중단되었습니다.", e);
             throw new RuntimeException(e);
         } finally {
             executor.shutdown();
         }
 
-        if (responses.isEmpty()) {
+        if (count.get() == 0) {
             throw new RuntimeException("번역할 데이터가 없거나 모두 실패했습니다.");
         }
 
@@ -101,6 +100,6 @@ public class AdminService {
                 prompt.updatePromptGeneratorResult(result);
             }
         });
-        return responses.size();
+        return count.get();
     }
 }
