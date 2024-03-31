@@ -75,9 +75,9 @@ public class AdminService {
             Thread.currentThread().interrupt();
             log.error("작업이 중단되었습니다.", e);
             throw new RuntimeException(e);
+        } finally {
+            executor.shutdown();
         }
-
-        executor.shutdown();
 
         if (responses.isEmpty()) {
             throw new RuntimeException("번역할 데이터가 없거나 모두 실패했습니다.");
