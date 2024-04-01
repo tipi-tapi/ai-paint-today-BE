@@ -21,6 +21,7 @@ public class PromptTextService {
     private final String defaultStyle;
     private final TextGeneratorService gptService;
     private final ObjectMapper objectMapper;
+    private static final int GPT_PROMPT_MAX_LENGTH = 150;
 
     public PromptTextService(
         @Value("${kakao.karlo.generate_image.style.default}") String defaultStyle,
@@ -48,7 +49,8 @@ public class PromptTextService {
         String promptText;
         PromptGeneratorResult result = null;
         try {
-            List<? extends TextGeneratorContent> gptResult = gptService.generatePrompt(diaryNote);
+            List<? extends TextGeneratorContent> gptResult = gptService.generatePrompt(diaryNote,
+                GPT_PROMPT_MAX_LENGTH);
             String content = objectMapper.writeValueAsString(gptResult);
             promptText = gptResult.get(gptResult.size() - 1).getContent();
             result = PromptGeneratorResult.createGpt3Result(content);
@@ -72,7 +74,7 @@ public class PromptTextService {
         PromptGeneratorResult result = null;
         try {
             List<? extends TextGeneratorContent> gptResult = gptService.regeneratePrompt(
-                diaryNote, prompt);
+                diaryNote, prompt, GPT_PROMPT_MAX_LENGTH);
             String content = objectMapper.writeValueAsString(gptResult);
             promptText = gptResult.get(gptResult.size() - 1).getContent();
             result = PromptGeneratorResult.createGpt3Result(content);

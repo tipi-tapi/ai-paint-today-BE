@@ -6,7 +6,8 @@ import tipitapi.drawmytoday.domain.generator.domain.TextGeneratorContent;
 
 public interface TextGeneratorService {
 
-    List<? extends TextGeneratorContent> generatePrompt(String keyword);
+    List<? extends TextGeneratorContent> generatePrompt(String keyword, int maxLength);
 
-    List<? extends TextGeneratorContent> regeneratePrompt(String diaryNote, Prompt prompt);
+    List<? extends TextGeneratorContent> regeneratePrompt(String diaryNote, Prompt prompt,
+        int maxLength);
 }

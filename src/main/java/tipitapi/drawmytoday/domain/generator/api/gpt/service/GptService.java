@@ -47,18 +47,18 @@ public class GptService implements TextGeneratorService {
 
     @Override
     @Transactional(noRollbackFor = TextGeneratorException.class)
-    public List<Message> generatePrompt(String diaryNote) {
+    public List<Message> generatePrompt(String diaryNote, int maxLength) {
         Assert.hasText(diaryNote, "일기 내용이 없습니다.");
 
         GptChatCompletionsRequest request = GptChatCompletionsRequest.createFirstMessage(
             gptChatCompletionsPrompt, diaryNote);
         HttpEntity<GptChatCompletionsRequest> httpEntity = createChatCompletionsRequest(request);
-        return requestGptChatCompletion(httpEntity);
+        return requestGptChatCompletion(httpEntity, maxLength);
     }
 
     @Override
     @Transactional(noRollbackFor = TextGeneratorException.class)
-    public List<Message> regeneratePrompt(String diaryNote, Prompt prompt) {
+    public List<Message> regeneratePrompt(String diaryNote, Prompt prompt, int maxLength) {
         Assert.hasText(diaryNote, "일기 내용이 없습니다.");
 
         String gptContent = prompt.getPromptGeneratorResult().getPromptGeneratorContent();
@@ -68,7 +68,7 @@ public class GptService implements TextGeneratorService {
             previousGptMessages, gptRegeneratePrompt);
         HttpEntity<GptChatCompletionsRequest> httpEntity = createChatCompletionsRequest(
             newGptChatCompletionsRequest);
-        return requestGptChatCompletion(httpEntity);
+        return requestGptChatCompletion(httpEntity, maxLength);
     }
 
     private List<Message> parsingGptContent(String gptContent) {
@@ -82,7 +82,7 @@ public class GptService implements TextGeneratorService {
     }
 
     private List<Message> requestGptChatCompletion(
-        HttpEntity<GptChatCompletionsRequest> httpEntity) {
+        HttpEntity<GptChatCompletionsRequest> httpEntity, int maxLength) {
         ResponseEntity<GptChatCompletionsResponse> responseEntity = null;
         try {
             responseEntity = openaiRestTemplate.postForEntity(
@@ -90,7 +90,7 @@ public class GptService implements TextGeneratorService {
 
             validIsSuccessfulRequest(responseEntity);
             Message responseMessage = responseEntity.getBody().getChoices()[0].getMessage();
-            responseMessage.clampContent();
+            responseMessage.clampContent(maxLength);
             List<Message> messages = httpEntity.getBody().getMessages();
             messages.add(responseMessage);
             return messages;
