@@ -2,11 +2,11 @@ package tipitapi.drawmytoday.domain.diary.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.domain.PromptGeneratorResult;
@@ -53,8 +53,8 @@ public class PromptTextService {
             List<? extends TextGeneratorContent> gptResult = gptService.generatePrompt(diaryNote,
                 GPT_PROMPT_MAX_LENGTH);
             String parsingGptResult = objectMapper.writeValueAsString(gptResult);
-            String gptContent = gptResult.get(gptResult.size() - 1).getContent();
-            promptText = clampContent(gptContent);
+            String gptLastContent = gptResult.get(gptResult.size() - 1).getContent();
+            promptText = clampGptContent(gptLastContent);
             result = PromptGeneratorResult.createGpt3Result(parsingGptResult);
         } catch (TextGeneratorException e) {
             promptText = diaryNote;
@@ -79,7 +79,7 @@ public class PromptTextService {
                 diaryNote, prompt);
             String parsingGptResult = objectMapper.writeValueAsString(gptResult);
             String gptContent = gptResult.get(gptResult.size() - 1).getContent();
-            promptText = clampContent(gptContent);
+            promptText = clampGptContent(gptContent);
             result = PromptGeneratorResult.createGpt3Result(parsingGptResult);
         } catch (TextGeneratorException e) {
             promptText = diaryNote;
@@ -112,19 +112,25 @@ public class PromptTextService {
         return sb.toString();
     }
 
-    private String clampContent(String content) {
-        if (content.length() > GPT_PROMPT_MAX_LENGTH) {
-            content = content.substring(0, GPT_PROMPT_MAX_LENGTH);
+    private String clampGptContent(String gptContent) {
+        Assert.hasText(gptContent, "GPT 결과가 없습니다.");
+
+        if (gptContent.length() <= GPT_PROMPT_MAX_LENGTH) {
+            return gptContent;
         }
-        String[] contents = content.split("\\.");
-        if (contents.length == 1) {
-            return content + ".";
+
+        gptContent = gptContent.substring(0, GPT_PROMPT_MAX_LENGTH);
+        String[] gptContents = gptContent.split("\\.");
+        if (gptContents.length == 1) {
+            return gptContent + ".";
         } else {
-            return Arrays.stream(contents)
-                .filter(StringUtils::hasText)
-                .map(s -> s + ".")
-                .reduce((s1, s2) -> s1 + " " + s2)
-                .orElseThrow(() -> new IllegalArgumentException("GPT 결과를 clamping하는데 실패했습니다."));
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < gptContents.length - 1; i++) {
+                if (!gptContents[i].isBlank()) {
+                    sb.append(gptContents[i]).append(". ");
+                }
+            }
+            return sb.substring(0, sb.length() - 1);
         }
     }
 
