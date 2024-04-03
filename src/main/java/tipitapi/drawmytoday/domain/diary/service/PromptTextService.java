@@ -2,6 +2,7 @@ package tipitapi.drawmytoday.domain.diary.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -51,9 +52,10 @@ public class PromptTextService {
         try {
             List<? extends TextGeneratorContent> gptResult = gptService.generatePrompt(diaryNote,
                 GPT_PROMPT_MAX_LENGTH);
-            String content = objectMapper.writeValueAsString(gptResult);
-            promptText = gptResult.get(gptResult.size() - 1).getContent();
-            result = PromptGeneratorResult.createGpt3Result(content);
+            String parsingGptResult = objectMapper.writeValueAsString(gptResult);
+            String gptContent = gptResult.get(gptResult.size() - 1).getContent();
+            promptText = clampContent(gptContent);
+            result = PromptGeneratorResult.createGpt3Result(parsingGptResult);
         } catch (TextGeneratorException e) {
             promptText = diaryNote;
             result = PromptGeneratorResult.createNoUse();
@@ -74,10 +76,11 @@ public class PromptTextService {
         PromptGeneratorResult result = null;
         try {
             List<? extends TextGeneratorContent> gptResult = gptService.regeneratePrompt(
-                diaryNote, prompt, GPT_PROMPT_MAX_LENGTH);
-            String content = objectMapper.writeValueAsString(gptResult);
-            promptText = gptResult.get(gptResult.size() - 1).getContent();
-            result = PromptGeneratorResult.createGpt3Result(content);
+                diaryNote, prompt);
+            String parsingGptResult = objectMapper.writeValueAsString(gptResult);
+            String gptContent = gptResult.get(gptResult.size() - 1).getContent();
+            promptText = clampContent(gptContent);
+            result = PromptGeneratorResult.createGpt3Result(parsingGptResult);
         } catch (TextGeneratorException e) {
             promptText = diaryNote;
             result = PromptGeneratorResult.createNoUse();
@@ -108,4 +111,22 @@ public class PromptTextService {
         }
         return sb.toString();
     }
+
+    private String clampContent(String content) {
+        if (content.length() > GPT_PROMPT_MAX_LENGTH) {
+            content = content.substring(0, GPT_PROMPT_MAX_LENGTH);
+        }
+        String[] contents = content.split("\\.");
+        if (contents.length == 1) {
+            return content + ".";
+        } else {
+            return Arrays.stream(contents)
+                .filter(StringUtils::hasText)
+                .map(s -> s + ".")
+                .reduce((s1, s2) -> s1 + " " + s2)
+                .orElseThrow(() -> new IllegalArgumentException("GPT 결과를 clamping하는데 실패했습니다."));
+        }
+    }
+
+
 }

@@ -15,17 +15,4 @@ public class Message implements TextGeneratorContent {
         this.role = role;
         this.content = content;
     }
-
-    public void clampContent(int maxLength) {
-        substringContent(maxLength);
-        if (content.lastIndexOf(".") != content.length() - 1) {
-            content = content.substring(0, content.lastIndexOf(".") + 1);
-        }
-    }
-
-    private void substringContent(int maxLength) {
-        if (content.length() > maxLength) {
-            content = content.substring(0, maxLength);
-        }
-    }
 }

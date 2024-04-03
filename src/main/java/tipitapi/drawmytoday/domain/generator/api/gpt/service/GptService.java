@@ -53,12 +53,12 @@ public class GptService implements TextGeneratorService {
         GptChatCompletionsRequest request = GptChatCompletionsRequest.createFirstMessage(
             gptChatCompletionsPrompt, diaryNote);
         HttpEntity<GptChatCompletionsRequest> httpEntity = createChatCompletionsRequest(request);
-        return requestGptChatCompletion(httpEntity, maxLength);
+        return requestGptChatCompletion(httpEntity);
     }
 
     @Override
     @Transactional(noRollbackFor = TextGeneratorException.class)
-    public List<Message> regeneratePrompt(String diaryNote, Prompt prompt, int maxLength) {
+    public List<Message> regeneratePrompt(String diaryNote, Prompt prompt) {
         Assert.hasText(diaryNote, "일기 내용이 없습니다.");
 
         String gptContent = prompt.getPromptGeneratorResult().getPromptGeneratorContent();
@@ -68,7 +68,7 @@ public class GptService implements TextGeneratorService {
             previousGptMessages, gptRegeneratePrompt);
         HttpEntity<GptChatCompletionsRequest> httpEntity = createChatCompletionsRequest(
             newGptChatCompletionsRequest);
-        return requestGptChatCompletion(httpEntity, maxLength);
+        return requestGptChatCompletion(httpEntity);
     }
 
     private List<Message> parsingGptContent(String gptContent) {
@@ -82,7 +82,7 @@ public class GptService implements TextGeneratorService {
     }
 
     private List<Message> requestGptChatCompletion(
-        HttpEntity<GptChatCompletionsRequest> httpEntity, int maxLength) {
+        HttpEntity<GptChatCompletionsRequest> httpEntity) {
         ResponseEntity<GptChatCompletionsResponse> responseEntity = null;
         try {
             responseEntity = openaiRestTemplate.postForEntity(
@@ -90,7 +90,6 @@ public class GptService implements TextGeneratorService {
 
             validIsSuccessfulRequest(responseEntity);
             Message responseMessage = responseEntity.getBody().getChoices()[0].getMessage();
-            responseMessage.clampContent(maxLength);
             List<Message> messages = httpEntity.getBody().getMessages();
             messages.add(responseMessage);
             return messages;
