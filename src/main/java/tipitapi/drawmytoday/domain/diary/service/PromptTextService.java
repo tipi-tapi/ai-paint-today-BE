@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.domain.PromptGeneratorResult;
@@ -21,6 +22,7 @@ public class PromptTextService {
     private final String defaultStyle;
     private final TextGeneratorService gptService;
     private final ObjectMapper objectMapper;
+    private static final int GPT_PROMPT_MAX_LENGTH = 150;
 
     public PromptTextService(
         @Value("${kakao.karlo.generate_image.style.default}") String defaultStyle,
@@ -48,10 +50,12 @@ public class PromptTextService {
         String promptText;
         PromptGeneratorResult result = null;
         try {
-            List<? extends TextGeneratorContent> gptResult = gptService.generatePrompt(diaryNote);
-            String content = objectMapper.writeValueAsString(gptResult);
-            promptText = gptResult.get(gptResult.size() - 1).getContent();
-            result = PromptGeneratorResult.createGpt3Result(content);
+            List<? extends TextGeneratorContent> gptResult = gptService.generatePrompt(diaryNote,
+                GPT_PROMPT_MAX_LENGTH);
+            String parsingGptResult = objectMapper.writeValueAsString(gptResult);
+            String gptLastContent = gptResult.get(gptResult.size() - 1).getContent();
+            promptText = clampGptContent(gptLastContent);
+            result = PromptGeneratorResult.createGpt3Result(parsingGptResult);
         } catch (TextGeneratorException e) {
             promptText = diaryNote;
             result = PromptGeneratorResult.createNoUse();
@@ -73,9 +77,10 @@ public class PromptTextService {
         try {
             List<? extends TextGeneratorContent> gptResult = gptService.regeneratePrompt(
                 diaryNote, prompt);
-            String content = objectMapper.writeValueAsString(gptResult);
-            promptText = gptResult.get(gptResult.size() - 1).getContent();
-            result = PromptGeneratorResult.createGpt3Result(content);
+            String parsingGptResult = objectMapper.writeValueAsString(gptResult);
+            String gptContent = gptResult.get(gptResult.size() - 1).getContent();
+            promptText = clampGptContent(gptContent);
+            result = PromptGeneratorResult.createGpt3Result(parsingGptResult);
         } catch (TextGeneratorException e) {
             promptText = diaryNote;
             result = PromptGeneratorResult.createNoUse();
@@ -106,4 +111,28 @@ public class PromptTextService {
         }
         return sb.toString();
     }
+
+    private String clampGptContent(String gptContent) {
+        Assert.hasText(gptContent, "GPT 결과가 없습니다.");
+
+        if (gptContent.length() <= GPT_PROMPT_MAX_LENGTH) {
+            return gptContent;
+        }
+
+        gptContent = gptContent.substring(0, GPT_PROMPT_MAX_LENGTH);
+        String[] gptContents = gptContent.split("\\.");
+        if (gptContents.length == 1) {
+            return gptContent + ".";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < gptContents.length - 1; i++) {
+                if (!gptContents[i].isBlank()) {
+                    sb.append(gptContents[i]).append(". ");
+                }
+            }
+            return sb.substring(0, sb.length() - 1);
+        }
+    }
+
+
 }

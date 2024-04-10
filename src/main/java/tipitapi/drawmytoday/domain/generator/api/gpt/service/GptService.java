@@ -47,7 +47,7 @@ public class GptService implements TextGeneratorService {
 
     @Override
     @Transactional(noRollbackFor = TextGeneratorException.class)
-    public List<Message> generatePrompt(String diaryNote) {
+    public List<Message> generatePrompt(String diaryNote, int maxLength) {
         Assert.hasText(diaryNote, "일기 내용이 없습니다.");
 
         GptChatCompletionsRequest request = GptChatCompletionsRequest.createFirstMessage(
@@ -90,7 +90,6 @@ public class GptService implements TextGeneratorService {
 
             validIsSuccessfulRequest(responseEntity);
             Message responseMessage = responseEntity.getBody().getChoices()[0].getMessage();
-            responseMessage.clampContent();
             List<Message> messages = httpEntity.getBody().getMessages();
             messages.add(responseMessage);
             return messages;
