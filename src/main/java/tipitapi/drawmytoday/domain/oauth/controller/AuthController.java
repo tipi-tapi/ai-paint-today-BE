@@ -109,7 +109,7 @@ public class AuthController {
     public ResponseEntity<SuccessResponse<ResponseAccessToken>> getAccessToken(
         HttpServletRequest request) {
         String refreshToken = HeaderUtils.getJwtToken(request, JwtType.REFRESH);
-        jwtTokenProvider.validRefreshToken(refreshToken);
+//        jwtTokenProvider.validRefreshToken(refreshToken);
         String accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
         return SuccessResponse.of(
             ResponseAccessToken.of(accessToken)

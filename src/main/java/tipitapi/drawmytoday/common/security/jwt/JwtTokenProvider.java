@@ -1,5 +1,8 @@
 package tipitapi.drawmytoday.common.security.jwt;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -8,6 +11,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,6 +44,7 @@ public class JwtTokenProvider {
     private final long REFRESH_TOKEN_EXPIRE_TIME;
 
     private final Key key;
+    private final ObjectMapper objectMapper;
 
     public JwtTokenProvider(@Value("${jwt.access-token-expire-time}") long accessTime,
         @Value("${jwt.refresh-token-expire-time}") long refreshTime,
@@ -48,6 +53,7 @@ public class JwtTokenProvider {
         this.REFRESH_TOKEN_EXPIRE_TIME = refreshTime;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.objectMapper = new ObjectMapper();
     }
 
     protected String createToken(Long userId, UserRole userRole, long tokenValid) {
@@ -89,11 +95,20 @@ public class JwtTokenProvider {
     }
 
     public String createNewAccessTokenFromRefreshToken(String refreshToken) {
-        Claims claims = parseClaims(refreshToken);
-
-        Long userId = Long.parseLong((String) claims.get(CLAIM_USER_ID));
-        UserRole role = UserRole.valueOf((String) claims.get(CLAIM_USER_ROLE));
-        return createAccessToken(userId, role);
+//        Claims claims = parseClaims(refreshToken);
+//
+//        Long userId = Long.parseLong((String) claims.get(CLAIM_USER_ID));
+//        UserRole role = UserRole.valueOf((String) claims.get(CLAIM_USER_ROLE));
+//        return createAccessToken(userId, role);
+        String payload = new String(Base64.getUrlDecoder().decode(refreshToken.split("\\.")[1]));
+        try {
+            JsonNode jsonNode = objectMapper.readTree(payload);
+            Long userId = jsonNode.get(CLAIM_USER_ID).asLong();
+            UserRole role = UserRole.valueOf(jsonNode.get(CLAIM_USER_ROLE).asText());
+            return createAccessToken(userId, role);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
