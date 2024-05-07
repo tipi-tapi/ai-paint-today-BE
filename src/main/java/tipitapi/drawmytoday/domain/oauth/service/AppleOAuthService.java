@@ -55,6 +55,7 @@ public class AppleOAuthService {
     public ResponseJwtToken login(HttpServletRequest request, RequestAppleLogin requestAppleLogin) {
         OAuthAccessToken oAuthAccessToken = getAccessToken(request);
         AppleIdToken appleIdToken = getAppleIdToken(requestAppleLogin.getIdToken());
+        log.info("[Apple User Login] appleIdToken: {}", appleIdToken);
 
         if (appleIdToken.getEmail() == null) {
             throw new BusinessException(APPLE_EMAIL_NOT_FOUND);
@@ -62,11 +63,12 @@ public class AppleOAuthService {
 
         User user = validateUserService.validateRegisteredUserByEmail(
             appleIdToken.getEmail(), SocialCode.APPLE);
-
         if (user == null) {
-            user = userService.registerUser(
-                appleIdToken.getEmail(), SocialCode.APPLE, oAuthAccessToken.getRefreshToken());
+            user = userService.registerAppleUser(appleIdToken, oAuthAccessToken.getRefreshToken());
         }
+        Auth auth = authRepository.findByUser(user)
+            .orElseThrow(OAuthNotFoundException::new);
+        auth.update(appleIdToken.toString(), oAuthAccessToken.getRefreshToken());
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
             user.getUserRole());

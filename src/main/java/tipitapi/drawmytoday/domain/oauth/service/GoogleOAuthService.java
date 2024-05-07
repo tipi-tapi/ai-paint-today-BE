@@ -56,7 +56,7 @@ public class GoogleOAuthService {
             oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
 
         if (user == null) {
-            user = userService.registerUser(
+            user = userService.registerGoogleUser(
                 oAuthUserProfile.getEmail(), SocialCode.GOOGLE, accessToken.getRefreshToken());
         }
 

@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.entity.BaseEntity;
@@ -31,17 +32,23 @@ public class Auth extends BaseEntity {
     @NotNull
     @Column(nullable = false)
     private String refreshToken;
+    private String sub;
+    private String idToken;
 
-    private Auth(User user, String refreshToken) {
+    @Builder
+    private Auth(User user, String refreshToken, String sub, String idToken) {
         this.user = user;
         this.refreshToken = refreshToken;
-    }
-
-    public static Auth create(User user, String refreshToken) {
-        return new Auth(user, refreshToken);
+        this.sub = sub;
+        this.idToken = idToken;
     }
 
     public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void update(String string, String refreshToken) {
+        this.idToken = string;
         this.refreshToken = refreshToken;
     }
 }
