@@ -1,8 +1,10 @@
 package tipitapi.drawmytoday.common.utils;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.stream.Stream;
+import java.time.LocalTime;
+import java.time.YearMonth;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import tipitapi.drawmytoday.common.exception.BusinessException;
@@ -18,11 +20,13 @@ public class DateUtils {
 
     public static LocalDateTime getEndDate(int year, int month) {
         validateMonth(month);
-        return LocalDateTime.of(year, month, getMaxDay(month), 23, 59);
+        LocalDate lastDay = YearMonth.of(year, month).atEndOfMonth();
+
+        return LocalDateTime.of(lastDay, LocalTime.of(23, 59, 59));
     }
 
     public static LocalDate getDate(int year, int month, int day) {
-        validateDate(month, day);
+        validateDate(year, month, day);
         return LocalDate.of(year, month, day);
     }
 
@@ -32,22 +36,15 @@ public class DateUtils {
         }
     }
 
-    private static void validateDate(int month, int day) {
-        validateMonth(month);
-        if (day > getMaxDay(month) || day < 1) {
-            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
-        }
-    }
-
-    private static int getMaxDay(int month) {
-        if (month == 2) {
-            return 29;
-        }
-        if (Stream.of(1, 3, 5, 7, 8, 10, 12)
-            .anyMatch(m -> m == month)) {
-            return 31;
-        } else {
-            return 30;
+    public static void validateDate(int year, int month, int day) {
+        try {
+            YearMonth yearMonth = YearMonth.of(year, month);
+            int lastDayOfMonth = yearMonth.lengthOfMonth();
+            if (day < 1 || day > lastDayOfMonth) {
+                throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+            }
+        } catch (DateTimeException e) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, e);
         }
     }
 }
