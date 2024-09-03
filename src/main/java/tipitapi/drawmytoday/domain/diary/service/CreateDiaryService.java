@@ -34,7 +34,7 @@ public class CreateDiaryService {
     private final ValidateDiaryService validateDiaryService;
     private final ValidateTicketService validateTicketService;
     private final ValidatePromptService validatePromptService;
-    private final ImageGeneratorService karloService;
+    private final ImageGeneratorService stabilityImageService;
     private final PromptService promptService;
     private final Encryptor encryptor;
     private final PromptTextService promptTextService;
@@ -57,7 +57,7 @@ public class CreateDiaryService {
             prompt = promptTextService.createPrompt(emotion, request.getKeyword());
         }
 
-        byte[] image = karloService.generateImage(prompt);
+        byte[] image = stabilityImageService.generateImage(prompt);
 
         prompt.imageGeneratorSuccess();
         Diary diary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, false);
@@ -75,7 +75,7 @@ public class CreateDiaryService {
         Emotion emotion = validateEmotionService.validateEmotionById(request.getEmotionId());
         LocalDateTime diaryDateTime = diaryDate.atTime(request.getUserTime());
 
-        List<byte[]> images = karloService.generateTestImage(request);
+        List<byte[]> images = stabilityImageService.generateTestImage(request);
 
         Diary diary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, true);
         Prompt prompt = promptService.createPrompt(request.getKarloParameter().getPrompt(), true);
@@ -119,7 +119,7 @@ public class CreateDiaryService {
             prompt = promptTextService.regeneratePromptUsingGpt(emotion, diaryNote, prompt);
         }
 
-        byte[] image = karloService.generateImage(prompt);
+        byte[] image = stabilityImageService.generateImage(prompt);
 
         prompt.imageGeneratorSuccess();
         imageService.unSelectAllImage(diary.getDiaryId());
@@ -131,7 +131,7 @@ public class CreateDiaryService {
         Long imageId = diary.getSelectedImage().getImageId();
         Prompt prompt = validatePromptService.validatePromptByImageId(imageId);
 
-        byte[] image = karloService.generateImage(prompt);
+        byte[] image = stabilityImageService.generateImage(prompt);
 
         imageService.unSelectAllImage(diary.getDiaryId());
         imageService.uploadAndCreateImage(diary, prompt, image, true);
