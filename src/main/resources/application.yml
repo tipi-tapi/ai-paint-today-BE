@@ -9,6 +9,15 @@ presigned-image:
     expiration:
         admin-diaries: ${PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES}
 
+stability:
+    api:
+        key: ${STABILITY_API_KEY}
+    stable_image_core:
+        url: https://api.stability.ai/v1/generation/stable-diffusion-v1-6/text-to-image
+        negative_prompt: ${NEGATIVE_PROMPT}
+
+
+
 ---
 spring.config.activate.on-profile: local
 
