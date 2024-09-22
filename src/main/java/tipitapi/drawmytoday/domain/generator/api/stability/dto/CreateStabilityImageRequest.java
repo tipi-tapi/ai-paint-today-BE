@@ -1,8 +1,11 @@
 package tipitapi.drawmytoday.domain.generator.api.stability.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -19,24 +22,31 @@ public class CreateStabilityImageRequest {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(MediaType.parseMediaTypes("image/png"));
         headers.setContentType(MediaType.APPLICATION_JSON);
-        String requestBody = "{\n" +
-            "    \"text_prompts\": [\n" +
-            "      {\n" +
-            "        \"text\": \"" + prompt + "\",\n" +
-            "        \"weight\": 1\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"text\": \"" + negativePrompt + "\",\n" +
-            "        \"weight\": -1\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"cfg_scale\": 7,\n" +
-            "    \"height\": 512,\n" +
-            "    \"width\": 512,\n" +
-            "    \"samples\": 1,\n" +
-            "    \"steps\": 30\n" +
-            "}";
-        return new HttpEntity<>(requestBody, headers);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // JSON 객체 생성
+        ObjectNode requestBody = objectMapper.createObjectNode();
+        ObjectNode textPrompt1 = objectMapper.createObjectNode();
+        textPrompt1.put("text", prompt);
+        textPrompt1.put("weight", 1);
+
+        ObjectNode textPrompt2 = objectMapper.createObjectNode();
+        textPrompt2.put("text", negativePrompt);
+        textPrompt2.put("weight", -1);
+
+        requestBody.set("text_prompts",
+            objectMapper.createArrayNode().add(textPrompt1).add(textPrompt2));
+        requestBody.put("cfg_scale", 7);
+        requestBody.put("height", 512);
+        requestBody.put("width", 512);
+        requestBody.put("samples", 1);
+        requestBody.put("steps", 30);
+
+        try {
+            return new HttpEntity<>(objectMapper.writeValueAsString(requestBody), headers);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("해당 prompt를 파싱할 수 없습니다. prompt:" + prompt, e);
+        }
     }
 
 }
