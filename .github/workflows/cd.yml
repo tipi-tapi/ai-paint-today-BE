@@ -61,7 +61,7 @@ jobs:
                         
                         add_env_var "KAKAO_API_KEY" "${{ secrets.KAKAO_API_KEY }}"
                         add_env_var "KARLO_API_URL" "${{ secrets.KARLO_API_URL }}"
-                        add_env_var "KARLO_NEGATIVE_PROMPT" "${{ secrets.KARLO_NEGATIVE_PROMPT }}"
+                        add_env_var "NEGATIVE_PROMPT" "${{ secrets.NEGATIVE_PROMPT }}"
                         add_env_var "KARLO_DEFAULT_STYLE" "${{ secrets.KARLO_DEFAULT_STYLE }}"
                         add_env_var "R2_SECRET_ACCESS_KEY" "${{ secrets.R2_SECRET_ACCESS_KEY }}"
                         add_env_var "R2_ACCESS_KEY_ID" "${{ secrets.R2_ACCESS_KEY_ID }}"
@@ -93,5 +93,6 @@ jobs:
                         add_env_var "RDS_PASSWORD" "${{ secrets.RDS_PASSWORD }}"
                         add_env_var "GPT_CHAT_COMPLETIONS_PROMPT" "${{ secrets.GPT_CHAT_COMPLETIONS_PROMPT }}"
                         add_env_var "GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT" "${{ secrets.GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT }}"
+                        add_env_var "STABILITY_API_KEY" "${{ secrets.STABILITY_API_KEY }}"
                         
                         ./deploy.sh
