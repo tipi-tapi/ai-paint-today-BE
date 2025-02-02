@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
@@ -68,9 +69,11 @@ public class AppleOAuthService {
             user = userService.registerUser(
                 appleIdToken.getEmail(), SocialCode.APPLE, oAuthAccessToken.getRefreshToken());
         } else {
-            Auth auth = authRepository.findByUser(user)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR));
-            auth.setRefreshToken(oAuthAccessToken.getRefreshToken());
+            if (StringUtils.hasText(oAuthAccessToken.getRefreshToken())) {
+                Auth auth = authRepository.findByUser(user)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR));
+                auth.setRefreshToken(oAuthAccessToken.getRefreshToken());
+            }
         }
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),

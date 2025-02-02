@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
@@ -60,9 +61,11 @@ public class GoogleOAuthService {
             user = userService.registerUser(
                 oAuthUserProfile.getEmail(), SocialCode.GOOGLE, accessToken.getRefreshToken());
         } else {
-            Auth auth = authRepository.findByUser(user)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR));
-            auth.setRefreshToken(accessToken.getRefreshToken());
+            if (StringUtils.hasText(accessToken.getRefreshToken())) {
+                Auth auth = authRepository.findByUser(user)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR));
+                auth.setRefreshToken(accessToken.getRefreshToken());
+            }
         }
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
