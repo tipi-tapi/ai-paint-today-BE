@@ -66,6 +66,9 @@ public enum ErrorCode {
     // Karlo
     KARLO_REQUEST_FAIL(500, "K001", "Karlo 요청에 실패하였습니다."),
 
+    // Stability
+    STABILITY_REQUEST_FAIL(500, "ST001", "Stability 요청에 실패했습니다."),
+
     // GPT
     GPT_REQUEST_FAIL(500, "G001", "GPT 요청에 실패하였습니다."),
 
