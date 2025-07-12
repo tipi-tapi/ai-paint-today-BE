@@ -13,7 +13,7 @@ stability:
     api:
         key: ${STABILITY_API_KEY}
     stable_image_core:
-        url: https://api.stability.ai/v1/generation/stable-diffusion-v1-6/text-to-image
+        url: https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image
         negative_prompt: ${NEGATIVE_PROMPT}
 
 

@@ -37,8 +37,8 @@ public class CreateStabilityImageRequest {
         requestBody.set("text_prompts",
             objectMapper.createArrayNode().add(textPrompt1).add(textPrompt2));
         requestBody.put("cfg_scale", 7);
-        requestBody.put("height", 512);
-        requestBody.put("width", 512);
+        requestBody.put("height", 1024);
+        requestBody.put("width", 1024);
         requestBody.put("samples", 1);
         requestBody.put("steps", 30);
 
