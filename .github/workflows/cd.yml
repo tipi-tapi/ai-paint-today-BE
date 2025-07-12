@@ -25,7 +25,7 @@ jobs:
                 run: ./gradlew clean build -x test
 
             -   name: Cache Gradle packages
-                uses: actions/cache@v1
+                uses: actions/cache@v4
                 with:
                     path: ~/.gradle/caches
                     key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
