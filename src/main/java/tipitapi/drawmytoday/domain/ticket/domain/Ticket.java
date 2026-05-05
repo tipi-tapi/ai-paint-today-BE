@@ -44,8 +44,21 @@ public class Ticket extends BaseEntity {
         this.ticketType = type;
     }
 
+    private Ticket(Long ticketId, User user, TicketType ticketType, LocalDateTime usedAt, LocalDateTime createdAt) {
+        super(createdAt);
+        this.ticketId = ticketId;
+        this.user = user;
+        this.ticketType = ticketType;
+        this.usedAt = usedAt;
+    }
+
     public static Ticket of(User user, TicketType type) {
         return new Ticket(user, type);
+    }
+
+    public static Ticket restore(Long ticketId, User user, TicketType ticketType,
+                                 LocalDateTime usedAt, LocalDateTime createdAt) {
+        return new Ticket(ticketId, user, ticketType, usedAt, createdAt);
     }
 
     public void use() {
