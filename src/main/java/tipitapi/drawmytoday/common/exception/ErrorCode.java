@@ -87,7 +87,10 @@ public enum ErrorCode {
     VALID_TICKET_NOT_EXISTS(404, "T001", "유효한 티켓이 존재하지 않습니다."),
 
     // Apple
-    APPLE_EMAIL_NOT_FOUND(400, "A001", "애플 소셜서버로부터 이메일을 받지 못했습니다.");
+    APPLE_EMAIL_NOT_FOUND(400, "A001", "애플 소셜서버로부터 이메일을 받지 못했습니다."),
+
+    // Firestore
+    FIRESTORE_IO_ERROR(500, "FS001", "Firestore IO 오류가 발생했습니다.");
 
 
     private final int status;

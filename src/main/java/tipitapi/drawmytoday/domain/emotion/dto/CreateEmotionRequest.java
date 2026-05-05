@@ -31,6 +31,12 @@ public class CreateEmotionRequest {
     private String colorPrompt;
 
     public Emotion toEmotionEntity() {
-        return Emotion.create(emotionName, colorHex, true, emotionPrompt, colorPrompt);
+        return Emotion.builder()
+            .name(emotionName)
+            .color(colorHex)
+            .isActive(true)
+            .emotionPrompt(emotionPrompt)
+            .colorPrompt(colorPrompt)
+            .build();
     }
 }

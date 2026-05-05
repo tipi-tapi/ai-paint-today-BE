@@ -18,4 +18,10 @@ public abstract class BaseEntity {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    protected BaseEntity() {}
+
+    protected BaseEntity(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

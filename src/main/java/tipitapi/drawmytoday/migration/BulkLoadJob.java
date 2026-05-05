@@ -1,6 +1,8 @@
 package tipitapi.drawmytoday.migration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import tipitapi.drawmytoday.common.exception.BusinessException;
+import tipitapi.drawmytoday.common.exception.ErrorCode;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteBatch;
 import lombok.RequiredArgsConstructor;
@@ -260,9 +262,9 @@ public class BulkLoadJob implements CommandLineRunner {
             state.batch.commit().get();
             log.debug("Committed batch #{} for {}", state.batchNum, collection);
         } catch (Exception e) {
-            throw new RuntimeException(String.format(
-                "WriteBatch commit failed for collection=%s batch#%d: %s",
-                collection, state.batchNum, e.getMessage()), e);
+            log.error("WriteBatch commit failed for collection={} batch#{}: {}",
+                collection, state.batchNum, e.getMessage());
+            throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
         }
         state.batch = firestore.batch();
         state.batchNum++;
