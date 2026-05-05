@@ -36,6 +36,17 @@ public class AdReward extends BaseEntity {
         this.user = user;
     }
 
+    private AdReward(Long adRewardId, User user, LocalDateTime usedAt, LocalDateTime createdAt) {
+        super(createdAt);
+        this.adRewardId = adRewardId;
+        this.user = user;
+        this.usedAt = usedAt;
+    }
+
+    public static AdReward restore(Long adRewardId, User user, LocalDateTime usedAt, LocalDateTime createdAt) {
+        return new AdReward(adRewardId, user, usedAt, createdAt);
+    }
+
     public void useReward() {
         this.usedAt = LocalDateTime.now();
     }
