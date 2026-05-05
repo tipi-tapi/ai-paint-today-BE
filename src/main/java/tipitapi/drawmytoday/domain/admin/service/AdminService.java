@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
@@ -37,7 +36,6 @@ public class AdminService {
     private final ValidateUserService validateUserService;
     private final AdminDiaryService adminDiaryService;
     private final TranslateTextService translateTextService;
-    private final TransactionTemplate writeTransactionTemplate;
     private final PromptRepository promptRepository;
     private final ObjectMapper objectMapper;
     @Value("${openai.gpt.chat_completions_prompt}")
@@ -84,25 +82,23 @@ public class AdminService {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
-        writeTransactionTemplate.executeWithoutResult(status -> {
-            for (GetDiaryNoteAndPromptResponse response : responses) {
-                Prompt prompt = promptRepository.findById(response.getPromptId()).get();
-                List<Message> messages = GptChatCompletionsRequest.createFirstMessage(
-                        gptChatCompletionsPrompt, response.getNotes())
-                    .getMessages();
-                messages.add(new Message(ChatCompletionsRole.assistant, response.getGptPrompt()));
-                String gptResponses;
-                try {
-                    gptResponses = objectMapper.writeValueAsString(messages);
-                } catch (JsonProcessingException e) {
-                    log.error("GPT Message를 JSON으로 변환하는데 실패했습니다.", e);
-                    throw new BusinessException(ErrorCode.PARSING_ERROR, e);
-                }
-                PromptGeneratorResult result = PromptGeneratorResult.createGpt3Result(gptResponses);
-                prompt.updatePromptGeneratorResult(result);
-                promptRepository.save(prompt);
+        for (GetDiaryNoteAndPromptResponse response : responses) {
+            Prompt prompt = promptRepository.findById(response.getPromptId()).get();
+            List<Message> messages = GptChatCompletionsRequest.createFirstMessage(
+                    gptChatCompletionsPrompt, response.getNotes())
+                .getMessages();
+            messages.add(new Message(ChatCompletionsRole.assistant, response.getGptPrompt()));
+            String gptResponses;
+            try {
+                gptResponses = objectMapper.writeValueAsString(messages);
+            } catch (JsonProcessingException e) {
+                log.error("GPT Message를 JSON으로 변환하는데 실패했습니다.", e);
+                throw new BusinessException(ErrorCode.PARSING_ERROR, e);
             }
-        });
+            PromptGeneratorResult result = PromptGeneratorResult.createGpt3Result(gptResponses);
+            prompt.updatePromptGeneratorResult(result);
+            promptRepository.save(prompt);
+        }
         return count.get();
     }
 }

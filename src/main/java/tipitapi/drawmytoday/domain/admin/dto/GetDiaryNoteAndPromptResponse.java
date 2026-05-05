@@ -1,6 +1,5 @@
 package tipitapi.drawmytoday.domain.admin.dto;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
 @Getter
@@ -10,7 +9,6 @@ public class GetDiaryNoteAndPromptResponse {
     private String notes;
     private final String prompt;
 
-    @QueryProjection
     public GetDiaryNoteAndPromptResponse(Long promptId, String notes, String prompt) {
         this.promptId = promptId;
         this.notes = notes;

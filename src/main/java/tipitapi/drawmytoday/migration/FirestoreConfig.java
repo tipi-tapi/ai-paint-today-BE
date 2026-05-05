@@ -7,23 +7,25 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Configuration
 @Slf4j
 public class FirestoreConfig {
 
+    @Value("${firestore.emulator-host:#{null}}")
+    private String emulatorHost;
+
+    @Value("${firestore.project-id:draw-my-today}")
+    private String projectId;
+
     @Bean
     public Firestore firestore() throws IOException {
-        String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
-        String projectId = Optional.ofNullable(System.getenv("FIRESTORE_PROJECT_ID"))
-            .orElse("demo-migration");
-
-        GoogleCredentials credentials = resolveCredentials(emulatorHost);
+        GoogleCredentials credentials = resolveCredentials();
 
         FirebaseOptions options = FirebaseOptions.builder()
             .setCredentials(credentials)
@@ -43,12 +45,11 @@ public class FirestoreConfig {
         return FirestoreClient.getFirestore();
     }
 
-    private GoogleCredentials resolveCredentials(String emulatorHost) {
+    private GoogleCredentials resolveCredentials() {
         try {
             return GoogleCredentials.getApplicationDefault();
         } catch (IOException e) {
             if (emulatorHost != null) {
-                // Emulator doesn't validate credentials — fall back to a stub token
                 log.warn("ADC not available, using stub credentials for emulator: {}", e.getMessage());
                 return GoogleCredentials.create(new AccessToken("owner", null));
             }

@@ -3,7 +3,6 @@ package tipitapi.drawmytoday.domain.admin.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.time.LocalDateTime;
@@ -41,7 +40,6 @@ public class GetDiaryAdminResponse {
     @Schema(description = "테스트 일기 여부", requiredMode = RequiredMode.REQUIRED)
     private final boolean isTest;
 
-    @QueryProjection
     public GetDiaryAdminResponse(Long id, String imageURL, String prompt,
         LocalDateTime createdAt, LocalDateTime imageCreatedAt, String review, boolean isTest) {
         this.id = id;

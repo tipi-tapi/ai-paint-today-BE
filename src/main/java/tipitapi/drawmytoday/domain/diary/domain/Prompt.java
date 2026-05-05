@@ -1,11 +1,5 @@
 package tipitapi.drawmytoday.domain.diary.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,18 +8,13 @@ import tipitapi.drawmytoday.common.entity.BaseEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
 public class Prompt extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long promptId;
 
-    @Embedded
     private PromptGeneratorResult promptGeneratorResult;
 
     @NotNull
-    @Column(length = 3000)
     private String promptText;
 
     @NotNull

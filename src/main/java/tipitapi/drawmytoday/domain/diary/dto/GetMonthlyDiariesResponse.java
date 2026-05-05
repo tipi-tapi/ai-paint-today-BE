@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.time.LocalDateTime;
@@ -29,7 +28,6 @@ public class GetMonthlyDiariesResponse {
     @Schema(description = "일기 날짜", requiredMode = RequiredMode.REQUIRED)
     private final LocalDateTime date;
 
-    @QueryProjection
     public GetMonthlyDiariesResponse(Long id, String imageUrl, LocalDateTime date) {
         this.id = id;
         this.imageUrl = imageUrl;
