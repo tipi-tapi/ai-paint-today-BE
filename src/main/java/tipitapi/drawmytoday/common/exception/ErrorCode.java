@@ -90,7 +90,8 @@ public enum ErrorCode {
     APPLE_EMAIL_NOT_FOUND(400, "A001", "애플 소셜서버로부터 이메일을 받지 못했습니다."),
 
     // Firestore
-    FIRESTORE_IO_ERROR(500, "FS001", "Firestore IO 오류가 발생했습니다.");
+    FIRESTORE_IO_ERROR(500, "FS001", "Firestore IO 오류가 발생했습니다."),
+    FIRESTORE_TIMEOUT(500, "FS002", "Firestore 응답 시간이 초과되었습니다.");
 
 
     private final int status;

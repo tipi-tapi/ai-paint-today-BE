@@ -18,4 +18,13 @@ public abstract class BaseEntityWithUpdate extends BaseEntity {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    protected BaseEntityWithUpdate() {
+        super();
+    }
+
+    protected BaseEntityWithUpdate(LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(createdAt);
+        this.updatedAt = updatedAt;
+    }
 }

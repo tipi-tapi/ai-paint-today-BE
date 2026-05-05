@@ -21,7 +21,7 @@ public class UserService {
 
     @Transactional
     public User registerUser(String email, SocialCode socialCode, String refreshToken) {
-        User user = userRepository.save(User.create(email, socialCode));
+        User user = userRepository.save(User.builder().email(email).socialCode(socialCode).build());
         authRepository.save(Auth.create(user, refreshToken));
         ticketService.createTicketByJoin(user);
         return user;

@@ -43,18 +43,30 @@ public class User extends BaseEntityWithUpdate {
 
     private LocalDateTime deletedAt;
 
-    @Builder(access = AccessLevel.PRIVATE)
+    @Builder
     private User(String email, SocialCode socialCode) {
         this.email = email;
         this.socialCode = socialCode;
         this.userRole = UserRole.USER;
     }
 
-    public static User create(String email, SocialCode socialCode) {
-        return User.builder()
-            .email(email)
-            .socialCode(socialCode)
-            .build();
+    private User(Long userId, String email, SocialCode socialCode, UserRole userRole,
+                 LocalDateTime lastDiaryDate, LocalDateTime deletedAt,
+                 LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(createdAt, updatedAt);
+        this.userId = userId;
+        this.email = email;
+        this.socialCode = socialCode;
+        this.userRole = userRole;
+        this.lastDiaryDate = lastDiaryDate;
+        this.deletedAt = deletedAt;
+    }
+
+    public static User restore(Long userId, String email, SocialCode socialCode,
+                                UserRole userRole, LocalDateTime lastDiaryDate,
+                                LocalDateTime deletedAt, LocalDateTime createdAt,
+                                LocalDateTime updatedAt) {
+        return new User(userId, email, socialCode, userRole, lastDiaryDate, deletedAt, createdAt, updatedAt);
     }
 
     public void setEmail(String email) {
