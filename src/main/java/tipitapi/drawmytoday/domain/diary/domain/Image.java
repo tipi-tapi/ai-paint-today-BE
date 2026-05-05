@@ -56,8 +56,26 @@ public class Image extends BaseEntity {
         this.isSelected = isSelected;
     }
 
+    private Image(Long imageId, Diary diary, Prompt prompt, String imageUrl, boolean isSelected,
+        String review, LocalDateTime deletedAt, LocalDateTime createdAt) {
+        super(createdAt);
+        this.imageId = imageId;
+        this.diary = diary;
+        this.prompt = prompt;
+        this.imageUrl = imageUrl;
+        this.isSelected = isSelected;
+        this.review = review;
+        this.deletedAt = deletedAt;
+    }
+
     public static Image create(Diary diary, Prompt prompt, String imageUrl, boolean isSelected) {
         return new Image(diary, prompt, imageUrl, isSelected);
+    }
+
+    public static Image restore(Long imageId, Diary diary, Prompt prompt, String imageUrl,
+        boolean isSelected, String review, LocalDateTime deletedAt, LocalDateTime createdAt) {
+        return new Image(imageId, diary, prompt, imageUrl, isSelected, review, deletedAt,
+            createdAt);
     }
 
     public void setSelected(boolean isSelected) {

@@ -113,6 +113,7 @@ public class DiaryService {
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
 
         diary.setNotes(encryptor.encrypt(notes));
+        diaryRepository.save(diary);
     }
 
     @Transactional
@@ -148,6 +149,7 @@ public class DiaryService {
                 Optional<Image> latestImage = imageService.getOneLatestImage(diaryResponse.getId());
                 if (latestImage.isPresent()) {
                     latestImage.get().setSelected(true);
+                    imageService.saveImage(latestImage.get());
                     diaryResponse.setImageUrl(
                         r2PreSignedService.getCustomDomainUrl(latestImage.get().getImageUrl()));
                 } else {

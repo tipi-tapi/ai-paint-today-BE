@@ -1,12 +1,16 @@
 package tipitapi.drawmytoday.domain.diary.repository;
 
+import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 
-public interface PromptRepository extends JpaRepository<Prompt, Long> {
+public interface PromptRepository {
 
-    @Query("SELECT p FROM Image i JOIN i.prompt p WHERE i.imageId = :imageId")
+    Prompt save(Prompt prompt);
+
+    Optional<Prompt> findById(Long promptId);
+
     Optional<Prompt> findByImageId(Long imageId);
+
+    List<Prompt> findAllByDiaryDiaryIdAndIsSuccessTrue(Long diaryId);
 }

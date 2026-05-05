@@ -32,7 +32,9 @@ public class ValidateDiaryService {
     }
 
     private void ownedByUser(Diary diary, User user) {
-        if (diary.getUser() != user) {
+        if (diary.getUser() == null || user == null
+            || diary.getUser().getUserId() == null
+            || !diary.getUser().getUserId().equals(user.getUserId())) {
             throw new NotOwnerOfDiaryException();
         }
     }

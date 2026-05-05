@@ -85,6 +85,24 @@ public class Diary extends BaseEntityWithUpdate {
         this.imageList = new ArrayList<>();
     }
 
+    private Diary(Long diaryId, User user, Emotion emotion, LocalDateTime diaryDate, String notes,
+        boolean isAi, String title, String weather, List<Image> imageList,
+        LocalDateTime deletedAt, boolean isTest, LocalDateTime createdAt,
+        LocalDateTime updatedAt) {
+        super(createdAt, updatedAt);
+        this.diaryId = diaryId;
+        this.user = user;
+        this.emotion = emotion;
+        this.diaryDate = diaryDate;
+        this.notes = notes;
+        this.isAi = isAi;
+        this.title = title;
+        this.weather = weather;
+        this.imageList = imageList != null ? imageList : new ArrayList<>();
+        this.deletedAt = deletedAt;
+        this.isTest = isTest;
+    }
+
     public static Diary of(User user, Emotion emotion, LocalDateTime diaryDateTime, String notes) {
         return Diary.builder()
             .user(user)
@@ -106,6 +124,14 @@ public class Diary extends BaseEntityWithUpdate {
             .isAi(true)
             .isTest(true)
             .build();
+    }
+
+    public static Diary restore(Long diaryId, User user, Emotion emotion, LocalDateTime diaryDate,
+        String notes, boolean isAi, String title, String weather, List<Image> imageList,
+        LocalDateTime deletedAt, boolean isTest, LocalDateTime createdAt,
+        LocalDateTime updatedAt) {
+        return new Diary(diaryId, user, emotion, diaryDate, notes, isAi, title, weather, imageList,
+            deletedAt, isTest, createdAt, updatedAt);
     }
 
     public void setNotes(String notes) {

@@ -15,6 +15,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import tipitapi.drawmytoday.common.exception.BusinessException;
+import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryAdminResponse;
 import tipitapi.drawmytoday.domain.admin.dto.GetDiaryNoteAndPromptResponse;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
@@ -73,13 +75,13 @@ public class AdminService {
             allFutures.join();
         } catch (Exception e) {
             log.error("작업이 중단되었습니다.", e);
-            throw new RuntimeException(e);
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, e);
         } finally {
             executor.shutdown();
         }
 
         if (count.get() == 0) {
-            throw new RuntimeException("번역할 데이터가 없거나 모두 실패했습니다.");
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
         writeTransactionTemplate.executeWithoutResult(status -> {
@@ -94,10 +96,11 @@ public class AdminService {
                     gptResponses = objectMapper.writeValueAsString(messages);
                 } catch (JsonProcessingException e) {
                     log.error("GPT Message를 JSON으로 변환하는데 실패했습니다.", e);
-                    throw new RuntimeException(e);
+                    throw new BusinessException(ErrorCode.PARSING_ERROR, e);
                 }
                 PromptGeneratorResult result = PromptGeneratorResult.createGpt3Result(gptResponses);
                 prompt.updatePromptGeneratorResult(result);
+                promptRepository.save(prompt);
             }
         });
         return count.get();

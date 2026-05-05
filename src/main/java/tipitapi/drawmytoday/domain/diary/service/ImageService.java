@@ -44,6 +44,10 @@ public class ImageService {
         return imageRepository.save(Image.create(diary, prompt, imagePath, isSelected));
     }
 
+    public Image saveImage(Image image) {
+        return imageRepository.save(image);
+    }
+
     public Image uploadAndCreateImage(Diary diary, Prompt prompt, byte[] dallEImage,
         boolean isSelected) {
         String imagePath = String.format(profile + "/post/%d/%s_%d.webp", diary.getDiaryId(),
@@ -55,7 +59,10 @@ public class ImageService {
     @Transactional
     public void unSelectAllImage(Long diaryId) {
         imageRepository.findByDiary(diaryId)
-            .forEach(image -> image.setSelected(false));
+            .forEach(image -> {
+                image.setSelected(false);
+                imageRepository.save(image);
+            });
     }
 
     @Transactional
@@ -73,6 +80,7 @@ public class ImageService {
         validateImageService.validateImageOwner(imageId, user);
 
         image.reviewImage(review);
+        imageRepository.save(image);
     }
 
     @Transactional
@@ -83,6 +91,7 @@ public class ImageService {
 
         unSelectAllImage(diary.getDiaryId());
         image.setSelected(true);
+        imageRepository.save(image);
     }
 
     private Image validateImage(Long imageId, User user) {

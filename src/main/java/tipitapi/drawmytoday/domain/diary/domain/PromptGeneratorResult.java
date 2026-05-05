@@ -32,6 +32,11 @@ public class PromptGeneratorResult {
         return new PromptGeneratorResult(PromptGeneratorType.NONE, null);
     }
 
+    public static PromptGeneratorResult restore(PromptGeneratorType promptGeneratorType,
+        String promptGeneratorContent) {
+        return new PromptGeneratorResult(promptGeneratorType, promptGeneratorContent);
+    }
+
     public PromptGeneratorType getPromptGeneratorType() {
         return promptGeneratorType;
     }
