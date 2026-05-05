@@ -31,6 +31,12 @@
         </root>
     </springProfile>
 
+    <springProfile name="bulk-load">
+        <root level="INFO">
+            <appender-ref ref="DEFAULT_CONSOLE"/>
+        </root>
+    </springProfile>
+
     <springProfile name="develop">
         <property name="LOG_PATH" value="/app/logs"/>
         <appender class="ch.qos.logback.core.rolling.RollingFileAppender"

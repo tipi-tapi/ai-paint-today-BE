@@ -29,6 +29,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation platform('software.amazon.awssdk:bom:2.20.26')
     implementation 'software.amazon.awssdk:s3'
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
@@ -140,4 +141,13 @@ jacocoTestCoverageVerification {
 
 jar {
     enabled = false
+}
+
+tasks.register('bootRunBulkLoad', JavaExec) {
+    group = 'Migration'
+    description = 'Run Firestore bulk load migration job'
+    dependsOn 'classes'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'tipitapi.drawmytoday.migration.BulkLoadApplication'
+    args = ['--spring.profiles.active=bulk-load', '--profile=bulk-load']
 }

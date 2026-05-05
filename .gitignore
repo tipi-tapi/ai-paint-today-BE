@@ -42,3 +42,11 @@ out/
 
 ### Docker ###
 .dbdata
+
+### firebase ###
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+.omc
+.omx

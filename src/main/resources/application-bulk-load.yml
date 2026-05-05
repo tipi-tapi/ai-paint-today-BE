@@ -1,0 +1,96 @@
+spring:
+  main:
+    web-application-type: none
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+logging:
+  level:
+    tipitapi.drawmytoday.migration: INFO
+    com.google.cloud.firestore: WARN
+    com.google.firebase: WARN
+
+# Dummy values for beans from always-included profiles (oauth, aws, r2, openai, kakao).
+# These services are not used during bulk load — beans initialize but are never invoked.
+cloud:
+  aws:
+    credentials:
+      secret-key: dummy
+      access-key: dummy
+    s3:
+      bucket: dummy
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+r2:
+  credentials:
+    secret-key: dummy
+    access-key: dummy
+  bucket: dummy
+  account-id: dummy
+  custom-domain: dummy
+
+oauth2:
+  google:
+    client-id: dummy
+    client-secret: dummy
+    token-url: http://localhost
+    user-info-url: http://localhost
+    redirect-uri: http://localhost
+    delete-account-url: http://localhost
+  apple:
+    ios:
+      client-id: dummy
+      team-id: dummy
+      key-id: dummy
+      private-key: dummy
+      token-url: http://localhost
+      delete-account-url: http://localhost
+
+jwt:
+  secret: dummy-jwt-secret-for-bulk-load-mode-must-be-at-least-32-chars-long
+  access-token-expire-time: 3600000
+  refresh-token-expire-time: 5184000000
+
+openai:
+  api:
+    key: dummy
+  dalle:
+    url: http://localhost
+  gpt:
+    chat_completions_prompt: dummy
+    chat_completions_regenerate_prompt: dummy
+
+kakao:
+  api:
+    key: dummy
+  karlo:
+    image_generate_url: http://localhost
+    generate_image:
+      negative_prompt: dummy
+      style:
+        default: dummy
+
+encryptor:
+  secret:
+    key: dummy-encryptor-key-exactly-32ch
+
+presigned-image:
+  expiration:
+    admin-diaries: 3600
+
+stability:
+  api:
+    key: dummy
+  stable_image_core:
+    url: http://localhost
+    negative_prompt: dummy
