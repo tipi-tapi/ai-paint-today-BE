@@ -73,11 +73,11 @@ public class FirestoreAdRewardRepository implements AdRewardRepository {
     public List<AdReward> findAllByUserIdAndUsedAtIsNull(Long userId) {
         try {
             return adRewardCollection(userId)
-                .whereEqualTo(AdRewardDocumentMapper.FIELD_USED_AT, null)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .getDocuments()
                 .stream()
+                .filter(doc -> doc.getTimestamp(AdRewardDocumentMapper.FIELD_USED_AT) == null)
                 .map(mapper::fromDocument)
                 .sorted(Comparator.comparing(AdReward::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());

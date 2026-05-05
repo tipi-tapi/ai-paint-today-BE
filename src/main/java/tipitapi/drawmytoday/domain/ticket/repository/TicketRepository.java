@@ -17,4 +17,6 @@ public interface TicketRepository {
     List<Ticket> findAllByUserIdAndUsedAtIsNull(Long userId);
 
     Optional<Ticket> findValidTicket(Long userId);
+
+    Optional<Ticket> useTicketAtomically(Long userId);
 }

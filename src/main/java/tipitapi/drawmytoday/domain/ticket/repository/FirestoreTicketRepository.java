@@ -1,8 +1,10 @@
 package tipitapi.drawmytoday.domain.ticket.repository;
 
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteBatch;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -125,11 +127,11 @@ public class FirestoreTicketRepository implements TicketRepository {
     public List<Ticket> findAllByUserIdAndUsedAtIsNull(Long userId) {
         try {
             return ticketCollection(userId)
-                .whereEqualTo(TicketDocumentMapper.FIELD_USED_AT, null)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .getDocuments()
                 .stream()
+                .filter(doc -> doc.getTimestamp(TicketDocumentMapper.FIELD_USED_AT) == null)
                 .map(mapper::fromDocument)
                 .sorted(Comparator.comparing(Ticket::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
@@ -146,6 +148,41 @@ public class FirestoreTicketRepository implements TicketRepository {
     @Override
     public Optional<Ticket> findValidTicket(Long userId) {
         return findAllByUserIdAndUsedAtIsNull(userId).stream().findFirst();
+    }
+
+    @Override
+    public Optional<Ticket> useTicketAtomically(Long userId) {
+        try {
+            var colRef = ticketCollection(userId);
+            Ticket result = firestore.runTransaction(transaction -> {
+                var docs = transaction.get(colRef).get().getDocuments();
+                var validDoc = docs.stream()
+                    .filter(doc -> doc.getTimestamp(TicketDocumentMapper.FIELD_USED_AT) == null)
+                    .min(Comparator.comparing(doc -> {
+                        var ts = doc.getTimestamp(TicketDocumentMapper.FIELD_CREATED_AT);
+                        return ts != null ? ts.getSeconds() : Long.MAX_VALUE;
+                    }));
+                if (validDoc.isEmpty()) return null;
+
+                var snapshot = validDoc.get();
+                Ticket ticket = mapper.fromDocument(snapshot);
+                ticket.use();
+
+                var instant = ticket.getUsedAt().atZone(ZoneId.systemDefault()).toInstant();
+                var usedAtTs = Timestamp.ofTimeSecondsAndNanos(instant.getEpochSecond(), instant.getNano());
+                transaction.update(snapshot.getReference(), TicketDocumentMapper.FIELD_USED_AT, usedAtTs);
+                return ticket;
+            }).get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+            return Optional.ofNullable(result);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
+        } catch (TimeoutException e) {
+            throw new BusinessException(ErrorCode.FIRESTORE_TIMEOUT, e);
+        } catch (ExecutionException e) {
+            throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
+        }
     }
 
     private com.google.cloud.firestore.CollectionReference ticketCollection(Long userId) {

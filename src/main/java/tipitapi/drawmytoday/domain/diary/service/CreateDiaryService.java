@@ -20,6 +20,7 @@ import tipitapi.drawmytoday.domain.generator.exception.ImageGeneratorException;
 import tipitapi.drawmytoday.domain.generator.service.ImageGeneratorService;
 import tipitapi.drawmytoday.domain.ticket.service.ValidateTicketService;
 import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.repository.UserRepository;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
 @Service
@@ -28,6 +29,7 @@ import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 public class CreateDiaryService {
 
     private final DiaryRepository diaryRepository;
+    private final UserRepository userRepository;
     private final ImageService imageService;
     private final ValidateUserService validateUserService;
     private final ValidateEmotionService validateEmotionService;
@@ -141,6 +143,7 @@ public class CreateDiaryService {
         boolean testDiary) {
         String encryptedNotes = encryptor.encrypt(notes);
         user.setLastDiaryDate(LocalDateTime.now());
+        userRepository.save(user);
 
         if (testDiary) {
             return diaryRepository.save(Diary.ofTest(user, emotion, diaryDate, encryptedNotes));

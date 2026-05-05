@@ -185,7 +185,7 @@ public class FirestoreDiaryRepository implements DiaryRepository {
                 .filter(snapshot -> snapshot.get("prompt.promptGeneratorContent") == null)
                 .filter(snapshot -> {
                     String prompt = snapshot.getString("prompt.promptText");
-                    return prompt != null && !prompt.contains(", portrait");
+                    return prompt != null && !prompt.endsWith(", portrait");
                 })
                 .limit(10L)
                 .map(snapshot -> {
