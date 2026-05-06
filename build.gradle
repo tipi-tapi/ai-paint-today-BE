@@ -115,6 +115,10 @@ jar {
     enabled = false
 }
 
+bootJar {
+    mainClass = 'tipitapi.drawmytoday.DrawMyTodayApplication'
+}
+
 tasks.register('bootRunBulkLoad', JavaExec) {
     group = 'Migration'
     description = 'Run Firestore bulk load migration job'
