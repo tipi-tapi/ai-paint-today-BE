@@ -1,98 +1,107 @@
-name: main branch cd
+name: Deploy to Cloud Run
 
 on:
     push:
-        branches: [ "main" ]
+        branches: [ "develop" ]
+
+env:
+    REGION: asia-northeast3
+    SERVICE: draw-my-today
+    IMAGE: asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/draw-my-today/app
 
 jobs:
     deploy:
         runs-on: ubuntu-latest
         environment: prod
+
+        permissions:
+            contents: read
+            id-token: write
+
         steps:
-            -   name: checkout
-                uses: actions/checkout@v3
+            -   name: Checkout
+                uses: actions/checkout@v4
 
             -   name: Set up JDK 11
-                uses: actions/setup-java@v3
+                uses: actions/setup-java@v4
                 with:
                     java-version: '11'
                     distribution: 'temurin'
+                    cache: gradle
 
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
-            -   name: Clean and Build with Gradle
+            -   name: Build with Gradle
                 run: ./gradlew clean build -x test
 
-            -   name: Cache Gradle packages
-                uses: actions/cache@v4
+            -   name: Authenticate to Google Cloud
+                uses: google-github-actions/auth@v2
                 with:
-                    path: ~/.gradle/caches
-                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-                    restore-keys: ${{ runner.os }}-gradle
+                    credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-            -   name: Copy JAR file to EC2
-                uses: appleboy/scp-action@master
-                with:
-                    host: ${{ secrets.EC2_HOST }}
-                    username: ${{ secrets.EC2_USERNAME }}
-                    key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-                    port: 22
-                    source: build/libs/draw-my-today-0.0.1-SNAPSHOT.jar
-                    target: /home/ubuntu/SpringServer
+            -   name: Set up Cloud SDK
+                uses: google-github-actions/setup-gcloud@v2
 
-            -   name: Deploy EC2
-                uses: appleboy/ssh-action@master
-                with:
-                    host: ${{ secrets.EC2_HOST }}
-                    username: ${{ secrets.EC2_USERNAME }}
-                    key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-                    port: 22
-                    script: |
-                        set -e
-                        
-                        cd SpringServer/deploy
-                        rm -f .env
-                        touch .env
-                        
-                        add_env_var() {
-                            echo "export $1='$2'" >> ./.env
-                        }
-                        
-                        add_env_var "KAKAO_API_KEY" "${{ secrets.KAKAO_API_KEY }}"
-                        add_env_var "KARLO_API_URL" "${{ secrets.KARLO_API_URL }}"
-                        add_env_var "NEGATIVE_PROMPT" "${{ secrets.NEGATIVE_PROMPT }}"
-                        add_env_var "KARLO_DEFAULT_STYLE" "${{ secrets.KARLO_DEFAULT_STYLE }}"
-                        add_env_var "R2_SECRET_ACCESS_KEY" "${{ secrets.R2_SECRET_ACCESS_KEY }}"
-                        add_env_var "R2_ACCESS_KEY_ID" "${{ secrets.R2_ACCESS_KEY_ID }}"
-                        add_env_var "R2_BUCKET_NAME" "${{ secrets.R2_BUCKET_NAME }}"
-                        add_env_var "R2_ACCOUNT_ID" "${{ secrets.R2_ACCOUNT_ID }}"
-                        add_env_var "R2_CUSTOM_DOMAIN" "${{ secrets.R2_CUSTOM_DOMAIN }}"
-                        add_env_var "OPENAI_API_KEY" "${{ secrets.OPENAI_API_KEY }}"
-                        add_env_var "DALLE_API_URL" "${{ secrets.DALLE_API_URL }}"
-                        add_env_var "AWS_SECRET_ACCESS_KEY" "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-                        add_env_var "AWS_ACCESS_KEY_ID" "${{ secrets.AWS_ACCESS_KEY_ID }}"
-                        add_env_var "AWS_S3_BUCKET" "${{ secrets.AWS_S3_BUCKET }}"
-                        add_env_var "GOOGLE_CLIENT_ID" "${{ secrets.GOOGLE_CLIENT_ID }}"
-                        add_env_var "GOOGLE_CLIENT_SECRET" "${{ secrets.GOOGLE_CLIENT_SECRET }}"
-                        add_env_var "GOOGLE_TOKEN_URL" "${{ secrets.GOOGLE_TOKEN_URL }}"
-                        add_env_var "GOOGLE_USER_INFO_URL" "${{ secrets.GOOGLE_USER_INFO_URL }}"
-                        add_env_var "GOOGLE_REDIRECT_URI" "${{ secrets.GOOGLE_REDIRECT_URI }}"
-                        add_env_var "GOOGLE_DELETE_ACCOUNT_URL" "${{ secrets.GOOGLE_DELETE_ACCOUNT_URL }}"
-                        add_env_var "APPLE_IOS_CLIENT_ID" "${{ secrets.APPLE_IOS_CLIENT_ID }}"
-                        add_env_var "APPLE_IOS_TEAM_ID" "${{ secrets.APPLE_IOS_TEAM_ID }}"
-                        add_env_var "APPLE_IOS_KEY_ID" "${{ secrets.APPLE_IOS_KEY_ID }}"
-                        add_env_var "APPLE_IOS_PRIVATE_KEY" "${{ secrets.APPLE_IOS_PRIVATE_KEY }}"
-                        add_env_var "APPLE_IOS_TOKEN_URL" "${{ secrets.APPLE_IOS_TOKEN_URL }}"
-                        add_env_var "APPLE_IOS_DELETE_ACCOUNT_URL" "${{ secrets.APPLE_IOS_DELETE_ACCOUNT_URL }}"
-                        add_env_var "JWT_SECRET" "${{ secrets.JWT_SECRET }}"
-                        add_env_var "ENCRYPTOR_SECRET_KEY" "${{ secrets.ENCRYPTOR_SECRET_KEY }}"
-                        add_env_var "PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES" "${{ secrets.PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES }}"
-                        add_env_var "RDS_URL" "${{ secrets.RDS_URL }}"
-                        add_env_var "RDS_USERNAME" "${{ secrets.RDS_USERNAME }}"
-                        add_env_var "RDS_PASSWORD" "${{ secrets.RDS_PASSWORD }}"
-                        add_env_var "GPT_CHAT_COMPLETIONS_PROMPT" "${{ secrets.GPT_CHAT_COMPLETIONS_PROMPT }}"
-                        add_env_var "GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT" "${{ secrets.GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT }}"
-                        add_env_var "STABILITY_API_KEY" "${{ secrets.STABILITY_API_KEY }}"
-                        
-                        ./deploy.sh
+            -   name: Configure Docker for Artifact Registry
+                run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+            -   name: Build Docker image
+                run: |
+                    docker build -t ${{ env.IMAGE }}:${{ github.sha }} \
+                                 -t ${{ env.IMAGE }}:latest .
+
+            -   name: Push Docker image
+                run: |
+                    docker push ${{ env.IMAGE }}:${{ github.sha }}
+                    docker push ${{ env.IMAGE }}:latest
+
+            -   name: Deploy to Cloud Run
+                run: |
+                    SECRETS="KAKAO_API_KEY=KAKAO_API_KEY:latest"
+                    SECRETS="${SECRETS},KARLO_API_URL=KARLO_API_URL:latest"
+                    SECRETS="${SECRETS},NEGATIVE_PROMPT=NEGATIVE_PROMPT:latest"
+                    SECRETS="${SECRETS},KARLO_DEFAULT_STYLE=KARLO_DEFAULT_STYLE:latest"
+                    SECRETS="${SECRETS},R2_SECRET_ACCESS_KEY=R2_SECRET_ACCESS_KEY:latest"
+                    SECRETS="${SECRETS},R2_ACCESS_KEY_ID=R2_ACCESS_KEY_ID:latest"
+                    SECRETS="${SECRETS},R2_BUCKET_NAME=R2_BUCKET_NAME:latest"
+                    SECRETS="${SECRETS},R2_ACCOUNT_ID=R2_ACCOUNT_ID:latest"
+                    SECRETS="${SECRETS},R2_CUSTOM_DOMAIN=R2_CUSTOM_DOMAIN:latest"
+                    SECRETS="${SECRETS},OPENAI_API_KEY=OPENAI_API_KEY:latest"
+                    SECRETS="${SECRETS},DALLE_API_URL=DALLE_API_URL:latest"
+                    SECRETS="${SECRETS},AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest"
+                    SECRETS="${SECRETS},AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest"
+                    SECRETS="${SECRETS},AWS_S3_BUCKET=AWS_S3_BUCKET:latest"
+                    SECRETS="${SECRETS},GOOGLE_CLIENT_ID=GOOGLE_CLIENT_ID:latest"
+                    SECRETS="${SECRETS},GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET:latest"
+                    SECRETS="${SECRETS},GOOGLE_TOKEN_URL=GOOGLE_TOKEN_URL:latest"
+                    SECRETS="${SECRETS},GOOGLE_USER_INFO_URL=GOOGLE_USER_INFO_URL:latest"
+                    SECRETS="${SECRETS},GOOGLE_REDIRECT_URI=GOOGLE_REDIRECT_URI:latest"
+                    SECRETS="${SECRETS},GOOGLE_DELETE_ACCOUNT_URL=GOOGLE_DELETE_ACCOUNT_URL:latest"
+                    SECRETS="${SECRETS},APPLE_IOS_CLIENT_ID=APPLE_IOS_CLIENT_ID:latest"
+                    SECRETS="${SECRETS},APPLE_IOS_TEAM_ID=APPLE_IOS_TEAM_ID:latest"
+                    SECRETS="${SECRETS},APPLE_IOS_KEY_ID=APPLE_IOS_KEY_ID:latest"
+                    SECRETS="${SECRETS},APPLE_IOS_PRIVATE_KEY=APPLE_IOS_PRIVATE_KEY:latest"
+                    SECRETS="${SECRETS},APPLE_IOS_TOKEN_URL=APPLE_IOS_TOKEN_URL:latest"
+                    SECRETS="${SECRETS},APPLE_IOS_DELETE_ACCOUNT_URL=APPLE_IOS_DELETE_ACCOUNT_URL:latest"
+                    SECRETS="${SECRETS},JWT_SECRET=JWT_SECRET:latest"
+                    SECRETS="${SECRETS},ENCRYPTOR_SECRET_KEY=ENCRYPTOR_SECRET_KEY:latest"
+                    SECRETS="${SECRETS},PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES=PRESIGNED_IMAGE_EXPIRATION_ADMIN_DIARIES:latest"
+                    SECRETS="${SECRETS},GPT_CHAT_COMPLETIONS_PROMPT=GPT_CHAT_COMPLETIONS_PROMPT:latest"
+                    SECRETS="${SECRETS},GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT=GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT:latest"
+                    SECRETS="${SECRETS},STABILITY_API_KEY=STABILITY_API_KEY:latest"
+
+                    gcloud run deploy ${{ env.SERVICE }} \
+                        --image ${{ env.IMAGE }}:${{ github.sha }} \
+                        --region ${{ env.REGION }} \
+                        --platform managed \
+                        --allow-unauthenticated \
+                        --set-env-vars "PROFILE=develop,FIRESTORE_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" \
+                        --set-secrets "${SECRETS}" \
+                        --min-instances 0 \
+                        --max-instances 2 \
+                        --concurrency 5 \
+                        --timeout 300 \
+                        --cpu-boost \
+                        --project ${{ secrets.GCP_PROJECT_ID }} \
+                        --quiet
