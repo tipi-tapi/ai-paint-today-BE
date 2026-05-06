@@ -98,6 +98,8 @@ jobs:
                         --allow-unauthenticated \
                         --set-env-vars "PROFILE=develop,SERVER_PORT=8080,FIRESTORE_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" \
                         --set-secrets "${SECRETS}" \
+                        --memory 1Gi \
+                        --cpu 1 \
                         --min-instances 0 \
                         --max-instances 2 \
                         --concurrency 5 \
