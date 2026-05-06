@@ -162,7 +162,10 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, LocalDateTime startMonth,
         LocalDateTime endMonth) {
         return findLiveDiarySnapshots().stream()
-            .filter(snapshot -> userId.equals(snapshot.getLong(DiaryDocumentMapper.FIELD_USER_ID)))
+            .filter(snapshot -> {
+                String stored = snapshot.getString(DiaryDocumentMapper.FIELD_USER_ID);
+                return stored != null && userId.equals(Long.parseLong(stored));
+            })
             .filter(snapshot -> isBetween(diaryMapper.fromDocument(snapshot).getDiaryDate(), startMonth, endMonth))
             .sorted(Comparator.comparing(snapshot -> diaryMapper.fromDocument(snapshot).getDiaryDate(),
                 Comparator.nullsLast(Comparator.naturalOrder())))

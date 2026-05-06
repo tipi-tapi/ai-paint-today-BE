@@ -32,7 +32,8 @@ public class SecurityConfig {
         "/oauth2/expiredJwt",
         "/health/server",
         "/health/profile",
-        "/actuator/**"
+        "/actuator/**",
+        "/dev/**"
     };
 
     @Bean
