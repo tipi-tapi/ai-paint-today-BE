@@ -3,9 +3,7 @@ package tipitapi.drawmytoday.migration;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.cloud.FirestoreClient;
+import com.google.cloud.firestore.FirestoreOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,26 +21,27 @@ public class FirestoreConfig {
     @Value("${firestore.project-id:draw-my-today}")
     private String projectId;
 
+    @Value("${firestore.database-id:(default)}")
+    private String databaseId;
+
     @Bean
     public Firestore firestore() throws IOException {
         GoogleCredentials credentials = resolveCredentials();
 
-        FirebaseOptions options = FirebaseOptions.builder()
-            .setCredentials(credentials)
+        FirestoreOptions.Builder builder = FirestoreOptions.newBuilder()
             .setProjectId(projectId)
-            .build();
+            .setDatabaseId(databaseId)
+            .setCredentials(credentials);
 
-        if (FirebaseApp.getApps().isEmpty()) {
-            FirebaseApp.initializeApp(options);
-        }
+        Firestore firestore = builder.build().getService();
 
         if (emulatorHost != null) {
-            log.info("Firestore target: emulator at {} (project={})", emulatorHost, projectId);
+            log.info("Firestore target: emulator at {} (project={}, db={})", emulatorHost, projectId, databaseId);
         } else {
-            log.warn("Firestore target: PRODUCTION (project={})", projectId);
+            log.warn("Firestore target: PRODUCTION (project={}, db={})", projectId, databaseId);
         }
 
-        return FirestoreClient.getFirestore();
+        return firestore;
     }
 
     private GoogleCredentials resolveCredentials() {

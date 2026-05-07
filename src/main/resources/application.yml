@@ -6,6 +6,7 @@ spring:
 firestore:
     emulator-host: ${FIRESTORE_EMULATOR_HOST:#{null}}
     project-id: ${FIRESTORE_PROJECT_ID:draw-my-today}
+    database-id: ${FIRESTORE_DATABASE_ID:(default)}
 
 encryptor:
     secret:
