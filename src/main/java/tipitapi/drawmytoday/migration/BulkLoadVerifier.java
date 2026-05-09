@@ -91,7 +91,7 @@ public class BulkLoadVerifier {
             } else {
                 @SuppressWarnings("unchecked")
                 var embeddedEmotion = (Map<String, Object>) emotionField;
-                var emotionId = (String) embeddedEmotion.get("emotionId");
+                var emotionId = String.valueOf(embeddedEmotion.get("emotionId"));
                 var emotionDoc = firestore.collection("emotions").document(emotionId).get().get();
                 if (!emotionDoc.exists()) {
                     log.error("[VERIFY FAIL] diary {} emotion.emotionId={} not in emotions collection", diaryId, emotionId);
@@ -106,7 +106,7 @@ public class BulkLoadVerifier {
             if (selectedImageField != null) {
                 @SuppressWarnings("unchecked")
                 var selectedImage = (Map<String, Object>) selectedImageField;
-                var imageId = (String) selectedImage.get("imageId");
+                var imageId = String.valueOf(selectedImage.get("imageId"));
                 var imageDoc = firestore.collection("diaries").document(diaryId)
                     .collection("images").document(imageId).get().get();
 
@@ -156,7 +156,8 @@ public class BulkLoadVerifier {
             if (promptField != null) {
                 @SuppressWarnings("unchecked")
                 var prompt = (Map<String, Object>) promptField;
-                var promptId = (String) prompt.get("promptId");
+                var promptIdRaw = prompt.get("promptId");
+                var promptId = promptIdRaw != null ? String.valueOf(promptIdRaw) : null;
                 if (promptId == null || promptId.isBlank()) {
                     log.error("[VERIFY FAIL] image {} has non-null prompt but promptId is blank", imageId);
                     ok = false;

@@ -21,10 +21,8 @@ public class AuthDocumentMapper {
 
     public Map<String, Object> toDocument(Auth auth) {
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_AUTH_ID, auth.getAuthId() != null ? String.valueOf(auth.getAuthId()) : null);
-        doc.put(FIELD_USER_ID, auth.getUser() != null && auth.getUser().getUserId() != null
-            ? String.valueOf(auth.getUser().getUserId())
-            : null);
+        doc.put(FIELD_AUTH_ID, auth.getAuthId());
+        doc.put(FIELD_USER_ID, auth.getUser() != null ? auth.getUser().getUserId() : null);
         doc.put(FIELD_REFRESH_TOKEN, auth.getRefreshToken());
         doc.put(FIELD_CREATED_AT, toTimestamp(auth.getCreatedAt()));
         return doc;
@@ -32,17 +30,17 @@ public class AuthDocumentMapper {
 
     public Auth fromDocument(DocumentSnapshot snapshot) {
         Long authId = Long.parseLong(snapshot.getId());
-        User user = toUser(snapshot.getString(FIELD_USER_ID));
+        User user = toUser(snapshot.getLong(FIELD_USER_ID));
         String refreshToken = snapshot.getString(FIELD_REFRESH_TOKEN);
         LocalDateTime createdAt = toLocalDateTime(snapshot.get(FIELD_CREATED_AT));
         return Auth.restore(authId, user, refreshToken, createdAt);
     }
 
-    private User toUser(String userId) {
+    private User toUser(Long userId) {
         if (userId == null) {
             return null;
         }
-        return User.restore(Long.parseLong(userId), null, null, null, null, null, null, null);
+        return User.restore(userId, null, null, null, null, null, null, null);
     }
 
     private Timestamp toTimestamp(LocalDateTime ldt) {

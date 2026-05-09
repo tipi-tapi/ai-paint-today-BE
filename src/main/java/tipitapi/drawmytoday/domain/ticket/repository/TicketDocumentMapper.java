@@ -23,7 +23,7 @@ public class TicketDocumentMapper {
 
     public Map<String, Object> toDocument(Ticket ticket) {
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_TICKET_ID, String.valueOf(ticket.getTicketId()));
+        doc.put(FIELD_TICKET_ID, ticket.getTicketId());
         doc.put(FIELD_USER_ID, userId(ticket));
         doc.put(FIELD_TICKET_TYPE, ticket.getTicketType() != null ? ticket.getTicketType().name() : null);
         doc.put(FIELD_USED_AT, toTimestamp(ticket.getUsedAt()));

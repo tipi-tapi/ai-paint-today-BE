@@ -26,7 +26,7 @@ public class UserDocumentMapper {
 
     public Map<String, Object> toDocument(User user) {
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_USER_ID, user.getUserId() != null ? String.valueOf(user.getUserId()) : null);
+        doc.put(FIELD_USER_ID, user.getUserId());
         doc.put(FIELD_EMAIL, user.getEmail());
         doc.put(FIELD_SOCIAL_CODE, user.getSocialCode() != null ? user.getSocialCode().name() : null);
         doc.put(FIELD_USER_ROLE, user.getUserRole() != null ? user.getUserRole().name() : null);

@@ -28,7 +28,7 @@ public class FirestoreDocumentMapper {
 
     public Map<String, Object> toUserDoc(SampleUser u) {
         var doc = new HashMap<String, Object>();
-        doc.put("userId", String.valueOf(u.getUserId()));
+        doc.put("userId", u.getUserId());
         doc.put("email", u.getEmail());
         doc.put("socialCode", u.getSocialCode());
         doc.put("userRole", u.getUserRole());
@@ -41,8 +41,8 @@ public class FirestoreDocumentMapper {
 
     public Map<String, Object> toAuthDoc(SampleAuth a) {
         var doc = new HashMap<String, Object>();
-        doc.put("authId", String.valueOf(a.getAuthId()));
-        doc.put("userId", a.getUserId() != null ? String.valueOf(a.getUserId()) : null);
+        doc.put("authId", a.getAuthId());
+        doc.put("userId", a.getUserId());
         doc.put("refreshToken", a.getRefreshToken());
         doc.put("createdAt", toTimestamp(a.getCreatedAt()));
         return doc;
@@ -50,7 +50,7 @@ public class FirestoreDocumentMapper {
 
     public Map<String, Object> toEmotionDoc(SampleEmotion e) {
         var doc = new HashMap<String, Object>();
-        doc.put("emotionId", String.valueOf(e.getEmotionId()));
+        doc.put("emotionId", e.getEmotionId());
         doc.put("name", e.getName());
         doc.put("color", e.getColor());
         doc.put("colorPrompt", e.getColorPrompt());
@@ -71,8 +71,8 @@ public class FirestoreDocumentMapper {
             .orElse(null);
 
         var doc = new HashMap<String, Object>();
-        doc.put("diaryId", String.valueOf(d.getDiaryId()));
-        doc.put("userId", String.valueOf(d.getUserId()));
+        doc.put("diaryId", d.getDiaryId());
+        doc.put("userId", d.getUserId());
         doc.put("diaryDate", toTimestamp(d.getDiaryDate()));
         doc.put("isAi", d.getIsAi());
         doc.put("notes", d.getNotes());
@@ -92,7 +92,7 @@ public class FirestoreDocumentMapper {
 
     public Map<String, Object> toImageDoc(SampleImage img, @Nullable SamplePrompt prompt) {
         var doc = new HashMap<String, Object>();
-        doc.put("imageId", String.valueOf(img.getImageId()));
+        doc.put("imageId", img.getImageId());
         doc.put("imageUrl", img.getImageUrl());
         doc.put("isSelected", img.getIsSelected());
         doc.put("review", img.getReview());
@@ -104,7 +104,7 @@ public class FirestoreDocumentMapper {
 
     public Map<String, Object> toTicketDoc(SampleTicket t) {
         var doc = new HashMap<String, Object>();
-        doc.put("ticketId", String.valueOf(t.getTicketId()));
+        doc.put("ticketId", t.getTicketId());
         doc.put("ticketType", t.getTicketType());
         doc.put("usedAt", toTimestamp(t.getUsedAt()));
         doc.put("createdAt", toTimestamp(t.getCreatedAt()));
@@ -113,7 +113,7 @@ public class FirestoreDocumentMapper {
 
     public Map<String, Object> toAdRewardDoc(SampleAdReward ar) {
         var doc = new HashMap<String, Object>();
-        doc.put("adRewardId", String.valueOf(ar.getAdRewardId()));
+        doc.put("adRewardId", ar.getAdRewardId());
         doc.put("usedAt", toTimestamp(ar.getUsedAt()));
         doc.put("createdAt", toTimestamp(ar.getCreatedAt()));
         return doc;
@@ -128,7 +128,7 @@ public class FirestoreDocumentMapper {
 
     private Map<String, Object> toEmotionEmbedded(SampleEmotion e) {
         var map = new HashMap<String, Object>();
-        map.put("emotionId", String.valueOf(e.getEmotionId()));
+        map.put("emotionId", e.getEmotionId());
         map.put("name", e.getName());
         map.put("color", e.getColor());
         map.put("colorPrompt", e.getColorPrompt());
@@ -138,10 +138,10 @@ public class FirestoreDocumentMapper {
 
     private Map<String, Object> toSelectedImageEmbedded(SampleImage img, @Nullable SamplePrompt prompt) {
         var map = new HashMap<String, Object>();
-        map.put("imageId", String.valueOf(img.getImageId()));
+        map.put("imageId", img.getImageId());
         map.put("imageUrl", img.getImageUrl());
         map.put("review", img.getReview());
-        map.put("promptId", img.getPromptId() != null ? String.valueOf(img.getPromptId()) : null);
+        map.put("promptId", img.getPromptId());
         map.put("promptText", prompt != null ? prompt.getPromptText() : null);
         map.put("promptGeneratorType", prompt != null ? prompt.getPromptGeneratorType() : null);
         return map;
@@ -149,7 +149,7 @@ public class FirestoreDocumentMapper {
 
     private Map<String, Object> toPromptEmbedded(SamplePrompt p) {
         var map = new HashMap<String, Object>();
-        map.put("promptId", String.valueOf(p.getPromptId()));
+        map.put("promptId", p.getPromptId());
         map.put("promptText", p.getPromptText());
         map.put("isSuccess", p.getIsSuccess());
         map.put("promptGeneratorType", p.getPromptGeneratorType());
