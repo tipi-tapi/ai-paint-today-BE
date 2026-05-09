@@ -86,7 +86,7 @@ public class FirestoreTicketRepository implements TicketRepository {
     public Optional<Ticket> findByTicketId(Long ticketId) {
         try {
             var documents = firestore.collectionGroup(TICKETS_COLLECTION)
-                .whereEqualTo(TicketDocumentMapper.FIELD_TICKET_ID, ticketId)
+                .whereEqualTo(TicketDocumentMapper.FIELD_TICKET_ID, String.valueOf(ticketId))
                 .limit(1)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)

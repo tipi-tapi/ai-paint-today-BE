@@ -164,7 +164,7 @@ public class FirestoreDiaryRepository implements DiaryRepository {
         return findLiveDiarySnapshots().stream()
             .filter(snapshot -> {
                 Long stored = snapshot.getLong(DiaryDocumentMapper.FIELD_USER_ID);
-                return stored != null && userId.equals(stored);
+                return userId.equals(stored);
             })
             .filter(snapshot -> isBetween(diaryMapper.fromDocument(snapshot).getDiaryDate(), startMonth, endMonth))
             .sorted(Comparator.comparing(snapshot -> diaryMapper.fromDocument(snapshot).getDiaryDate(),
