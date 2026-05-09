@@ -99,9 +99,9 @@ jobs:
                         --set-env-vars "PROFILE=develop,SERVER_PORT=8080,FIRESTORE_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},FIRESTORE_DATABASE_ID=draw-my-today-db" \
                         --set-secrets "${SECRETS}" \
                         --memory 512Mi \
-                        --cpu 0.5 \
-                        --min-instances 1 \
-                        --max-instances 1 \
+                        --cpu 1 \
+                        --min-instances 0 \
+                        --max-instances 3 \
                         --concurrency 20 \
                         --timeout 300 \
                         --cpu-boost \
