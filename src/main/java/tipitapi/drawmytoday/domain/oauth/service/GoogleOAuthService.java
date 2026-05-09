@@ -100,7 +100,7 @@ public class GoogleOAuthService {
             throw new BusinessException(OAUTH_SERVER_FAILED);
         }
 
-        user.deleteUser();
+        userService.deleteUser(user);
     }
 
     private OAuthAccessToken getAccessToken(HttpServletRequest request) {

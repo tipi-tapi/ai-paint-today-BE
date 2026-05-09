@@ -106,7 +106,7 @@ public class AppleOAuthService {
             throw new BusinessException(OAUTH_SERVER_FAILED, new Throwable(response.getBody()));
         }
 
-        user.deleteUser();
+        userService.deleteUser(user);
     }
 
     private OAuthAccessToken getAccessToken(HttpServletRequest request) {

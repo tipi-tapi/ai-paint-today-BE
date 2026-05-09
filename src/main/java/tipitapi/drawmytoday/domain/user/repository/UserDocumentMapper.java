@@ -40,7 +40,8 @@ public class UserDocumentMapper {
     public User fromDocument(DocumentSnapshot snapshot) {
         Long userId = Long.parseLong(snapshot.getId());
         String email = snapshot.getString(FIELD_EMAIL);
-        SocialCode socialCode = SocialCode.valueOf(snapshot.getString(FIELD_SOCIAL_CODE));
+        String socialCodeStr = snapshot.getString(FIELD_SOCIAL_CODE);
+        SocialCode socialCode = socialCodeStr != null ? SocialCode.valueOf(socialCodeStr) : null;
         String roleStr = snapshot.getString(FIELD_USER_ROLE);
         UserRole userRole = roleStr != null ? UserRole.valueOf(roleStr) : null;
         LocalDateTime lastDiaryDate = toLocalDateTime(snapshot.getTimestamp(FIELD_LAST_DIARY_DATE));

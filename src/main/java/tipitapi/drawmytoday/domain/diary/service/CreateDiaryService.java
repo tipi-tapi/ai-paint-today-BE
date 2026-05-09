@@ -47,7 +47,7 @@ public class CreateDiaryService {
         LocalDate diaryDate = request.getDiaryDate();
         User user = validateUserService.validateUserById(userId);
         validateDiaryService.validateExistsByDate(userId, diaryDate);
-        validateTicketService.findAndUseTicket(userId);
+        validateTicketService.validateTicketExists(userId);
         Emotion emotion = validateEmotionService.validateEmotionById(request.getEmotionId());
         LocalDateTime diaryDateTime = diaryDate.atTime(request.getUserTime());
 
@@ -64,6 +64,7 @@ public class CreateDiaryService {
         prompt.imageGeneratorSuccess();
         Diary diary = saveDiary(request.getNotes(), user, emotion, diaryDateTime, false);
         imageService.uploadAndCreateImage(diary, prompt, image, true);
+        validateTicketService.findAndUseTicket(userId);
 
         return new CreateDiaryResponse(diary.getDiaryId());
     }
@@ -93,13 +94,14 @@ public class CreateDiaryService {
         throws ImageGeneratorException {
         User user = validateUserService.validateUserById(userId);
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
-        validateTicketService.findAndUseTicket(userId);
+        validateTicketService.validateTicketExists(userId);
 
         if (isNewVersion(diaryNote)) {
             regenerateDiaryImageWithNewPrompt(diary, diaryNote);
         } else {
             regenerateDiaryImageWithPreviousPrompt(diary);
         }
+        validateTicketService.findAndUseTicket(userId);
     }
 
     private boolean isNewVersion(String diaryNote) {

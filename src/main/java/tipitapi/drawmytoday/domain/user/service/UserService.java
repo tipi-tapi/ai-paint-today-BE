@@ -26,4 +26,10 @@ public class UserService {
         ticketService.createTicketByJoin(user);
         return user;
     }
+
+    @Transactional
+    public void deleteUser(User user) {
+        user.deleteUser();
+        userRepository.save(user);
+    }
 }

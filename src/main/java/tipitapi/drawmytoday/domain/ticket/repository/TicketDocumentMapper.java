@@ -34,7 +34,8 @@ public class TicketDocumentMapper {
     public Ticket fromDocument(DocumentSnapshot snapshot) {
         Long ticketId = toLong(snapshot.get(FIELD_TICKET_ID), snapshot.getId());
         User user = toUser(snapshot.get(FIELD_USER_ID));
-        TicketType ticketType = TicketType.valueOf(snapshot.getString(FIELD_TICKET_TYPE));
+        String ticketTypeStr = snapshot.getString(FIELD_TICKET_TYPE);
+        TicketType ticketType = ticketTypeStr != null ? TicketType.valueOf(ticketTypeStr) : null;
         LocalDateTime usedAt = toLocalDateTime(snapshot.get(FIELD_USED_AT));
         LocalDateTime createdAt = toLocalDateTime(snapshot.get(FIELD_CREATED_AT));
         return Ticket.restore(ticketId, user, ticketType, usedAt, createdAt);

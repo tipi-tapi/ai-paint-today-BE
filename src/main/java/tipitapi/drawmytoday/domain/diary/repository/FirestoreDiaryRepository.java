@@ -163,8 +163,8 @@ public class FirestoreDiaryRepository implements DiaryRepository {
         LocalDateTime endMonth) {
         return findLiveDiarySnapshots().stream()
             .filter(snapshot -> {
-                String stored = snapshot.getString(DiaryDocumentMapper.FIELD_USER_ID);
-                return stored != null && userId.equals(Long.parseLong(stored));
+                Long stored = snapshot.getLong(DiaryDocumentMapper.FIELD_USER_ID);
+                return stored != null && userId.equals(stored);
             })
             .filter(snapshot -> isBetween(diaryMapper.fromDocument(snapshot).getDiaryDate(), startMonth, endMonth))
             .sorted(Comparator.comparing(snapshot -> diaryMapper.fromDocument(snapshot).getDiaryDate(),
