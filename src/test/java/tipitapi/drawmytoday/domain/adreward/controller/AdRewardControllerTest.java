@@ -39,7 +39,7 @@ class AdRewardControllerTest extends ControllerTestSetup {
 
             //then
             result.andExpect(status().isNoContent());
-            verify(adRewardService).createAdReward(any(Long.class));
+            verify(adRewardService).createTicket(any(Long.class));
         }
     }
 

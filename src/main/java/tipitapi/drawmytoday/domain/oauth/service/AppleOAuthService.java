@@ -102,9 +102,10 @@ public class AppleOAuthService {
         String url = properties.getDeleteAccountUrl();
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
-        if (response.getStatusCode() != HttpStatus.OK) {
-            throw new BusinessException(OAUTH_SERVER_FAILED, new Throwable(response.getBody()));
-        }
+//      애플 탈퇴 실패해도 내부적으로 유저 삭제하도록 정함
+//        if (response.getStatusCode() != HttpStatus.OK) {
+//            throw new BusinessException(OAUTH_SERVER_FAILED, new Throwable(response.getBody()));
+//        }
 
         userService.deleteUser(user);
     }

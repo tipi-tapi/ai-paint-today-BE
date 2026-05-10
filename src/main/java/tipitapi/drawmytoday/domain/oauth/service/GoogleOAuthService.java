@@ -96,9 +96,10 @@ public class GoogleOAuthService {
         String url = properties.getDeleteAccountUrl();
         String response = restTemplate.postForObject(url, request, String.class);
 
-        if (response.contains("error")) {
-            throw new BusinessException(OAUTH_SERVER_FAILED);
-        }
+//      구글 탈퇴 실패해도 내부적으로 유저 삭제하도록 정함
+//        if (response.contains("error")) {
+//            throw new BusinessException(OAUTH_SERVER_FAILED);
+//        }
 
         userService.deleteUser(user);
     }

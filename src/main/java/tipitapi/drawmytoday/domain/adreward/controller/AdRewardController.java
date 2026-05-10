@@ -22,17 +22,17 @@ public class AdRewardController {
 
     private final AdRewardService adRewardService;
 
-    @Operation(summary = "광고 기록 생성", description = "사용자가 광고를 시청한 후에 광고 기록을 생성합니다.")
+    @Operation(summary = "(구)광고 기록 생성 (신)티켓 생성", description = "광고 기록 저장 및 티켓 발급을 담당했으나, 현재는 티켓만 발급함")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "204",
-            description = "성공적으로 광고 기록을 등록함"),
+            description = "성공적으로 티켓을 등록함"),
     })
     @PostMapping()
     public ResponseEntity<Void> createDiary(
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
-        adRewardService.createAdReward(tokenInfo.getUserId());
+        adRewardService.createTicket(tokenInfo.getUserId());
         return ResponseEntity.noContent().build();
     }
 }
