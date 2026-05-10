@@ -46,7 +46,6 @@ public class BulkLoadVerifier {
 
         ok &= verifyTopLevelCount("emotions", data.getEmotions().size());
         ok &= verifyTopLevelCount("users", data.getUsers().size());
-        ok &= verifyTopLevelCount("auth", data.getAuths().size());
 
         long expectedDiaries = data.getDiaries().stream()
             .filter(d -> !Boolean.TRUE.equals(d.getIsTest()))

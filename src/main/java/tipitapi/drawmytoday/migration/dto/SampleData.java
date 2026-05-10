@@ -14,13 +14,11 @@ public class SampleData {
 
     private SampleMetadata metadata;
     private List<SampleUser> users;
-    private List<SampleAuth> auths;
     private List<SampleEmotion> emotions;
     private List<SampleDiary> diaries;
     private List<SamplePrompt> prompts;
     private List<SampleImage> images;
     private List<SampleTicket> tickets;
-    private List<SampleAdReward> adRewards;
 
     @Getter
     @NoArgsConstructor
@@ -52,19 +50,6 @@ public class SampleData {
         private String userRole;
         @JsonProperty("deleted_at")
         private LocalDateTime deletedAt;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class SampleAuth {
-        @JsonProperty("auth_id")
-        private Long authId;
-        @JsonProperty("created_at")
-        private LocalDateTime createdAt;
-        @JsonProperty("refresh_token")
-        private String refreshToken;
-        @JsonProperty("user_id")
-        private Long userId;
     }
 
     @Getter
@@ -168,16 +153,4 @@ public class SampleData {
         private Long userId;
     }
 
-    @Getter
-    @NoArgsConstructor
-    public static class SampleAdReward {
-        @JsonProperty("ad_reward_id")
-        private Long adRewardId;
-        @JsonProperty("created_at")
-        private LocalDateTime createdAt;
-        @JsonProperty("used_at")
-        private LocalDateTime usedAt;
-        @JsonProperty("user_id")
-        private Long userId;
-    }
 }

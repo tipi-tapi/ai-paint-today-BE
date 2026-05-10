@@ -11,8 +11,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import tipitapi.drawmytoday.migration.dto.SampleData;
-import tipitapi.drawmytoday.migration.dto.SampleData.SampleAdReward;
-import tipitapi.drawmytoday.migration.dto.SampleData.SampleAuth;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleDiary;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleEmotion;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleImage;
@@ -88,20 +86,18 @@ public class BulkLoadJob implements CommandLineRunner {
 
         loadEmotions(data.getEmotions());
         loadUsers(data.getUsers());
-        loadAuths(data.getAuths());
         loadDiaries(filteredDiaries, emotionMap, imagesByDiary, promptMap);
         loadImages(filteredDiaries, imagesByDiary, promptMap);
         loadTickets(data.getTickets());
-        loadAdRewards(data.getAdRewards());
 
         var elapsed = Duration.between(globalStart, Instant.now()).getSeconds();
-        log.info("=== Bulk load complete in {}s. Loaded: {} emotions, {} users, {} auths, " +
-                 "{} diaries, {} images, {} tickets, {} adRewards ===",
+        log.info("=== Bulk load complete in {}s. Loaded: {} emotions, {} users, " +
+                 "{} diaries, {} images, {} tickets ===",
             elapsed,
-            data.getEmotions().size(), data.getUsers().size(), data.getAuths().size(),
+            data.getEmotions().size(), data.getUsers().size(),
             filteredDiaries.size(),
             imagesByDiary.values().stream().mapToLong(List::size).sum(),
-            data.getTickets().size(), data.getAdRewards().size());
+            data.getTickets().size());
 
         verifier.verify(data, imagesByDiary);
     }
@@ -141,18 +137,6 @@ public class BulkLoadJob implements CommandLineRunner {
             if (state.shouldCommit()) commitAndReset(state, "users");
         }
         flushAndLog(state, "users", items.size(), start);
-    }
-
-    private void loadAuths(List<SampleAuth> items) throws Exception {
-        var start = startCollection("auth", items.size());
-        var state = new BatchState("auth");
-        for (var item : items) {
-            var ref = firestore.collection("auth").document(String.valueOf(item.getAuthId()));
-            state.batch.set(ref, mapper.toAuthDoc(item));
-            state.advance(items.size());
-            if (state.shouldCommit()) commitAndReset(state, "auth");
-        }
-        flushAndLog(state, "auth", items.size(), start);
     }
 
     private void loadDiaries(
@@ -227,21 +211,6 @@ public class BulkLoadJob implements CommandLineRunner {
             if (state.shouldCommit()) commitAndReset(state, "users/tickets");
         }
         flushAndLog(state, "tickets", items.size(), start);
-    }
-
-    private void loadAdRewards(List<SampleAdReward> items) throws Exception {
-        var start = startCollection("adRewards (subcollection)", items.size());
-        var state = new BatchState("users/adRewards");
-        for (var item : items) {
-            var ref = firestore.collection("users")
-                .document(String.valueOf(item.getUserId()))
-                .collection("adRewards")
-                .document(String.valueOf(item.getAdRewardId()));
-            state.batch.set(ref, mapper.toAdRewardDoc(item));
-            state.advance(items.size());
-            if (state.shouldCommit()) commitAndReset(state, "users/adRewards");
-        }
-        flushAndLog(state, "adRewards", items.size(), start);
     }
 
     private Instant startCollection(String name, int total) {
