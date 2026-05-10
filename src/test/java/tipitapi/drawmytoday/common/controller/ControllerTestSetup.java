@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -13,7 +12,6 @@ import org.springframework.web.context.WebApplicationContext;
 import tipitapi.drawmytoday.common.validator.CustomCollectionValidator;
 
 @Import({CustomCollectionValidator.class})
-@MockBean(JpaMetamodelMappingContext.class)
 public abstract class ControllerTestSetup {
 
     protected static final long REQUEST_USER_ID = 1L;

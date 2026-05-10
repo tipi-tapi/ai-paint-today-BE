@@ -23,6 +23,8 @@ public class UserDocumentMapper {
     private static final String FIELD_DELETED_AT = "deletedAt";
     private static final String FIELD_CREATED_AT = "createdAt";
     private static final String FIELD_UPDATED_AT = "updatedAt";
+    private static final String FIELD_REFRESH_TOKEN = "refreshToken";
+    private static final String FIELD_APPLE_ID_TOKEN = "appleIdToken";
 
     public Map<String, Object> toDocument(User user) {
         var doc = new HashMap<String, Object>();
@@ -34,6 +36,8 @@ public class UserDocumentMapper {
         doc.put(FIELD_DELETED_AT, toTimestamp(user.getDeletedAt()));
         doc.put(FIELD_CREATED_AT, toTimestamp(user.getCreatedAt()));
         doc.put(FIELD_UPDATED_AT, toTimestamp(user.getUpdatedAt()));
+        doc.put(FIELD_REFRESH_TOKEN, user.getRefreshToken());
+        doc.put(FIELD_APPLE_ID_TOKEN, user.getAppleIdToken());
         return doc;
     }
 
@@ -48,7 +52,10 @@ public class UserDocumentMapper {
         LocalDateTime deletedAt = toLocalDateTime(snapshot.getTimestamp(FIELD_DELETED_AT));
         LocalDateTime createdAt = toLocalDateTime(snapshot.getTimestamp(FIELD_CREATED_AT));
         LocalDateTime updatedAt = toLocalDateTime(snapshot.getTimestamp(FIELD_UPDATED_AT));
-        return User.restore(userId, email, socialCode, userRole, lastDiaryDate, deletedAt, createdAt, updatedAt);
+        User user = User.restore(userId, email, socialCode, userRole, lastDiaryDate, deletedAt, createdAt, updatedAt);
+        user.setRefreshToken(snapshot.getString(FIELD_REFRESH_TOKEN));
+        user.setAppleIdToken(snapshot.getString(FIELD_APPLE_ID_TOKEN));
+        return user;
     }
 
     private Timestamp toTimestamp(LocalDateTime ldt) {

@@ -28,16 +28,15 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
-import tipitapi.drawmytoday.common.testdata.TestAuth;
 import tipitapi.drawmytoday.common.testdata.TestUser;
 import tipitapi.drawmytoday.domain.oauth.dto.AppleIdToken;
 import tipitapi.drawmytoday.domain.oauth.dto.OAuthAccessToken;
 import tipitapi.drawmytoday.domain.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.domain.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.domain.oauth.properties.AppleProperties;
-import tipitapi.drawmytoday.domain.oauth.repository.AuthRepository;
 import tipitapi.drawmytoday.domain.user.domain.SocialCode;
 import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.repository.UserRepository;
 import tipitapi.drawmytoday.domain.user.service.UserService;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
@@ -55,7 +54,7 @@ class AppleOAuthServiceTest {
     @Mock
     private ValidateUserService validateUserService;
     @Mock
-    private AuthRepository authRepository;
+    private UserRepository userRepository;
     @Mock
     private JwtTokenProvider jwtTokenProvider;
     @InjectMocks
@@ -89,15 +88,12 @@ class AppleOAuthServiceTest {
             @Test
             @DisplayName("accessToken 파싱을 실패할 경우 예외를 던진다.")
             void accessToken_parsing_fail_then_throw_exception() throws Exception {
-                // given
                 given(restTemplate.postForEntity(any(String.class), any(HttpEntity.class),
                     any(Class.class)))
                     .willReturn(ResponseEntity.of(Optional.of("invalid token")));
                 given(objectMapper.readValue(any(String.class), any(Class.class)))
                     .willThrow(JsonProcessingException.class);
 
-                // when
-                // then
                 assertThatThrownBy(() -> appleOAuthService.login(request, requestAppleLogin))
                     .isInstanceOf(BusinessException.class);
             }
@@ -105,7 +101,6 @@ class AppleOAuthServiceTest {
             @Test
             @DisplayName("AppleIdToken 파싱을 실패할 경우 예외를 던진다.")
             void appleIdToken_parsing_fail_then_throw_exception() throws Exception {
-                // given
                 given(restTemplate.postForEntity(any(String.class), any(HttpEntity.class),
                     any(Class.class)))
                     .willReturn(ResponseEntity.of(Optional.of("valid token")));
@@ -114,8 +109,6 @@ class AppleOAuthServiceTest {
                 given(objectMapper.readValue(any(byte[].class), any(Class.class)))
                     .willThrow(IOException.class);
 
-                // when
-                // then
                 assertThatThrownBy(() -> appleOAuthService.login(request, requestAppleLogin))
                     .isInstanceOf(BusinessException.class);
             }
@@ -142,15 +135,14 @@ class AppleOAuthServiceTest {
 
             @Test
             @DisplayName("유저가 존재하지 않을 경우 회원가입을 진행하고 토큰을 반환한다.")
-            void user_not_exist_then_register_and_return_token() throws Exception {
-                // given
+            void user_not_exist_then_register_and_return_token() {
                 User newUser = TestUser.createUserWithId(1L);
                 String accessToken = "accessToken";
                 String refreshToken = "refreshToken";
                 given(validateUserService.validateRegisteredUserByEmail(any(String.class),
                     eq(SocialCode.APPLE))).willReturn(null);
                 given(userService.registerUser(any(String.class), eq(SocialCode.APPLE),
-                    any(String.class))).willReturn(newUser);
+                    eq("refreshToken"), eq("idToken.idToken"))).willReturn(newUser);
                 given(jwtTokenProvider.createAccessToken(
                     eq(newUser.getUserId()), eq(newUser.getUserRole())))
                     .willReturn(accessToken);
@@ -158,21 +150,18 @@ class AppleOAuthServiceTest {
                     eq(newUser.getUserId()), eq(newUser.getUserRole())))
                     .willReturn(refreshToken);
 
-                // when
                 ResponseJwtToken responseJwtToken = appleOAuthService.login(request,
                     requestAppleLogin);
 
-                // then
                 verify(userService).registerUser(any(String.class), eq(SocialCode.APPLE),
-                    any(String.class));
+                    eq("refreshToken"), eq("idToken.idToken"));
                 assertThat(responseJwtToken.getAccessToken()).isEqualTo(accessToken);
                 assertThat(responseJwtToken.getRefreshToken()).isEqualTo(refreshToken);
             }
 
             @Test
-            @DisplayName("유저가 존재할 경우 회원가입을 진행하지 않고 토큰을 반환한다.")
+            @DisplayName("유저가 존재할 경우 회원가입을 진행하지 않고 refreshToken/idToken을 갱신한다.")
             void user_exist_then_no_register() {
-                // given
                 User user = TestUser.createUserWithId(1L);
                 String accessToken = "accessToken";
                 String refreshToken = "refreshToken";
@@ -183,13 +172,14 @@ class AppleOAuthServiceTest {
                 given(jwtTokenProvider.createRefreshToken(
                     eq(user.getUserId()), eq(user.getUserRole()))).willReturn(refreshToken);
 
-                // when
                 ResponseJwtToken responseJwtToken = appleOAuthService.login(
                     request, requestAppleLogin);
 
-                // then
                 verify(userService, never()).registerUser(any(String.class), eq(SocialCode.APPLE),
-                    any(String.class));
+                    any(), any());
+                verify(userRepository).save(eq(user));
+                assertThat(user.getRefreshToken()).isEqualTo("refreshToken");
+                assertThat(user.getAppleIdToken()).isEqualTo("idToken.idToken");
                 assertThat(responseJwtToken.getAccessToken()).isEqualTo(accessToken);
                 assertThat(responseJwtToken.getRefreshToken()).isEqualTo(refreshToken);
             }
@@ -201,66 +191,21 @@ class AppleOAuthServiceTest {
     class DeleteAccount_test {
 
         @Test
-        @DisplayName("유저 아이디에 해당하는 Auth가 없을 경우 회원탈퇴를 진행하지 않는다.")
-        void no_auth_then_no_delete() {
-            // given
-            User user = TestUser.createUser();
-            given(authRepository.findByUser(any(User.class))).willReturn(Optional.empty());
+        @DisplayName("OAuth 서버 호출 후 유저 삭제를 진행한다.")
+        void delete_user_after_oauth_call() {
+            User user = TestUser.createUserWithId(1L);
+            user.setRefreshToken("refresh-token");
+            given(appleProperties.getClientId()).willReturn("clientId");
+            given(appleProperties.getClientSecret()).willReturn("clientSecret");
+            given(appleProperties.getDeleteAccountUrl()).willReturn("deleteAccountUrl");
+            given(restTemplate.postForEntity(any(String.class), any(HttpEntity.class),
+                eq(String.class))).willReturn(ResponseEntity.ok(""));
 
-            // when
-            // then
-            assertThatThrownBy(() -> appleOAuthService.deleteAccount(user))
-                .isInstanceOf(BusinessException.class);
-            verify(restTemplate, never()).postForEntity(any(String.class), any(HttpEntity.class),
-                any(Class.class));
-            assertThat(user.getDeletedAt()).isNull();
-        }
+            appleOAuthService.deleteAccount(user);
 
-        @Nested
-        @DisplayName("유저 아이디에 해당하는 Auth가 있을 경우")
-        class Exist_auth {
-
-            @BeforeEach
-            void setUp() {
-                given(appleProperties.getClientId()).willReturn("clientId");
-                given(appleProperties.getClientSecret()).willReturn("clientSecret");
-                given(appleProperties.getDeleteAccountUrl()).willReturn("deleteAccountUrl");
-            }
-
-            @Test
-            @DisplayName("회원탈퇴를 진행한다.")
-            void exist_auth_then_delete_user() {
-                // given
-                User user = TestUser.createUser();
-                given(authRepository.findByUser(eq(user))).willReturn(Optional.of(
-                    TestAuth.createAuth(user)));
-                given(restTemplate.postForObject(any(String.class), any(HttpEntity.class),
-                    eq(String.class))).willReturn(null);
-
-                // when
-                appleOAuthService.deleteAccount(user);
-
-                // then
-                assertThat(user.getDeletedAt()).isNotNull();
-            }
-
-            @Test
-            @DisplayName("회원탈퇴 REST 요청이 실패할 경우 예외를 던진다.")
-            void rest_request_fail_then_throw_exception() {
-                // given
-                User user = TestUser.createUser();
-                given(authRepository.findByUser(eq(user))).willReturn(Optional.of(
-                    TestAuth.createAuth(user)));
-                given(restTemplate.postForObject(any(String.class), any(HttpEntity.class),
-                    eq(String.class))).willReturn(
-                    "{\"error\":\"invalid_token\",\"error_description\":\"Invalid Value\"}");
-
-                // when
-                // then
-                assertThatThrownBy(() -> appleOAuthService.deleteAccount(user))
-                    .isInstanceOf(BusinessException.class);
-                assertThat(user.getDeletedAt()).isNull();
-            }
+            verify(restTemplate).postForEntity(any(String.class), any(HttpEntity.class),
+                eq(String.class));
+            verify(userService).deleteUser(eq(user));
         }
     }
 }

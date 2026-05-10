@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static tipitapi.drawmytoday.common.testdata.TestUser.createUserWithId;
 
 import java.util.Optional;
@@ -99,6 +100,7 @@ public class ValidateTicketServiceTest {
                 validateTicketService.findAndUseTicket(user.getUserId());
 
                 assertThat(ticket.getUsedAt()).isNotNull();
+                verify(ticketRepository).save(ticket);
             }
         }
     }

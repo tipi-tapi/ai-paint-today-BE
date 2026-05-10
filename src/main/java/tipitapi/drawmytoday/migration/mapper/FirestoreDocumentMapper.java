@@ -4,8 +4,6 @@ import com.google.cloud.Timestamp;
 import org.springframework.context.annotation.Profile;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import tipitapi.drawmytoday.migration.dto.SampleData.SampleAdReward;
-import tipitapi.drawmytoday.migration.dto.SampleData.SampleAuth;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleDiary;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleEmotion;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleImage;
@@ -36,15 +34,6 @@ public class FirestoreDocumentMapper {
         doc.put("createdAt", toTimestamp(u.getCreatedAt()));
         doc.put("updatedAt", toTimestamp(u.getUpdatedAt()));
         doc.put("deletedAt", toTimestamp(u.getDeletedAt()));
-        return doc;
-    }
-
-    public Map<String, Object> toAuthDoc(SampleAuth a) {
-        var doc = new HashMap<String, Object>();
-        doc.put("authId", a.getAuthId());
-        doc.put("userId", a.getUserId());
-        doc.put("refreshToken", a.getRefreshToken());
-        doc.put("createdAt", toTimestamp(a.getCreatedAt()));
         return doc;
     }
 
@@ -108,14 +97,6 @@ public class FirestoreDocumentMapper {
         doc.put("ticketType", t.getTicketType());
         doc.put("usedAt", toTimestamp(t.getUsedAt()));
         doc.put("createdAt", toTimestamp(t.getCreatedAt()));
-        return doc;
-    }
-
-    public Map<String, Object> toAdRewardDoc(SampleAdReward ar) {
-        var doc = new HashMap<String, Object>();
-        doc.put("adRewardId", ar.getAdRewardId());
-        doc.put("usedAt", toTimestamp(ar.getUsedAt()));
-        doc.put("createdAt", toTimestamp(ar.getCreatedAt()));
         return doc;
     }
 

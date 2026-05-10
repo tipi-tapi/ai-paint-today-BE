@@ -1,7 +1,6 @@
 package tipitapi.drawmytoday.domain.oauth.service;
 
 import static tipitapi.drawmytoday.common.exception.ErrorCode.APPLE_EMAIL_NOT_FOUND;
-import static tipitapi.drawmytoday.common.exception.ErrorCode.OAUTH_SERVER_FAILED;
 import static tipitapi.drawmytoday.common.exception.ErrorCode.PARSING_ERROR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,19 +21,16 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.exception.BusinessException;
-import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.utils.HeaderUtils;
-import tipitapi.drawmytoday.domain.oauth.domain.Auth;
 import tipitapi.drawmytoday.domain.oauth.dto.AppleIdToken;
 import tipitapi.drawmytoday.domain.oauth.dto.OAuthAccessToken;
 import tipitapi.drawmytoday.domain.oauth.dto.RequestAppleLogin;
 import tipitapi.drawmytoday.domain.oauth.dto.ResponseJwtToken;
-import tipitapi.drawmytoday.domain.oauth.exception.OAuthNotFoundException;
 import tipitapi.drawmytoday.domain.oauth.properties.AppleProperties;
-import tipitapi.drawmytoday.domain.oauth.repository.AuthRepository;
 import tipitapi.drawmytoday.domain.user.domain.SocialCode;
 import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.repository.UserRepository;
 import tipitapi.drawmytoday.domain.user.service.UserService;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
@@ -50,7 +45,7 @@ public class AppleOAuthService {
     private final ObjectMapper objectMapper;
     private final ValidateUserService validateUserService;
     private final UserService userService;
-    private final AuthRepository authRepository;
+    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
@@ -67,12 +62,20 @@ public class AppleOAuthService {
 
         if (user == null) {
             user = userService.registerUser(
-                appleIdToken.getEmail(), SocialCode.APPLE, oAuthAccessToken.getRefreshToken());
+                appleIdToken.getEmail(), SocialCode.APPLE,
+                oAuthAccessToken.getRefreshToken(), requestAppleLogin.getIdToken());
         } else {
+            boolean dirty = false;
             if (StringUtils.hasText(oAuthAccessToken.getRefreshToken())) {
-                Auth auth = authRepository.findByUser(user)
-                    .orElseThrow(() -> new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR));
-                auth.setRefreshToken(oAuthAccessToken.getRefreshToken());
+                user.setRefreshToken(oAuthAccessToken.getRefreshToken());
+                dirty = true;
+            }
+            if (StringUtils.hasText(requestAppleLogin.getIdToken())) {
+                user.setAppleIdToken(requestAppleLogin.getIdToken());
+                dirty = true;
+            }
+            if (dirty) {
+                userRepository.save(user);
             }
         }
 
@@ -86,15 +89,13 @@ public class AppleOAuthService {
 
     @Transactional
     public void deleteAccount(User user) {
-        Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("client_id", properties.getClientId());
         body.add("client_secret", properties.getClientSecret());
-        body.add("token", auth.getRefreshToken());
+        body.add("token", user.getRefreshToken());
         body.add("token_type_hint", "refresh_token");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);

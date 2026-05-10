@@ -1,7 +1,9 @@
 package tipitapi.drawmytoday.domain.diary.repository;
 
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -122,18 +124,33 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     @Override
     public List<Diary> findAllByUserUserIdAndDiaryDateBetween(Long userId, LocalDateTime startMonth,
         LocalDateTime endMonth) {
-        return findLiveDiaries().stream()
-            .filter(diary -> diary.getUser() != null && userId.equals(diary.getUser().getUserId()))
-            .filter(diary -> isBetween(diary.getDiaryDate(), startMonth, endMonth))
-            .sorted(Comparator.comparing(Diary::getDiaryDate, Comparator.nullsLast(Comparator.naturalOrder())))
+        return findUserDiarySnapshotsInRange(userId, startMonth, endMonth).stream()
+            .map(diaryMapper::fromDocument)
             .collect(Collectors.toList());
     }
 
     @Override
     public Optional<Diary> findFirstByUserUserIdOrderByCreatedAtDesc(Long userId) {
-        return findLiveDiaries().stream()
-            .filter(diary -> diary.getUser() != null && userId.equals(diary.getUser().getUserId()))
-            .max(Comparator.comparing(Diary::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())));
+        try {
+            return firestore.collection(DIARIES_COLLECTION)
+                .whereEqualTo(DiaryDocumentMapper.FIELD_USER_ID, userId)
+                .orderBy(DiaryDocumentMapper.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                .limit(20)
+                .get()
+                .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .getDocuments()
+                .stream()
+                .filter(this::isLiveDiary)
+                .findFirst()
+                .map(diaryMapper::fromDocument);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
+        } catch (TimeoutException e) {
+            throw new BusinessException(ErrorCode.FIRESTORE_TIMEOUT, e);
+        } catch (ExecutionException e) {
+            throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
+        }
     }
 
     @Override
@@ -161,18 +178,14 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     @Override
     public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, LocalDateTime startMonth,
         LocalDateTime endMonth) {
-        return findLiveDiarySnapshots().stream()
-            .filter(snapshot -> {
-                Long stored = snapshot.getLong(DiaryDocumentMapper.FIELD_USER_ID);
-                return userId.equals(stored);
+        return findUserDiarySnapshotsInRange(userId, startMonth, endMonth).stream()
+            .map(snapshot -> {
+                Diary diary = diaryMapper.fromDocument(snapshot);
+                return GetMonthlyDiariesResponse.of(
+                    Long.parseLong(snapshot.getId()),
+                    selectedImageUrl(snapshot),
+                    diary.getDiaryDate());
             })
-            .filter(snapshot -> isBetween(diaryMapper.fromDocument(snapshot).getDiaryDate(), startMonth, endMonth))
-            .sorted(Comparator.comparing(snapshot -> diaryMapper.fromDocument(snapshot).getDiaryDate(),
-                Comparator.nullsLast(Comparator.naturalOrder())))
-            .map(snapshot -> GetMonthlyDiariesResponse.of(
-                Long.parseLong(snapshot.getId()),
-                selectedImageUrl(snapshot),
-                diaryMapper.fromDocument(snapshot).getDiaryDate()))
             .collect(Collectors.toList());
     }
 
@@ -212,6 +225,37 @@ public class FirestoreDiaryRepository implements DiaryRepository {
 
     private List<Diary> findLiveDiaries() {
         return findLiveDiarySnapshots().stream().map(diaryMapper::fromDocument).collect(Collectors.toList());
+    }
+
+    private List<DocumentSnapshot> findUserDiarySnapshotsInRange(Long userId, LocalDateTime startMonth,
+        LocalDateTime endMonth) {
+        try {
+            Timestamp start = toTimestamp(startMonth);
+            Timestamp end = toTimestamp(endMonth);
+            return firestore.collection(DIARIES_COLLECTION)
+                .whereEqualTo(DiaryDocumentMapper.FIELD_USER_ID, userId)
+                .whereGreaterThanOrEqualTo(DiaryDocumentMapper.FIELD_DIARY_DATE, start)
+                .whereLessThanOrEqualTo(DiaryDocumentMapper.FIELD_DIARY_DATE, end)
+                .orderBy(DiaryDocumentMapper.FIELD_DIARY_DATE)
+                .get()
+                .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .getDocuments()
+                .stream()
+                .filter(this::isLiveDiary)
+                .collect(Collectors.toList());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
+        } catch (TimeoutException e) {
+            throw new BusinessException(ErrorCode.FIRESTORE_TIMEOUT, e);
+        } catch (ExecutionException e) {
+            throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
+        }
+    }
+
+    private Timestamp toTimestamp(LocalDateTime ldt) {
+        var instant = ldt.atZone(ZoneId.systemDefault()).toInstant();
+        return Timestamp.ofTimeSecondsAndNanos(instant.getEpochSecond(), instant.getNano());
     }
 
     private List<DocumentSnapshot> findLiveDiarySnapshots() {

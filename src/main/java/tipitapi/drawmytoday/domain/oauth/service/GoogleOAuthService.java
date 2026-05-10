@@ -1,6 +1,5 @@
 package tipitapi.drawmytoday.domain.oauth.service;
 
-import static tipitapi.drawmytoday.common.exception.ErrorCode.OAUTH_SERVER_FAILED;
 import static tipitapi.drawmytoday.common.exception.ErrorCode.PARSING_ERROR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,18 +18,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.exception.BusinessException;
-import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.utils.HeaderUtils;
-import tipitapi.drawmytoday.domain.oauth.domain.Auth;
 import tipitapi.drawmytoday.domain.oauth.dto.OAuthAccessToken;
 import tipitapi.drawmytoday.domain.oauth.dto.OAuthUserProfile;
 import tipitapi.drawmytoday.domain.oauth.dto.ResponseJwtToken;
-import tipitapi.drawmytoday.domain.oauth.exception.OAuthNotFoundException;
 import tipitapi.drawmytoday.domain.oauth.properties.GoogleProperties;
-import tipitapi.drawmytoday.domain.oauth.repository.AuthRepository;
 import tipitapi.drawmytoday.domain.user.domain.SocialCode;
 import tipitapi.drawmytoday.domain.user.domain.User;
+import tipitapi.drawmytoday.domain.user.repository.UserRepository;
 import tipitapi.drawmytoday.domain.user.service.UserService;
 import tipitapi.drawmytoday.domain.user.service.ValidateUserService;
 
@@ -44,7 +40,7 @@ public class GoogleOAuthService {
     private final ObjectMapper objectMapper;
     private final UserService userService;
     private final ValidateUserService validateUserService;
-    private final AuthRepository authRepository;
+    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
 
@@ -59,13 +55,10 @@ public class GoogleOAuthService {
 
         if (user == null) {
             user = userService.registerUser(
-                oAuthUserProfile.getEmail(), SocialCode.GOOGLE, accessToken.getRefreshToken());
-        } else {
-            if (StringUtils.hasText(accessToken.getRefreshToken())) {
-                Auth auth = authRepository.findByUser(user)
-                    .orElseThrow(() -> new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR));
-                auth.setRefreshToken(accessToken.getRefreshToken());
-            }
+                oAuthUserProfile.getEmail(), SocialCode.GOOGLE, accessToken.getRefreshToken(), null);
+        } else if (StringUtils.hasText(accessToken.getRefreshToken())) {
+            user.setRefreshToken(accessToken.getRefreshToken());
+            userRepository.save(user);
         }
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
@@ -84,12 +77,10 @@ public class GoogleOAuthService {
      */
     @Transactional
     public void deleteAccount(User user) {
-        Auth auth = authRepository.findByUser(user).orElseThrow(OAuthNotFoundException::new);
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("token", auth.getRefreshToken());
+        body.add("token", user.getRefreshToken());
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 

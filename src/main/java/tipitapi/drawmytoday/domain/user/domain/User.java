@@ -27,6 +27,10 @@ public class User extends BaseEntityWithUpdate {
 
     private LocalDateTime deletedAt;
 
+    private String refreshToken;
+
+    private String appleIdToken;
+
     @Builder
     private User(String email, SocialCode socialCode) {
         this.email = email;
@@ -59,6 +63,14 @@ public class User extends BaseEntityWithUpdate {
 
     public void setLastDiaryDate(LocalDateTime date) {
         this.lastDiaryDate = date;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void setAppleIdToken(String appleIdToken) {
+        this.appleIdToken = appleIdToken;
     }
 
     public void deleteUser() {
