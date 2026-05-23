@@ -50,3 +50,4 @@ firestore-debug.log
 
 .omc
 .omx
+src/test/**

@@ -14,9 +14,9 @@ public class GetDiaryExistByDateResponse {
     private final boolean exist;
 
     @Schema(description = "일기 아이디", requiredMode = RequiredMode.NOT_REQUIRED)
-    private final Long diaryId;
+    private final String diaryId;
 
-    public static GetDiaryExistByDateResponse ofExist(Long diaryId) {
+    public static GetDiaryExistByDateResponse ofExist(String diaryId) {
         return new GetDiaryExistByDateResponse(true, diaryId);
     }
 

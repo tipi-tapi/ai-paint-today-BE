@@ -44,7 +44,7 @@ public class DiaryService {
     private final ValidateDiaryService validateDiaryService;
     private final ValidateTicketService validateTicketService;
 
-    public GetDiaryResponse getDiary(Long userId, Long diaryId) {
+    public GetDiaryResponse getDiary(String userId, String diaryId) {
         User user = validateUserService.validateUserById(userId);
 
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
@@ -73,7 +73,7 @@ public class DiaryService {
     }
 
     @Transactional
-    public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, int year, int month) {
+    public List<GetMonthlyDiariesResponse> getMonthlyDiaries(String userId, int year, int month) {
         validateUserService.validateUserById(userId);
         LocalDateTime startMonth = DateUtils.getStartDate(year, month);
         LocalDateTime endMonth = DateUtils.getEndDate(year, month);
@@ -85,7 +85,7 @@ public class DiaryService {
         return monthlyDiaries;
     }
 
-    public GetDiaryExistByDateResponse getDiaryExistByDate(Long userId, int year, int month,
+    public GetDiaryExistByDateResponse getDiaryExistByDate(String userId, int year, int month,
         int day) {
         User user = validateUserService.validateUserById(userId);
         LocalDate date = DateUtils.getDate(year, month, day);
@@ -99,7 +99,7 @@ public class DiaryService {
         }
     }
 
-    public GetLastCreationResponse getLastCreation(Long userId) {
+    public GetLastCreationResponse getLastCreation(String userId) {
         validateUserService.validateUserById(userId);
         return new GetLastCreationResponse(
             diaryRepository.findFirstByUserUserIdOrderByCreatedAtDesc(userId)
@@ -108,7 +108,7 @@ public class DiaryService {
     }
 
     @Transactional
-    public void updateDiaryNotes(Long userId, Long diaryId, String notes) {
+    public void updateDiaryNotes(String userId, String diaryId, String notes) {
         User user = validateUserService.validateUserById(userId);
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
 
@@ -117,14 +117,14 @@ public class DiaryService {
     }
 
     @Transactional
-    public void deleteDiary(Long userId, Long diaryId) {
+    public void deleteDiary(String userId, String diaryId) {
         User user = validateUserService.validateUserById(userId);
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
 
         diaryRepository.delete(diary);
     }
 
-    public GetDiaryLimitResponse getDrawLimit(Long userId) {
+    public GetDiaryLimitResponse getDrawLimit(String userId) {
         User user = validateUserService.validateUserById(userId);
 
         boolean available = false;

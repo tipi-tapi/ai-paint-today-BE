@@ -42,7 +42,7 @@ public class CreateDiaryService {
     private final PromptTextService promptTextService;
 
     @Transactional(noRollbackFor = {ImageGeneratorException.class})
-    public CreateDiaryResponse createDiary(Long userId, CreateDiaryRequest request)
+    public CreateDiaryResponse createDiary(String userId, CreateDiaryRequest request)
         throws ImageGeneratorException {
         LocalDate diaryDate = request.getDiaryDate();
         User user = validateUserService.validateUserById(userId);
@@ -70,7 +70,7 @@ public class CreateDiaryService {
     }
 
     @Transactional(noRollbackFor = {ImageGeneratorException.class})
-    public CreateDiaryResponse createTestDiary(Long userId, CreateTestDiaryRequest request)
+    public CreateDiaryResponse createTestDiary(String userId, CreateTestDiaryRequest request)
         throws ImageGeneratorException {
         LocalDate diaryDate = request.getDiaryDate();
         User user = validateUserService.validateAdminUserById(userId);
@@ -90,7 +90,7 @@ public class CreateDiaryService {
     }
 
     @Transactional(noRollbackFor = {ImageGeneratorException.class})
-    public void regenerateDiaryImage(Long userId, Long diaryId, String diaryNote)
+    public void regenerateDiaryImage(String userId, String diaryId, String diaryNote)
         throws ImageGeneratorException {
         User user = validateUserService.validateUserById(userId);
         Diary diary = validateDiaryService.validateDiaryById(diaryId, user);
@@ -132,7 +132,7 @@ public class CreateDiaryService {
 
     private void regenerateDiaryImageWithPreviousPrompt(Diary diary)
         throws ImageGeneratorException {
-        Long imageId = diary.getSelectedImage().getImageId();
+        String imageId = diary.getSelectedImage().getImageId();
         Prompt prompt = validatePromptService.validatePromptByImageId(imageId);
 
         byte[] image = stabilityImageService.generateImage(prompt);

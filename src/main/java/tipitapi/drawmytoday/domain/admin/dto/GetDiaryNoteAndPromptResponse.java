@@ -5,11 +5,11 @@ import lombok.Getter;
 @Getter
 public class GetDiaryNoteAndPromptResponse {
 
-    private final Long promptId;
+    private final String promptId;
     private String notes;
     private final String prompt;
 
-    public GetDiaryNoteAndPromptResponse(Long promptId, String notes, String prompt) {
+    public GetDiaryNoteAndPromptResponse(String promptId, String notes, String prompt) {
         this.promptId = promptId;
         this.notes = notes;
         this.prompt = prompt;

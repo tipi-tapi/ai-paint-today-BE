@@ -23,7 +23,7 @@ public class CreateDiaryRequest {
 
     @NotNull
     @Schema(description = "감정 ID")
-    private Long emotionId;
+    private String emotionId;
 
     @Schema(description = "일기 키워드(deprecated)", nullable = true)
     private String keyword;

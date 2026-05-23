@@ -14,7 +14,7 @@ public class ValidateEmotionService {
 
     private final EmotionRepository emotionRepository;
 
-    public Emotion validateEmotionById(Long emotionId) {
+    public Emotion validateEmotionById(String emotionId) {
         return emotionRepository.findById(emotionId).orElseThrow(EmotionNotFoundException::new);
     }
 }

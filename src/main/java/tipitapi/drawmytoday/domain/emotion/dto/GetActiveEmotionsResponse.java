@@ -14,7 +14,7 @@ import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 public class GetActiveEmotionsResponse {
 
     @Schema(description = "감정 ID", requiredMode = RequiredMode.REQUIRED)
-    private final Long id;
+    private final String id;
 
     @Schema(description = "감정 이름", requiredMode = RequiredMode.REQUIRED)
     private final String name;
@@ -25,7 +25,7 @@ public class GetActiveEmotionsResponse {
     @Schema(description = "감정 색깔 프롬프트값", requiredMode = RequiredMode.REQUIRED)
     private final String colorPrompt;
 
-    public static GetActiveEmotionsResponse of(Long id, String name, String color,
+    public static GetActiveEmotionsResponse of(String id, String name, String color,
         String colorPrompt) {
         return new GetActiveEmotionsResponse(id, name, color, colorPrompt);
     }

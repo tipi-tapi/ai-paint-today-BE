@@ -10,5 +10,5 @@ import lombok.RequiredArgsConstructor;
 public class CreateDiaryResponse {
 
     @Schema(description = "일기 ID")
-    private final Long id;
+    private final String id;
 }

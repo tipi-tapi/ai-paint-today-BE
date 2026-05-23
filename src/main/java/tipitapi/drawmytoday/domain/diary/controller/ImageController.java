@@ -60,7 +60,7 @@ public class ImageController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteImage(
         @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "일기 이미지 id", in = ParameterIn.PATH) @PathVariable("id") Long imageId
+        @Parameter(description = "일기 이미지 id", in = ParameterIn.PATH) @PathVariable("id") String imageId
     ) {
         imageService.deleteImage(tokenInfo.getUserId(), imageId);
         return ResponseEntity.noContent().build();
@@ -83,7 +83,7 @@ public class ImageController {
     @PostMapping("/{id}/review")
     public ResponseEntity<Void> reviewImage(
         @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "이미지 id", in = ParameterIn.PATH) @PathVariable("id") Long imageId,
+        @Parameter(description = "이미지 id", in = ParameterIn.PATH) @PathVariable("id") String imageId,
         @RequestBody @Valid ReviewDiaryRequest reviewDiaryRequest
     ) {
         imageService.reviewImage(tokenInfo.getUserId(), imageId, reviewDiaryRequest.getReview());
@@ -111,7 +111,7 @@ public class ImageController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> setSelectedImage(
         @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "이미지 ID", in = ParameterIn.PATH) @PathVariable("id") Long imageId
+        @Parameter(description = "이미지 ID", in = ParameterIn.PATH) @PathVariable("id") String imageId
     ) {
         imageService.setSelectedImage(tokenInfo.getUserId(), imageId);
         return ResponseEntity.noContent().build();

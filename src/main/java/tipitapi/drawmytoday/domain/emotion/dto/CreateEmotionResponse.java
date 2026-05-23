@@ -12,7 +12,7 @@ import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 public class CreateEmotionResponse {
 
     @Schema(description = "추가된 감정 ID", requiredMode = RequiredMode.REQUIRED)
-    private final Long id;
+    private final String id;
 
     @Schema(description = "추가된 감정 이름", requiredMode = RequiredMode.REQUIRED)
     private final String emotionName;

@@ -27,7 +27,7 @@ public class PromptService {
         return promptRepository.save(Prompt.create(promptText));
     }
 
-    public Optional<Prompt> getPromptByImageId(Long imageId) {
+    public Optional<Prompt> getPromptByImageId(String imageId) {
         return promptRepository.findByImageId(imageId);
     }
 

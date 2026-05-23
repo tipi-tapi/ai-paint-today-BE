@@ -19,7 +19,7 @@ import tipitapi.drawmytoday.domain.diary.domain.Diary;
 public class GetDiaryResponse {
 
     @Schema(description = "일기 아이디", requiredMode = RequiredMode.REQUIRED)
-    private final Long id;
+    private final String id;
 
     @Schema(description = "대표 이미지 URL", requiredMode = RequiredMode.REQUIRED)
     private final String imageUrl;

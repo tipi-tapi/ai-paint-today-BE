@@ -16,11 +16,11 @@ public class ValidateImageService {
 
     private final ImageRepository imageRepository;
 
-    public Image validateImageById(Long imageId) {
+    public Image validateImageById(String imageId) {
         return imageRepository.findImage(imageId).orElseThrow(ImageNotFoundException::new);
     }
 
-    public void validateImageOwner(Long imageId, User user) {
+    public void validateImageOwner(String imageId, User user) {
         imageRepository.findByImageIdAndDiaryUser(imageId, user)
             .orElseThrow(NotOwnerOfImageException::new);
     }

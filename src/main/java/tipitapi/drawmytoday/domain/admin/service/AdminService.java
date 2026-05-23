@@ -42,13 +42,13 @@ public class AdminService {
     private String gptChatCompletionsPrompt;
 
     @Transactional(readOnly = true)
-    public Page<GetDiaryAdminResponse> getDiaries(Long userId, int size, int page,
-        Direction direction, Long emotionId, boolean withTest) {
+    public Page<GetDiaryAdminResponse> getDiaries(String userId, int size, int page,
+        Direction direction, String emotionId, boolean withTest) {
         validateUserService.validateAdminUserById(userId);
         return adminDiaryService.getDiaries(size, page, direction, emotionId, withTest);
     }
 
-    public int addGptGeneratorContent(Long userId) {
+    public int addGptGeneratorContent(String userId) {
         validateUserService.validateAdminUserById(userId);
         List<GetDiaryNoteAndPromptResponse> responses = adminDiaryService.getDiaryNoteAndPrompt();
         ExecutorService executor = Executors.newFixedThreadPool(10);

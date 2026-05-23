@@ -15,16 +15,16 @@ public class ValidateTicketService {
 
     private final TicketRepository ticketRepository;
 
-    public Optional<Ticket> findValidTicket(Long userId) {
+    public Optional<Ticket> findValidTicket(String userId) {
         return ticketRepository.findValidTicket(userId);
     }
 
-    public void validateTicketExists(Long userId) {
+    public void validateTicketExists(String userId) {
         ticketRepository.findValidTicket(userId)
             .orElseThrow(ValidTicketNotExistsException::new);
     }
 
-    public void findAndUseTicket(Long userId) {
+    public void findAndUseTicket(String userId) {
         ticketRepository.useTicketAtomically(userId)
             .orElseThrow(ValidTicketNotExistsException::new);
     }

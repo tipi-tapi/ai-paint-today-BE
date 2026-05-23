@@ -16,7 +16,7 @@ public class ValidateUserService {
 
     private final UserRepository userRepository;
 
-    public User validateUserById(Long userId) {
+    public User validateUserById(String userId) {
         return userRepository.findByUserId(userId)
             .orElseThrow(UserNotFoundException::new);
     }
@@ -28,7 +28,7 @@ public class ValidateUserService {
             .orElse(null);
     }
 
-    public User validateAdminUserById(Long userId) {
+    public User validateAdminUserById(String userId) {
         User user = validateUserById(userId);
         if (user.isAdmin()) {
             return user;

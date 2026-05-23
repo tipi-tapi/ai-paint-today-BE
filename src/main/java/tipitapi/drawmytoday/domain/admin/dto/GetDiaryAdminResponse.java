@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 public class GetDiaryAdminResponse {
 
     @Schema(description = "일기 ID", requiredMode = RequiredMode.REQUIRED)
-    private final Long id;
+    private final String id;
 
     @Schema(description = "일기 프롬프트", requiredMode = RequiredMode.NOT_REQUIRED)
     private final String prompt;
@@ -40,7 +40,7 @@ public class GetDiaryAdminResponse {
     @Schema(description = "테스트 일기 여부", requiredMode = RequiredMode.REQUIRED)
     private final boolean isTest;
 
-    public GetDiaryAdminResponse(Long id, String imageURL, String prompt,
+    public GetDiaryAdminResponse(String id, String imageURL, String prompt,
         LocalDateTime createdAt, LocalDateTime imageCreatedAt, String review, boolean isTest) {
         this.id = id;
         this.imageURL = imageURL;

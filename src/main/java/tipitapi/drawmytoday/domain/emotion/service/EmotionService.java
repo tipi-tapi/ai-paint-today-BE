@@ -24,7 +24,7 @@ public class EmotionService {
 
 
     @Cacheable(CacheConst.ACTIVE_EMOTIONS)
-    public List<GetActiveEmotionsResponse> getActiveEmotions(Long userId) {
+    public List<GetActiveEmotionsResponse> getActiveEmotions(String userId) {
         validateUserService.validateUserById(userId);
         return GetActiveEmotionsResponse.buildWithEmotions(
             emotionRepository.findAllActiveEmotions());

@@ -18,14 +18,14 @@ public class ValidateDiaryService {
 
     private final DiaryRepository diaryRepository;
 
-    public Diary validateDiaryById(Long diaryId, User user) {
+    public Diary validateDiaryById(String diaryId, User user) {
         Diary diary = diaryRepository.findById(diaryId)
             .orElseThrow(DiaryNotFoundException::new);
         ownedByUser(diary, user);
         return diary;
     }
 
-    public void validateExistsByDate(Long userId, LocalDate diaryDate) {
+    public void validateExistsByDate(String userId, LocalDate diaryDate) {
         if (diaryRepository.getDiaryExistsByDiaryDate(userId, diaryDate).isPresent()) {
             throw new DiaryDateAlreadyExistsException();
         }

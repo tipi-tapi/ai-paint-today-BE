@@ -16,7 +16,7 @@ import lombok.Setter;
 public class GetMonthlyDiariesResponse {
 
     @Schema(description = "일기 아이디", requiredMode = RequiredMode.REQUIRED)
-    private final Long id;
+    private final String id;
 
     @Schema(description = "대표 이미지 URL", requiredMode = RequiredMode.REQUIRED)
     @Setter
@@ -28,13 +28,13 @@ public class GetMonthlyDiariesResponse {
     @Schema(description = "일기 날짜", requiredMode = RequiredMode.REQUIRED)
     private final LocalDateTime date;
 
-    public GetMonthlyDiariesResponse(Long id, String imageUrl, LocalDateTime date) {
+    public GetMonthlyDiariesResponse(String id, String imageUrl, LocalDateTime date) {
         this.id = id;
         this.imageUrl = imageUrl;
         this.date = date;
     }
 
-    public static GetMonthlyDiariesResponse of(Long diaryId, String imageUrl,
+    public static GetMonthlyDiariesResponse of(String diaryId, String imageUrl,
         LocalDateTime diaryDate) {
         return new GetMonthlyDiariesResponse(diaryId, imageUrl, diaryDate);
     }

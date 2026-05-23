@@ -42,7 +42,7 @@ public class DevelopController {
     @Operation(summary = "테스트용 JWT 발급", description = "userId로 JWT access token을 발급합니다. (dev/local 전용)")
     @ApiResponse(responseCode = "200", description = "토큰 발급 성공")
     @GetMapping("/token")
-    public String getTestToken(@RequestParam Long userId) {
+    public String getTestToken(@RequestParam String userId) {
         return jwtTokenProvider.createAccessToken(userId, UserRole.USER);
     }
 

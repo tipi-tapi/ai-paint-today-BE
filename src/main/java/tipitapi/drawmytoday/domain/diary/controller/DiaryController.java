@@ -47,7 +47,7 @@ public class DiaryController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<SuccessResponse<GetDiaryResponse>> getDiary(
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") String diaryId,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         return SuccessResponse.of(
@@ -175,7 +175,7 @@ public class DiaryController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateDiaryNotes(
         @RequestBody @Valid UpdateDiaryRequest updateDiaryRequest,
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") String diaryId,
         @AuthUser @Parameter(hidden = true) JwtTokenInfo tokenInfo
     ) {
         diaryService.updateDiaryNotes(tokenInfo.getUserId(), diaryId,
@@ -200,7 +200,7 @@ public class DiaryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDiary(
         @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") String diaryId
     ) {
         diaryService.deleteDiary(tokenInfo.getUserId(), diaryId);
         return ResponseEntity.noContent().build();
@@ -239,7 +239,7 @@ public class DiaryController {
     @PostMapping("/{id}/regenerate")
     public ResponseEntity<Void> regenerateDiaryImage(
         @AuthUser JwtTokenInfo tokenInfo,
-        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") Long diaryId,
+        @Parameter(description = "일기 id", in = ParameterIn.PATH) @PathVariable("id") String diaryId,
         @RequestBody(required = false) RegenerateDiaryRequest request
     ) throws ImageGeneratorException {
         String diary = request == null ? "" : request.getDiary();

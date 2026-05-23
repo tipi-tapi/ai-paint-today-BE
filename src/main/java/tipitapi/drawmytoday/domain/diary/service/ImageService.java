@@ -36,7 +36,7 @@ public class ImageService {
         return imageRepository.findLatestByDiary(diary.getDiaryId());
     }
 
-    public Optional<Image> getOneLatestImage(Long diaryId) {
+    public Optional<Image> getOneLatestImage(String diaryId) {
         return imageRepository.findRecentByDiary(diaryId);
     }
 
@@ -50,14 +50,14 @@ public class ImageService {
 
     public Image uploadAndCreateImage(Diary diary, Prompt prompt, byte[] dallEImage,
         boolean isSelected) {
-        String imagePath = String.format(profile + "/post/%d/%s_%d.webp", diary.getDiaryId(),
+        String imagePath = String.format(profile + "/post/%s/%s_%d.webp", diary.getDiaryId(),
             new Date().getTime(), 1);
         r2Service.uploadImage(dallEImage, imagePath);
         return createImage(diary, prompt, imagePath, isSelected);
     }
 
     @Transactional
-    public void unSelectAllImage(Long diaryId) {
+    public void unSelectAllImage(String diaryId) {
         imageRepository.findByDiary(diaryId)
             .forEach(image -> {
                 image.setSelected(false);
@@ -66,7 +66,7 @@ public class ImageService {
     }
 
     @Transactional
-    public void deleteImage(Long userId, Long imageId) {
+    public void deleteImage(String userId, String imageId) {
         User user = validateUserService.validateUserById(userId);
         Image image = validateImage(imageId, user);
 
@@ -74,7 +74,7 @@ public class ImageService {
     }
 
     @Transactional
-    public void reviewImage(Long userId, Long imageId, String review) {
+    public void reviewImage(String userId, String imageId, String review) {
         User user = validateUserService.validateUserById(userId);
         Image image = validateImageService.validateImageById(imageId);
         validateImageService.validateImageOwner(imageId, user);
@@ -84,7 +84,7 @@ public class ImageService {
     }
 
     @Transactional
-    public void setSelectedImage(Long userId, Long imageId) {
+    public void setSelectedImage(String userId, String imageId) {
         User user = validateUserService.validateUserById(userId);
         Image image = validateImageService.validateImageById(imageId);
         Diary diary = validateDiaryService.validateDiaryById(image.getDiary().getDiaryId(), user);
@@ -94,7 +94,7 @@ public class ImageService {
         imageRepository.save(image);
     }
 
-    private Image validateImage(Long imageId, User user) {
+    private Image validateImage(String imageId, User user) {
         Image image = imageRepository.findImage(imageId).orElseThrow(ImageNotFoundException::new);
         if (image.isSelected()) {
             throw new SelectedImageDeletionDeniedException();

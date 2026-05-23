@@ -20,7 +20,7 @@ public class OAuthService {
     private final ValidateUserService validateUserService;
 
     @Transactional
-    public void deleteAccount(Long userId) {
+    public void deleteAccount(String userId) {
         User user = validateUserService.validateUserById(userId);
         if (user.getSocialCode() == SocialCode.GOOGLE) {
             googleOAuthService.deleteAccount(user);

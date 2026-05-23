@@ -16,7 +16,7 @@ public class AdRewardService {
     private final TicketService ticketService;
 
     @Transactional
-    public void createTicket(Long userId) {
+    public void createTicket(String userId) {
         User user = validateUserService.validateUserById(userId);
         ticketService.createTicketByAdReward(user);
     }

@@ -27,7 +27,7 @@ public class CreateTestDiaryRequest {
 
     @NotNull
     @Schema(description = "감정 ID")
-    private Long emotionId;
+    private String emotionId;
 
     @Size(max = 6010)
     @Schema(description = "일기 내용", nullable = true)

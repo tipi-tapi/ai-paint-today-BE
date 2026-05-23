@@ -14,7 +14,7 @@ public class ValidatePromptService {
 
     private final PromptRepository promptRepository;
 
-    public Prompt validatePromptByImageId(Long imageId) {
+    public Prompt validatePromptByImageId(String imageId) {
         return promptRepository.findByImageId(imageId)
             .orElseThrow(PromptNotFoundException::new);
     }
