@@ -42,7 +42,7 @@ public class UserDocumentMapper {
     }
 
     public User fromDocument(DocumentSnapshot snapshot) {
-        Long userId = Long.parseLong(snapshot.getId());
+        String userId = snapshot.getId();
         String email = snapshot.getString(FIELD_EMAIL);
         String socialCodeStr = snapshot.getString(FIELD_SOCIAL_CODE);
         SocialCode socialCode = socialCodeStr != null ? SocialCode.valueOf(socialCodeStr) : null;

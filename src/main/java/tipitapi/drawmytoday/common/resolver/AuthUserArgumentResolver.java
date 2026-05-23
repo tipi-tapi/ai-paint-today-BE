@@ -28,7 +28,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Claims claims = (Claims) authentication.getPrincipal();
-        Long userId = Long.parseLong((String) claims.get(JwtProperties.USER_ID));
+        String userId = (String) claims.get(JwtProperties.USER_ID);
         UserRole userRole = UserRole.valueOf((String) claims.get(JwtProperties.ROLE));
 
         return JwtTokenInfo.builder()

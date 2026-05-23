@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
+import tipitapi.drawmytoday.common.util.FirestoreIdUtils;
 import tipitapi.drawmytoday.domain.ticket.domain.Ticket;
 import tipitapi.drawmytoday.domain.ticket.domain.TicketType;
 import tipitapi.drawmytoday.domain.user.domain.User;
@@ -23,8 +24,8 @@ public class TicketDocumentMapper {
 
     public Map<String, Object> toDocument(Ticket ticket) {
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_TICKET_ID, ticket.getTicketId());
-        doc.put(FIELD_USER_ID, userId(ticket));
+        doc.put(FIELD_TICKET_ID, FirestoreIdUtils.toStorageType(ticket.getTicketId()));
+        doc.put(FIELD_USER_ID, FirestoreIdUtils.toStorageType(userId(ticket)));
         doc.put(FIELD_TICKET_TYPE, ticket.getTicketType() != null ? ticket.getTicketType().name() : null);
         doc.put(FIELD_USED_AT, toTimestamp(ticket.getUsedAt()));
         doc.put(FIELD_CREATED_AT, toTimestamp(ticket.getCreatedAt()));
@@ -32,7 +33,7 @@ public class TicketDocumentMapper {
     }
 
     public Ticket fromDocument(DocumentSnapshot snapshot) {
-        Long ticketId = toLong(snapshot.get(FIELD_TICKET_ID), snapshot.getId());
+        String ticketId = FirestoreIdUtils.toDomainId(snapshot.get(FIELD_TICKET_ID), snapshot.getId());
         User user = toUser(snapshot.get(FIELD_USER_ID));
         String ticketTypeStr = snapshot.getString(FIELD_TICKET_TYPE);
         TicketType ticketType = ticketTypeStr != null ? TicketType.valueOf(ticketTypeStr) : null;
@@ -41,7 +42,7 @@ public class TicketDocumentMapper {
         return Ticket.restore(ticketId, user, ticketType, usedAt, createdAt);
     }
 
-    private Long userId(Ticket ticket) {
+    private String userId(Ticket ticket) {
         if (ticket.getUser() == null) {
             return null;
         }
@@ -49,24 +50,15 @@ public class TicketDocumentMapper {
     }
 
     private User toUser(Object userId) {
-        Long parsed = toLong(userId, null);
+        String parsed = FirestoreIdUtils.toDomainId(userId, null);
         if (parsed == null) {
             return null;
         }
         return User.restore(parsed, null, null, null, null, null, null, null);
     }
 
-    private Long toLong(Object value, String fallback) {
-        if (value instanceof Number) {
-            return ((Number) value).longValue();
-        }
-        if (value instanceof String) {
-            return Long.parseLong((String) value);
-        }
-        if (fallback == null) {
-            return null;
-        }
-        return Long.parseLong(fallback);
+    static Object toFirestoreId(String id) {
+        return FirestoreIdUtils.toStorageType(id);
     }
 
     private Timestamp toTimestamp(LocalDateTime ldt) {

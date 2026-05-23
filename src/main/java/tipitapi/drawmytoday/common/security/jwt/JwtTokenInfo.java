@@ -7,11 +7,11 @@ import tipitapi.drawmytoday.domain.user.domain.UserRole;
 @Getter
 public class JwtTokenInfo {
 
-    private final Long userId;
+    private final String userId;
     private final UserRole userRole;
 
     @Builder
-    public JwtTokenInfo(Long userId, UserRole userRole) {
+    public JwtTokenInfo(String userId, UserRole userRole) {
         this.userId = userId;
         this.userRole = userRole;
     }

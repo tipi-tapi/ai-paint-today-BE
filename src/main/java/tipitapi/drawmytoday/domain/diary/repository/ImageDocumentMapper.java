@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
+import tipitapi.drawmytoday.common.util.FirestoreIdUtils;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.diary.domain.Image;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
@@ -28,7 +29,7 @@ public class ImageDocumentMapper {
 
     public Map<String, Object> toDocument(Image image) {
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_IMAGE_ID, image.getImageId());
+        doc.put(FIELD_IMAGE_ID, FirestoreIdUtils.toStorageType(image.getImageId()));
         doc.put(FIELD_IMAGE_URL, image.getImageUrl());
         doc.put(FIELD_IS_SELECTED, image.isSelected());
         doc.put(FIELD_REVIEW, image.getReview());
@@ -39,8 +40,8 @@ public class ImageDocumentMapper {
     }
 
     public Image fromDocument(DocumentSnapshot snapshot) {
-        Long diaryId = snapshot.getReference().getParent().getParent() != null
-            ? Long.parseLong(snapshot.getReference().getParent().getParent().getId())
+        String diaryId = snapshot.getReference().getParent().getParent() != null
+            ? snapshot.getReference().getParent().getParent().getId()
             : null;
         Diary diary = Diary.restore(diaryId, null, null, null, null, false, null, null, null,
             null, false, null, null);
@@ -48,7 +49,7 @@ public class ImageDocumentMapper {
     }
 
     public Image fromDocument(DocumentSnapshot snapshot, Diary diary) {
-        Long imageId = promptMapper.toLong(snapshot.get(FIELD_IMAGE_ID), snapshot.getId());
+        String imageId = FirestoreIdUtils.toDomainId(snapshot.get(FIELD_IMAGE_ID), snapshot.getId());
         Prompt prompt = promptMapper.fromEmbeddedDocument(snapshot.get(FIELD_PROMPT));
         String imageUrl = snapshot.getString(FIELD_IMAGE_URL);
         Boolean isSelected = snapshot.getBoolean(FIELD_IS_SELECTED);
@@ -64,11 +65,11 @@ public class ImageDocumentMapper {
             return null;
         }
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_IMAGE_ID, image.getImageId());
+        doc.put(FIELD_IMAGE_ID, FirestoreIdUtils.toStorageType(image.getImageId()));
         doc.put(FIELD_IMAGE_URL, image.getImageUrl());
         doc.put(FIELD_REVIEW, image.getReview());
         Prompt prompt = image.getPrompt();
-        doc.put(PromptDocumentMapper.FIELD_PROMPT_ID, prompt != null ? prompt.getPromptId() : null);
+        doc.put(PromptDocumentMapper.FIELD_PROMPT_ID, prompt != null ? FirestoreIdUtils.toStorageType(prompt.getPromptId()) : null);
         doc.put(PromptDocumentMapper.FIELD_PROMPT_TEXT,
             prompt != null ? prompt.getPromptText() : null);
         if (prompt != null && prompt.getPromptGeneratorResult() != null

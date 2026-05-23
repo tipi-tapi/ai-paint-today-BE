@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
+import tipitapi.drawmytoday.common.util.FirestoreIdUtils;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 import tipitapi.drawmytoday.domain.user.domain.User;
@@ -33,17 +34,17 @@ public class DiaryDocumentMapper {
     private static final String FIELD_COLOR_PROMPT = "colorPrompt";
     private static final String FIELD_EMOTION_PROMPT = "emotionPrompt";
 
-    private final PromptDocumentMapper timeMapper;
+    private final PromptDocumentMapper promptMapper;
 
-    public DiaryDocumentMapper(PromptDocumentMapper timeMapper) {
-        this.timeMapper = timeMapper;
+    public DiaryDocumentMapper(PromptDocumentMapper promptMapper) {
+        this.promptMapper = promptMapper;
     }
 
     public Map<String, Object> toDocument(Diary diary, Object selectedImage, long imageCount) {
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_DIARY_ID, diary.getDiaryId());
-        doc.put(FIELD_USER_ID, diary.getUser() != null ? diary.getUser().getUserId() : null);
-        doc.put(FIELD_DIARY_DATE, timeMapper.toTimestamp(diary.getDiaryDate()));
+        doc.put(FIELD_DIARY_ID, FirestoreIdUtils.toStorageType(diary.getDiaryId()));
+        doc.put(FIELD_USER_ID, diary.getUser() != null ? FirestoreIdUtils.toStorageType(diary.getUser().getUserId()) : null);
+        doc.put(FIELD_DIARY_DATE, promptMapper.toTimestamp(diary.getDiaryDate()));
         doc.put(FIELD_IS_AI, diary.isAi());
         doc.put(FIELD_NOTES, diary.getNotes());
         doc.put(FIELD_TITLE, diary.getTitle());
@@ -52,20 +53,20 @@ public class DiaryDocumentMapper {
         doc.put(FIELD_EMOTION, toEmotionDocument(diary.getEmotion()));
         doc.put(FIELD_SELECTED_IMAGE, selectedImage);
         doc.put(FIELD_IMAGE_COUNT, imageCount);
-        doc.put(FIELD_CREATED_AT, timeMapper.toTimestamp(diary.getCreatedAt()));
-        doc.put(FIELD_UPDATED_AT, timeMapper.toTimestamp(diary.getUpdatedAt()));
-        doc.put(FIELD_DELETED_AT, timeMapper.toTimestamp(diary.getDeletedAt()));
+        doc.put(FIELD_CREATED_AT, promptMapper.toTimestamp(diary.getCreatedAt()));
+        doc.put(FIELD_UPDATED_AT, promptMapper.toTimestamp(diary.getUpdatedAt()));
+        doc.put(FIELD_DELETED_AT, promptMapper.toTimestamp(diary.getDeletedAt()));
         return doc;
     }
 
     public Diary fromDocument(DocumentSnapshot snapshot) {
-        Long diaryId = timeMapper.toLong(snapshot.get(FIELD_DIARY_ID), snapshot.getId());
+        String diaryId = FirestoreIdUtils.toDomainId(snapshot.get(FIELD_DIARY_ID), snapshot.getId());
         User user = toUser(snapshot.get(FIELD_USER_ID));
         Emotion emotion = toEmotion(snapshot.get(FIELD_EMOTION));
-        LocalDateTime diaryDate = timeMapper.toLocalDateTime(snapshot.get(FIELD_DIARY_DATE));
-        LocalDateTime createdAt = timeMapper.toLocalDateTime(snapshot.get(FIELD_CREATED_AT));
-        LocalDateTime updatedAt = timeMapper.toLocalDateTime(snapshot.get(FIELD_UPDATED_AT));
-        LocalDateTime deletedAt = timeMapper.toLocalDateTime(snapshot.get(FIELD_DELETED_AT));
+        LocalDateTime diaryDate = promptMapper.toLocalDateTime(snapshot.get(FIELD_DIARY_DATE));
+        LocalDateTime createdAt = promptMapper.toLocalDateTime(snapshot.get(FIELD_CREATED_AT));
+        LocalDateTime updatedAt = promptMapper.toLocalDateTime(snapshot.get(FIELD_UPDATED_AT));
+        LocalDateTime deletedAt = promptMapper.toLocalDateTime(snapshot.get(FIELD_DELETED_AT));
         return Diary.restore(
             diaryId,
             user,
@@ -88,7 +89,7 @@ public class DiaryDocumentMapper {
             return null;
         }
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_EMOTION_ID, emotion.getEmotionId());
+        doc.put(FIELD_EMOTION_ID, FirestoreIdUtils.toStorageType(emotion.getEmotionId()));
         doc.put(FIELD_NAME, emotion.getName());
         doc.put(FIELD_COLOR, emotion.getColor());
         doc.put(FIELD_COLOR_PROMPT, emotion.getColorPrompt());
@@ -101,23 +102,24 @@ public class DiaryDocumentMapper {
             return null;
         }
         Map<?, ?> doc = (Map<?, ?>) value;
-        Long emotionId = timeMapper.toLong(doc.get(FIELD_EMOTION_ID), null);
+        String emotionId = FirestoreIdUtils.toDomainId(doc.get(FIELD_EMOTION_ID), null);
         return Emotion.restore(
             emotionId,
-            timeMapper.toString(doc.get(FIELD_NAME)),
-            timeMapper.toString(doc.get(FIELD_COLOR)),
+            promptMapper.toString(doc.get(FIELD_NAME)),
+            promptMapper.toString(doc.get(FIELD_COLOR)),
             true,
-            timeMapper.toString(doc.get(FIELD_EMOTION_PROMPT)),
-            timeMapper.toString(doc.get(FIELD_COLOR_PROMPT)),
+            promptMapper.toString(doc.get(FIELD_EMOTION_PROMPT)),
+            promptMapper.toString(doc.get(FIELD_COLOR_PROMPT)),
             null
         );
     }
 
     private User toUser(Object userId) {
-        Long parsed = timeMapper.toLong(userId, null);
+        String parsed = FirestoreIdUtils.toDomainId(userId, null);
         if (parsed == null) {
             return null;
         }
         return User.restore(parsed, null, null, null, null, null, null, null);
     }
+
 }

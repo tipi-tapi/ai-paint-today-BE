@@ -56,14 +56,14 @@ public class JwtTokenProvider {
         this.objectMapper = new ObjectMapper();
     }
 
-    protected String createToken(Long userId, UserRole userRole, long tokenValid) {
+    protected String createToken(String userId, UserRole userRole, long tokenValid) {
 
         Map<String, Object> header = new HashMap<>();
         header.put("typ", "JWT");
 
         Claims claims = Jwts.claims();
 
-        claims.put(CLAIM_USER_ID, userId.toString());
+        claims.put(CLAIM_USER_ID, userId);
         claims.put(CLAIM_USER_ROLE, userRole);
 
         Date date = new Date();
@@ -77,11 +77,11 @@ public class JwtTokenProvider {
             .compact();
     }
 
-    public String createAccessToken(Long userId, UserRole userRole) {
+    public String createAccessToken(String userId, UserRole userRole) {
         return createToken(userId, userRole, ACCESS_TOKEN_EXPIRE_TIME);
     }
 
-    public String createRefreshToken(Long userId, UserRole userRole) {
+    public String createRefreshToken(String userId, UserRole userRole) {
         return createToken(userId, userRole, REFRESH_TOKEN_EXPIRE_TIME);
     }
 
@@ -97,7 +97,7 @@ public class JwtTokenProvider {
     public String createNewAccessTokenFromRefreshToken(String refreshToken) {
         Claims claims = parseClaims(refreshToken);
 
-        Long userId = Long.parseLong((String) claims.get(CLAIM_USER_ID));
+        String userId = (String) claims.get(CLAIM_USER_ID);
         UserRole role = UserRole.valueOf((String) claims.get(CLAIM_USER_ROLE));
         return createAccessToken(userId, role);
     }

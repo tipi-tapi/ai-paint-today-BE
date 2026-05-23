@@ -3,6 +3,7 @@ package tipitapi.drawmytoday.domain.emotion.repository;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentSnapshot;
 import org.springframework.stereotype.Component;
+import tipitapi.drawmytoday.common.util.FirestoreIdUtils;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ public class EmotionDocumentMapper {
     public Map<String, Object> toDocument(Emotion emotion) {
         var doc = new HashMap<String, Object>();
         if (emotion.getEmotionId() != null) {
-            doc.put(FIELD_EMOTION_ID, String.valueOf(emotion.getEmotionId()));
+            doc.put(FIELD_EMOTION_ID, FirestoreIdUtils.toStorageType(emotion.getEmotionId()));
         }
         doc.put(FIELD_NAME, emotion.getName());
         doc.put(FIELD_COLOR, emotion.getColor());
@@ -38,7 +39,7 @@ public class EmotionDocumentMapper {
     }
 
     public Emotion fromDocument(DocumentSnapshot snapshot) {
-        Long emotionId = Long.parseLong(snapshot.getId());
+        String emotionId = snapshot.getId();
         String name = snapshot.getString(FIELD_NAME);
         String color = snapshot.getString(FIELD_COLOR);
         String colorPrompt = snapshot.getString(FIELD_COLOR_PROMPT);

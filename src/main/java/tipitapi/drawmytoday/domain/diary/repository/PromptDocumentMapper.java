@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
+import tipitapi.drawmytoday.common.util.FirestoreIdUtils;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
 import tipitapi.drawmytoday.domain.diary.domain.PromptGeneratorResult;
 import tipitapi.drawmytoday.domain.diary.domain.PromptGeneratorType;
@@ -26,7 +27,7 @@ public class PromptDocumentMapper {
             return null;
         }
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_PROMPT_ID, prompt.getPromptId());
+        doc.put(FIELD_PROMPT_ID, FirestoreIdUtils.toStorageType(prompt.getPromptId()));
         doc.put(FIELD_PROMPT_TEXT, prompt.getPromptText());
         doc.put(FIELD_IS_SUCCESS, prompt.isSuccess());
         PromptGeneratorResult result = prompt.getPromptGeneratorResult();
@@ -45,7 +46,7 @@ public class PromptDocumentMapper {
             return null;
         }
         Map<?, ?> doc = (Map<?, ?>) value;
-        Long promptId = toLong(doc.get(FIELD_PROMPT_ID), null);
+        String promptId = FirestoreIdUtils.toDomainId(doc.get(FIELD_PROMPT_ID), null);
         String promptText = toString(doc.get(FIELD_PROMPT_TEXT));
         boolean isSuccess = Boolean.TRUE.equals(doc.get(FIELD_IS_SUCCESS));
         String type = toString(doc.get(FIELD_PROMPT_GENERATOR_TYPE));
@@ -83,16 +84,6 @@ public class PromptDocumentMapper {
                 .toLocalDateTime();
         }
         return null;
-    }
-
-    Long toLong(Object value, String fallback) {
-        if (value instanceof Number) {
-            return ((Number) value).longValue();
-        }
-        if (value instanceof String) {
-            return Long.parseLong((String) value);
-        }
-        return fallback != null ? Long.parseLong(fallback) : null;
     }
 
     String toString(Object value) {
