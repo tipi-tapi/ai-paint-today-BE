@@ -10,8 +10,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import tipitapi.drawmytoday.common.util.IdGenerator;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +37,10 @@ public class FirestoreTicketRepository implements TicketRepository {
     @Override
     public Ticket save(Ticket ticket) {
         try {
-            Long userId = requireUserId(ticket);
+            String userId = requireUserId(ticket);
             Ticket target = ticket.getTicketId() != null ? ticket : restoreNewTicket(ticket);
             ticketCollection(userId)
-                .document(String.valueOf(target.getTicketId()))
+                .document(target.getTicketId())
                 .set(mapper.toDocument(target))
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
             return target;
@@ -61,10 +61,10 @@ public class FirestoreTicketRepository implements TicketRepository {
             for (var partition : partition(tickets, BATCH_LIMIT)) {
                 WriteBatch batch = firestore.batch();
                 for (var ticket : partition) {
-                    Long userId = requireUserId(ticket);
+                    String userId = requireUserId(ticket);
                     Ticket target = ticket.getTicketId() != null ? ticket : restoreNewTicket(ticket);
                     batch.set(
-                        ticketCollection(userId).document(String.valueOf(target.getTicketId())),
+                        ticketCollection(userId).document(target.getTicketId()),
                         mapper.toDocument(target)
                     );
                     saved.add(target);
@@ -83,10 +83,10 @@ public class FirestoreTicketRepository implements TicketRepository {
     }
 
     @Override
-    public Optional<Ticket> findByTicketId(Long ticketId) {
+    public Optional<Ticket> findByTicketId(String ticketId) {
         try {
             var documents = firestore.collectionGroup(TICKETS_COLLECTION)
-                .whereEqualTo(TicketDocumentMapper.FIELD_TICKET_ID, ticketId)
+                .whereEqualTo(TicketDocumentMapper.FIELD_TICKET_ID, TicketDocumentMapper.toFirestoreId(ticketId))
                 .limit(1)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -103,7 +103,7 @@ public class FirestoreTicketRepository implements TicketRepository {
     }
 
     @Override
-    public List<Ticket> findAllByUserId(Long userId) {
+    public List<Ticket> findAllByUserId(String userId) {
         try {
             return ticketCollection(userId)
                 .get()
@@ -124,7 +124,7 @@ public class FirestoreTicketRepository implements TicketRepository {
     }
 
     @Override
-    public List<Ticket> findAllByUserIdAndUsedAtIsNull(Long userId) {
+    public List<Ticket> findAllByUserIdAndUsedAtIsNull(String userId) {
         try {
             return ticketCollection(userId)
                 .get()
@@ -146,12 +146,12 @@ public class FirestoreTicketRepository implements TicketRepository {
     }
 
     @Override
-    public Optional<Ticket> findValidTicket(Long userId) {
+    public Optional<Ticket> findValidTicket(String userId) {
         return findAllByUserIdAndUsedAtIsNull(userId).stream().findFirst();
     }
 
     @Override
-    public Optional<Ticket> useTicketAtomically(Long userId) {
+    public Optional<Ticket> useTicketAtomically(String userId) {
         try {
             var colRef = ticketCollection(userId);
             Ticket result = firestore.runTransaction(transaction -> {
@@ -185,13 +185,13 @@ public class FirestoreTicketRepository implements TicketRepository {
         }
     }
 
-    private com.google.cloud.firestore.CollectionReference ticketCollection(Long userId) {
+    private com.google.cloud.firestore.CollectionReference ticketCollection(String userId) {
         return firestore.collection(USERS_COLLECTION)
-            .document(String.valueOf(userId))
+            .document(userId)
             .collection(TICKETS_COLLECTION);
     }
 
-    private Long requireUserId(Ticket ticket) {
+    private String requireUserId(Ticket ticket) {
         if (ticket.getUser() == null || ticket.getUser().getUserId() == null) {
             throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR);
         }
@@ -208,8 +208,8 @@ public class FirestoreTicketRepository implements TicketRepository {
         );
     }
 
-    private Long generateTicketId() {
-        return System.currentTimeMillis() * 1000L + ThreadLocalRandom.current().nextInt(1000);
+    private String generateTicketId() {
+        return IdGenerator.generate();
     }
 
     private static <T> List<List<T>> partition(List<T> list, int size) {

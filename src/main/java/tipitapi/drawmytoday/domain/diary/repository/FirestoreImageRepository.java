@@ -8,8 +8,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import tipitapi.drawmytoday.common.util.FirestoreIdUtils;
+import tipitapi.drawmytoday.common.util.IdGenerator;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +39,9 @@ public class FirestoreImageRepository implements ImageRepository {
     @Override
     public Image save(Image image) {
         try {
-            Long diaryId = requireDiaryId(image);
+            String diaryId = requireDiaryId(image);
             Image target = restoreForSave(image);
-            var ref = imageCollection(diaryId).document(String.valueOf(target.getImageId()));
+            var ref = imageCollection(diaryId).document(target.getImageId());
             ref.set(imageMapper.toDocument(target)).get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
             syncDiaryImageSummary(diaryId, target.isSelected() ? target : null);
             return target;
@@ -57,9 +58,9 @@ public class FirestoreImageRepository implements ImageRepository {
     @Override
     public void delete(Image image) {
         try {
-            Long diaryId = requireDiaryId(image);
+            String diaryId = requireDiaryId(image);
             imageCollection(diaryId)
-                .document(String.valueOf(image.getImageId()))
+                .document(image.getImageId())
                 .set(java.util.Map.of(ImageDocumentMapper.FIELD_DELETED_AT,
                     promptMapper.toTimestamp(LocalDateTime.now())), SetOptions.merge())
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -75,17 +76,17 @@ public class FirestoreImageRepository implements ImageRepository {
     }
 
     @Override
-    public List<Image> findLatestByDiary(Long diaryId) {
+    public List<Image> findLatestByDiary(String diaryId) {
         return findByDiary(diaryId).stream()
             .sorted(Comparator.comparing(Image::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
             .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<Image> findImage(Long imageId) {
+    public Optional<Image> findImage(String imageId) {
         try {
             return firestore.collectionGroup(IMAGES_COLLECTION)
-                .whereEqualTo(ImageDocumentMapper.FIELD_IMAGE_ID, imageId)
+                .whereEqualTo(ImageDocumentMapper.FIELD_IMAGE_ID, FirestoreIdUtils.toStorageType(imageId))
                 .limit(1)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -105,12 +106,12 @@ public class FirestoreImageRepository implements ImageRepository {
     }
 
     @Override
-    public Long countImage(Long diaryId) {
+    public Long countImage(String diaryId) {
         return (long) findByDiary(diaryId).size();
     }
 
     @Override
-    public List<Image> findByDiary(Long diaryId) {
+    public List<Image> findByDiary(String diaryId) {
         try {
             Diary diary = Diary.restore(diaryId, null, null, null, null, false, null, null, null,
                 null, false, null, null);
@@ -133,7 +134,7 @@ public class FirestoreImageRepository implements ImageRepository {
     }
 
     @Override
-    public Optional<Image> findByImageIdAndDiaryUser(Long imageId, User user) {
+    public Optional<Image> findByImageIdAndDiaryUser(String imageId, User user) {
         return findImage(imageId)
             .filter(image -> image.getDiary() != null
                 && image.getDiary().getDiaryId() != null
@@ -141,11 +142,11 @@ public class FirestoreImageRepository implements ImageRepository {
     }
 
     @Override
-    public Optional<Image> findRecentByDiary(Long diaryId) {
+    public Optional<Image> findRecentByDiary(String diaryId) {
         return findLatestByDiary(diaryId).stream().findFirst();
     }
 
-    private void syncDiaryImageSummary(Long diaryId, Image selectedImage) throws InterruptedException, ExecutionException, TimeoutException {
+    private void syncDiaryImageSummary(String diaryId, Image selectedImage) throws InterruptedException, ExecutionException, TimeoutException {
         long count = imageCollection(diaryId)
             .get()
             .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -160,7 +161,7 @@ public class FirestoreImageRepository implements ImageRepository {
                 imageMapper.toSelectedImageDocument(selectedImage));
         }
         firestore.collection(DIARIES_COLLECTION)
-            .document(String.valueOf(diaryId))
+            .document(diaryId)
             .set(update, SetOptions.merge())
             .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
@@ -193,16 +194,17 @@ public class FirestoreImageRepository implements ImageRepository {
         );
     }
 
-    private boolean diaryOwnedBy(Long diaryId, User user) {
+    private boolean diaryOwnedBy(String diaryId, User user) {
         try {
             var diary = firestore.collection(DIARIES_COLLECTION)
-                .document(String.valueOf(diaryId))
+                .document(diaryId)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            return diary.exists()
-                && user != null
-                && user.getUserId() != null
-                && user.getUserId().equals(diary.getLong(DiaryDocumentMapper.FIELD_USER_ID));
+            if (!diary.exists() || user == null || user.getUserId() == null) {
+                return false;
+            }
+            String storedId = FirestoreIdUtils.toDomainId(diary.get(DiaryDocumentMapper.FIELD_USER_ID), null);
+            return user.getUserId().equals(storedId);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
@@ -213,13 +215,13 @@ public class FirestoreImageRepository implements ImageRepository {
         }
     }
 
-    private com.google.cloud.firestore.CollectionReference imageCollection(Long diaryId) {
+    private com.google.cloud.firestore.CollectionReference imageCollection(String diaryId) {
         return firestore.collection(DIARIES_COLLECTION)
-            .document(String.valueOf(diaryId))
+            .document(diaryId)
             .collection(IMAGES_COLLECTION);
     }
 
-    private Long requireDiaryId(Image image) {
+    private String requireDiaryId(Image image) {
         if (image.getDiary() == null || image.getDiary().getDiaryId() == null) {
             throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR);
         }
@@ -230,7 +232,7 @@ public class FirestoreImageRepository implements ImageRepository {
         return snapshot.exists() && snapshot.get(ImageDocumentMapper.FIELD_DELETED_AT) == null;
     }
 
-    private Long generateId() {
-        return System.currentTimeMillis() * 1000L + ThreadLocalRandom.current().nextInt(1000);
+    private String generateId() {
+        return IdGenerator.generate();
     }
 }

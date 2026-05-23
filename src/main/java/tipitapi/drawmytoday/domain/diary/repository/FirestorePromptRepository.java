@@ -6,8 +6,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import tipitapi.drawmytoday.common.util.FirestoreIdUtils;
+import tipitapi.drawmytoday.common.util.IdGenerator;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class FirestorePromptRepository implements PromptRepository {
         Prompt target = restoreForSave(prompt);
         try {
             var images = firestore.collectionGroup(IMAGES_COLLECTION)
-                .whereEqualTo("prompt.promptId", target.getPromptId())
+                .whereEqualTo("prompt.promptId", FirestoreIdUtils.toStorageType(target.getPromptId()))
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .getDocuments();
@@ -64,20 +65,20 @@ public class FirestorePromptRepository implements PromptRepository {
     }
 
     @Override
-    public Optional<Prompt> findById(Long promptId) {
+    public Optional<Prompt> findById(String promptId) {
         return findPromptByField("prompt.promptId", promptId);
     }
 
     @Override
-    public Optional<Prompt> findByImageId(Long imageId) {
+    public Optional<Prompt> findByImageId(String imageId) {
         return findPromptByField(ImageDocumentMapper.FIELD_IMAGE_ID, imageId);
     }
 
     @Override
-    public List<Prompt> findAllByDiaryDiaryIdAndIsSuccessTrue(Long diaryId) {
+    public List<Prompt> findAllByDiaryDiaryIdAndIsSuccessTrue(String diaryId) {
         try {
             return firestore.collection("diaries")
-                .document(String.valueOf(diaryId))
+                .document(diaryId)
                 .collection(IMAGES_COLLECTION)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -97,10 +98,10 @@ public class FirestorePromptRepository implements PromptRepository {
         }
     }
 
-    private Optional<Prompt> findPromptByField(String field, Long value) {
+    private Optional<Prompt> findPromptByField(String field, String value) {
         try {
             return firestore.collectionGroup(IMAGES_COLLECTION)
-                .whereEqualTo(field, value)
+                .whereEqualTo(field, FirestoreIdUtils.toStorageType(value))
                 .limit(1)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -130,8 +131,8 @@ public class FirestorePromptRepository implements PromptRepository {
         );
     }
 
-    private Long generateId() {
-        return System.currentTimeMillis() * 1000L + ThreadLocalRandom.current().nextInt(1000);
+    private String generateId() {
+        return IdGenerator.generate();
     }
 
     private static class ImageDocumentMapperSnapshot {

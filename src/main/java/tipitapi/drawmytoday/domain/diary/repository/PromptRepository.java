@@ -8,9 +8,9 @@ public interface PromptRepository {
 
     Prompt save(Prompt prompt);
 
-    Optional<Prompt> findById(Long promptId);
+    Optional<Prompt> findById(String promptId);
 
-    Optional<Prompt> findByImageId(Long imageId);
+    Optional<Prompt> findByImageId(String imageId);
 
-    List<Prompt> findAllByDiaryDiaryIdAndIsSuccessTrue(Long diaryId);
+    List<Prompt> findAllByDiaryDiaryIdAndIsSuccessTrue(String diaryId);
 }

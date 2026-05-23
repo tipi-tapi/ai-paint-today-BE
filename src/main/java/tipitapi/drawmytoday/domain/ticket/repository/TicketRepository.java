@@ -10,13 +10,13 @@ public interface TicketRepository {
 
     List<Ticket> saveAll(List<Ticket> tickets);
 
-    Optional<Ticket> findByTicketId(Long ticketId);
+    Optional<Ticket> findByTicketId(String ticketId);
 
-    List<Ticket> findAllByUserId(Long userId);
+    List<Ticket> findAllByUserId(String userId);
 
-    List<Ticket> findAllByUserIdAndUsedAtIsNull(Long userId);
+    List<Ticket> findAllByUserIdAndUsedAtIsNull(String userId);
 
-    Optional<Ticket> findValidTicket(Long userId);
+    Optional<Ticket> findValidTicket(String userId);
 
-    Optional<Ticket> useTicketAtomically(Long userId);
+    Optional<Ticket> useTicketAtomically(String userId);
 }

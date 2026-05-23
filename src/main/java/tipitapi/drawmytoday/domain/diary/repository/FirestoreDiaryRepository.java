@@ -12,8 +12,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import tipitapi.drawmytoday.common.util.FirestoreIdUtils;
+import tipitapi.drawmytoday.common.util.IdGenerator;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,7 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     public Diary save(Diary diary) {
         try {
             Diary target = diary.getDiaryId() != null ? restoreForSave(diary) : restoreNewDiary(diary);
-            var ref = firestore.collection(DIARIES_COLLECTION).document(String.valueOf(target.getDiaryId()));
+            var ref = firestore.collection(DIARIES_COLLECTION).document(target.getDiaryId());
             var existing = ref.get().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
             Object selectedImage = existing.exists()
                 ? existing.get(DiaryDocumentMapper.FIELD_SELECTED_IMAGE)
@@ -75,10 +76,10 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     }
 
     @Override
-    public Optional<Diary> findById(Long diaryId) {
+    public Optional<Diary> findById(String diaryId) {
         try {
             var snapshot = firestore.collection(DIARIES_COLLECTION)
-                .document(String.valueOf(diaryId))
+                .document(diaryId)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!isLiveDiary(snapshot)) {
@@ -99,7 +100,7 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     public void delete(Diary diary) {
         try {
             firestore.collection(DIARIES_COLLECTION)
-                .document(String.valueOf(diary.getDiaryId()))
+                .document(diary.getDiaryId())
                 .update(DiaryDocumentMapper.FIELD_DELETED_AT,
                     diaryMapper.toDocument(Diary.restore(diary.getDiaryId(), diary.getUser(),
                         diary.getEmotion(), diary.getDiaryDate(), diary.getNotes(), diary.isAi(),
@@ -122,7 +123,7 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     }
 
     @Override
-    public List<Diary> findAllByUserUserIdAndDiaryDateBetween(Long userId, LocalDateTime startMonth,
+    public List<Diary> findAllByUserUserIdAndDiaryDateBetween(String userId, LocalDateTime startMonth,
         LocalDateTime endMonth) {
         return findUserDiarySnapshotsInRange(userId, startMonth, endMonth).stream()
             .map(diaryMapper::fromDocument)
@@ -130,10 +131,10 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     }
 
     @Override
-    public Optional<Diary> findFirstByUserUserIdOrderByCreatedAtDesc(Long userId) {
+    public Optional<Diary> findFirstByUserUserIdOrderByCreatedAtDesc(String userId) {
         try {
             return firestore.collection(DIARIES_COLLECTION)
-                .whereEqualTo(DiaryDocumentMapper.FIELD_USER_ID, userId)
+                .whereEqualTo(DiaryDocumentMapper.FIELD_USER_ID, FirestoreIdUtils.toStorageType(userId))
                 .orderBy(DiaryDocumentMapper.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                 .limit(20)
                 .get()
@@ -155,7 +156,7 @@ public class FirestoreDiaryRepository implements DiaryRepository {
 
     @Override
     public Page<GetDiaryAdminResponse> getDiariesForMonitorAsPage(Pageable pageable,
-        Direction direction, Long emotionId, boolean withTest) {
+        Direction direction, String emotionId, boolean withTest) {
         List<GetDiaryAdminResponse> all = findLiveDiarySnapshots().stream()
             .filter(snapshot -> withTest || !Boolean.TRUE.equals(snapshot.getBoolean(DiaryDocumentMapper.FIELD_IS_TEST)))
             .filter(snapshot -> emotionId == null || emotionId.equals(emotionId(snapshot)))
@@ -170,19 +171,19 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     }
 
     @Override
-    public Optional<Diary> getDiaryExistsByDiaryDate(Long userId, LocalDate diaryDate) {
+    public Optional<Diary> getDiaryExistsByDiaryDate(String userId, LocalDate diaryDate) {
         return findAllByUserUserIdAndDiaryDateBetween(userId, diaryDate.atStartOfDay(),
             diaryDate.atTime(23, 59, 59)).stream().findFirst();
     }
 
     @Override
-    public List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, LocalDateTime startMonth,
+    public List<GetMonthlyDiariesResponse> getMonthlyDiaries(String userId, LocalDateTime startMonth,
         LocalDateTime endMonth) {
         return findUserDiarySnapshotsInRange(userId, startMonth, endMonth).stream()
             .map(snapshot -> {
                 Diary diary = diaryMapper.fromDocument(snapshot);
                 return GetMonthlyDiariesResponse.of(
-                    Long.parseLong(snapshot.getId()),
+                    snapshot.getId(),
                     selectedImageUrl(snapshot),
                     diary.getDiaryDate());
             })
@@ -207,7 +208,7 @@ public class FirestoreDiaryRepository implements DiaryRepository {
                 .map(snapshot -> {
                     DocumentSnapshot diary = parentDiary(snapshot);
                     return new GetDiaryNoteAndPromptResponse(
-                        toLong(snapshot.get("prompt.promptId")),
+                        FirestoreIdUtils.toDomainId(snapshot.get("prompt.promptId"), null),
                         diary != null ? diary.getString(DiaryDocumentMapper.FIELD_NOTES) : null,
                         snapshot.getString("prompt.promptText")
                     );
@@ -227,13 +228,13 @@ public class FirestoreDiaryRepository implements DiaryRepository {
         return findLiveDiarySnapshots().stream().map(diaryMapper::fromDocument).collect(Collectors.toList());
     }
 
-    private List<DocumentSnapshot> findUserDiarySnapshotsInRange(Long userId, LocalDateTime startMonth,
+    private List<DocumentSnapshot> findUserDiarySnapshotsInRange(String userId, LocalDateTime startMonth,
         LocalDateTime endMonth) {
         try {
             Timestamp start = toTimestamp(startMonth);
             Timestamp end = toTimestamp(endMonth);
             return firestore.collection(DIARIES_COLLECTION)
-                .whereEqualTo(DiaryDocumentMapper.FIELD_USER_ID, userId)
+                .whereEqualTo(DiaryDocumentMapper.FIELD_USER_ID, FirestoreIdUtils.toStorageType(userId))
                 .whereGreaterThanOrEqualTo(DiaryDocumentMapper.FIELD_DIARY_DATE, start)
                 .whereLessThanOrEqualTo(DiaryDocumentMapper.FIELD_DIARY_DATE, end)
                 .orderBy(DiaryDocumentMapper.FIELD_DIARY_DATE)
@@ -286,7 +287,7 @@ public class FirestoreDiaryRepository implements DiaryRepository {
                 .stream()
                 .filter(this::isLiveImage)
                 .map(image -> new GetDiaryAdminResponse(
-                    Long.parseLong(diarySnapshot.getId()),
+                    diarySnapshot.getId(),
                     image.getString(ImageDocumentMapper.FIELD_IMAGE_URL),
                     image.getString("prompt.promptText"),
                     diaryMapper.fromDocument(diarySnapshot).getCreatedAt(),
@@ -358,10 +359,10 @@ public class FirestoreDiaryRepository implements DiaryRepository {
         return null;
     }
 
-    private Long emotionId(DocumentSnapshot snapshot) {
+    private String emotionId(DocumentSnapshot snapshot) {
         Object emotion = snapshot.get(DiaryDocumentMapper.FIELD_EMOTION);
         if (emotion instanceof java.util.Map) {
-            return toLong(((java.util.Map<?, ?>) emotion).get("emotionId"));
+            return FirestoreIdUtils.toDomainId(((java.util.Map<?, ?>) emotion).get("emotionId"), null);
         }
         return null;
     }
@@ -370,16 +371,6 @@ public class FirestoreDiaryRepository implements DiaryRepository {
         Comparator<LocalDateTime> comparator = Comparator.nullsLast(Comparator.naturalOrder());
         int result = comparator.compare(left.getImageCreatedAt(), right.getImageCreatedAt());
         return direction.isAscending() ? result : -result;
-    }
-
-    private Long toLong(Object value) {
-        if (value instanceof Number) {
-            return ((Number) value).longValue();
-        }
-        if (value instanceof String) {
-            return Long.parseLong((String) value);
-        }
-        return null;
     }
 
     private LocalDateTime toLocalDateTime(Object value) {
@@ -399,7 +390,7 @@ public class FirestoreDiaryRepository implements DiaryRepository {
         return null;
     }
 
-    private Long generateId() {
-        return System.currentTimeMillis() * 1000L + ThreadLocalRandom.current().nextInt(1000);
+    private String generateId() {
+        return IdGenerator.generate();
     }
 }

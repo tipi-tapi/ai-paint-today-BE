@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import tipitapi.drawmytoday.common.util.IdGenerator;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,12 +31,11 @@ public class FirestoreUserRepository implements UserRepository {
     public User save(User user) {
         try {
             if (user.getUserId() != null) {
-                var ref = firestore.collection(COLLECTION).document(String.valueOf(user.getUserId()));
+                var ref = firestore.collection(COLLECTION).document(user.getUserId());
                 ref.set(mapper.toDocument(user)).get();
                 return user;
             }
-            // 신규 생성: 충돌 없는 ID 생성 + createdAt/updatedAt 스탬프
-            Long userId = generateUniqueUserId();
+            String userId = IdGenerator.generate();
             var now = LocalDateTime.now();
             var newUser = User.restore(
                 userId,
@@ -48,7 +47,7 @@ public class FirestoreUserRepository implements UserRepository {
                 now,
                 now
             );
-            firestore.collection(COLLECTION).document(String.valueOf(userId))
+            firestore.collection(COLLECTION).document(userId)
                 .set(mapper.toDocument(newUser)).get();
             return newUser;
         } catch (InterruptedException e) {
@@ -60,10 +59,10 @@ public class FirestoreUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByUserId(Long userId) {
+    public Optional<User> findByUserId(String userId) {
         try {
             var snapshot = firestore.collection(COLLECTION)
-                .document(String.valueOf(userId))
+                .document(userId)
                 .get().get();
             if (!snapshot.exists() || snapshot.getTimestamp(FIELD_DELETED_AT) != null) {
                 return Optional.empty();
@@ -98,14 +97,4 @@ public class FirestoreUserRepository implements UserRepository {
         }
     }
 
-    private Long generateUniqueUserId() throws InterruptedException, ExecutionException {
-        int maxAttempts = 5;
-        for (int i = 0; i < maxAttempts; i++) {
-            Long candidateId = System.currentTimeMillis() * 1000L + ThreadLocalRandom.current().nextInt(1000);
-            if (!firestore.collection(COLLECTION).document(String.valueOf(candidateId)).get().get().exists()) {
-                return candidateId;
-            }
-        }
-        throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR);
-    }
 }

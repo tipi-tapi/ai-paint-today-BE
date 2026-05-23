@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
+import tipitapi.drawmytoday.common.util.IdGenerator;
 
 @Repository
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class FirestoreEmotionRepository implements EmotionRepository {
                 .get().get().getDocuments()
                 .stream()
                 .map(mapper::fromDocument)
-                .sorted(Comparator.comparing(Emotion::getEmotionId))
+                .sorted(Comparator.comparing(Emotion::getEmotionId, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
@@ -44,10 +44,10 @@ public class FirestoreEmotionRepository implements EmotionRepository {
     }
 
     @Override
-    public Optional<Emotion> findById(Long emotionId) {
+    public Optional<Emotion> findById(String emotionId) {
         try {
             var snapshot = firestore.collection(COLLECTION)
-                .document(String.valueOf(emotionId))
+                .document(emotionId)
                 .get().get();
             return snapshot.exists() ? Optional.of(mapper.fromDocument(snapshot)) : Optional.empty();
         } catch (Exception e) {
@@ -59,14 +59,14 @@ public class FirestoreEmotionRepository implements EmotionRepository {
     public Emotion save(Emotion emotion) {
         try {
             String docId = emotion.getEmotionId() != null
-                ? String.valueOf(emotion.getEmotionId())
-                : UUID.randomUUID().toString();
+                ? emotion.getEmotionId()
+                : IdGenerator.generate();
+            Emotion target = Emotion.restore(docId, emotion.getName(), emotion.getColor(),
+                emotion.isActive(), emotion.getEmotionPrompt(), emotion.getColorPrompt(),
+                emotion.getCreatedAt());
             firestore.collection(COLLECTION).document(docId)
-                .set(mapper.toDocument(emotion)).get();
-            if (emotion.getEmotionId() != null) {
-                return findById(emotion.getEmotionId()).orElse(emotion);
-            }
-            return emotion;
+                .set(mapper.toDocument(target)).get();
+            return target;
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
         }
@@ -79,8 +79,8 @@ public class FirestoreEmotionRepository implements EmotionRepository {
                 WriteBatch writeBatch = firestore.batch();
                 for (var emotion : batch) {
                     String docId = emotion.getEmotionId() != null
-                        ? String.valueOf(emotion.getEmotionId())
-                        : UUID.randomUUID().toString();
+                        ? emotion.getEmotionId()
+                        : IdGenerator.generate();
                     writeBatch.set(
                         firestore.collection(COLLECTION).document(docId),
                         mapper.toDocument(emotion));

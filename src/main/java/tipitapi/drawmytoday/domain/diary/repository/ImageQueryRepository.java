@@ -7,15 +7,15 @@ import tipitapi.drawmytoday.domain.user.domain.User;
 
 public interface ImageQueryRepository {
 
-    List<Image> findLatestByDiary(Long diaryId);
+    List<Image> findLatestByDiary(String diaryId);
 
-    Optional<Image> findImage(Long imageId);
+    Optional<Image> findImage(String imageId);
 
-    Long countImage(Long diaryId);
+    Long countImage(String diaryId);
 
-    List<Image> findByDiary(Long diaryId);
+    List<Image> findByDiary(String diaryId);
 
-    Optional<Image> findByImageIdAndDiaryUser(Long imageId, User user);
+    Optional<Image> findByImageIdAndDiaryUser(String imageId, User user);
 
-    Optional<Image> findRecentByDiary(Long diaryId);
+    Optional<Image> findRecentByDiary(String diaryId);
 }

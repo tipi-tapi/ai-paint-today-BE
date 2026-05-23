@@ -15,11 +15,11 @@ import tipitapi.drawmytoday.domain.diary.dto.GetMonthlyDiariesResponse;
 public interface DiaryQueryRepository {
 
     Page<GetDiaryAdminResponse> getDiariesForMonitorAsPage(Pageable pageable,
-        Direction direction, Long emotionId, boolean withTest);
+        Direction direction, String emotionId, boolean withTest);
 
-    Optional<Diary> getDiaryExistsByDiaryDate(Long userId, LocalDate diaryDate);
+    Optional<Diary> getDiaryExistsByDiaryDate(String userId, LocalDate diaryDate);
 
-    List<GetMonthlyDiariesResponse> getMonthlyDiaries(Long userId, LocalDateTime startMonth,
+    List<GetMonthlyDiariesResponse> getMonthlyDiaries(String userId, LocalDateTime startMonth,
         LocalDateTime endMonth);
 
     List<GetDiaryNoteAndPromptResponse> getDiaryNoteAndPrompt();

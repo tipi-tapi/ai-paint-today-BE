@@ -7,6 +7,6 @@ import java.util.Optional;
 public interface EmotionRepository {
     List<Emotion> findAllActiveEmotions();
     List<Emotion> saveAll(List<Emotion> emotions);
-    Optional<Emotion> findById(Long emotionId);
+    Optional<Emotion> findById(String emotionId);
     Emotion save(Emotion emotion);
 }

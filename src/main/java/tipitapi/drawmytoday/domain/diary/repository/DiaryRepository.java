@@ -11,14 +11,14 @@ public interface DiaryRepository extends DiaryQueryRepository {
 
     List<Diary> saveAll(List<Diary> diaries);
 
-    Optional<Diary> findById(Long diaryId);
+    Optional<Diary> findById(String diaryId);
 
     void delete(Diary diary);
 
     void flush();
 
-    List<Diary> findAllByUserUserIdAndDiaryDateBetween(Long userId, LocalDateTime startMonth,
+    List<Diary> findAllByUserUserIdAndDiaryDateBetween(String userId, LocalDateTime startMonth,
         LocalDateTime endMonth);
 
-    Optional<Diary> findFirstByUserUserIdOrderByCreatedAtDesc(Long userId);
+    Optional<Diary> findFirstByUserUserIdOrderByCreatedAtDesc(String userId);
 }
