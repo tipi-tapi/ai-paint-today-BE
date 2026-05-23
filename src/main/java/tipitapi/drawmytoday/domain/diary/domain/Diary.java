@@ -17,7 +17,7 @@ import tipitapi.drawmytoday.domain.user.domain.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Diary extends BaseEntityWithUpdate {
 
-    private Long diaryId;
+    private String diaryId;
 
     @NotNull
     private User user;
@@ -58,7 +58,7 @@ public class Diary extends BaseEntityWithUpdate {
         this.imageList = new ArrayList<>();
     }
 
-    private Diary(Long diaryId, User user, Emotion emotion, LocalDateTime diaryDate, String notes,
+    private Diary(String diaryId, User user, Emotion emotion, LocalDateTime diaryDate, String notes,
         boolean isAi, String title, String weather, List<Image> imageList,
         LocalDateTime deletedAt, boolean isTest, LocalDateTime createdAt,
         LocalDateTime updatedAt) {
@@ -99,7 +99,7 @@ public class Diary extends BaseEntityWithUpdate {
             .build();
     }
 
-    public static Diary restore(Long diaryId, User user, Emotion emotion, LocalDateTime diaryDate,
+    public static Diary restore(String diaryId, User user, Emotion emotion, LocalDateTime diaryDate,
         String notes, boolean isAi, String title, String weather, List<Image> imageList,
         LocalDateTime deletedAt, boolean isTest, LocalDateTime createdAt,
         LocalDateTime updatedAt) {

@@ -12,7 +12,7 @@ import tipitapi.drawmytoday.domain.user.domain.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Ticket extends BaseEntity {
 
-    private Long ticketId;
+    private String ticketId;
 
     @NotNull
     private User user;
@@ -27,7 +27,7 @@ public class Ticket extends BaseEntity {
         this.ticketType = type;
     }
 
-    private Ticket(Long ticketId, User user, TicketType ticketType, LocalDateTime usedAt, LocalDateTime createdAt) {
+    private Ticket(String ticketId, User user, TicketType ticketType, LocalDateTime usedAt, LocalDateTime createdAt) {
         super(createdAt);
         this.ticketId = ticketId;
         this.user = user;
@@ -39,7 +39,7 @@ public class Ticket extends BaseEntity {
         return new Ticket(user, type);
     }
 
-    public static Ticket restore(Long ticketId, User user, TicketType ticketType,
+    public static Ticket restore(String ticketId, User user, TicketType ticketType,
                                  LocalDateTime usedAt, LocalDateTime createdAt) {
         return new Ticket(ticketId, user, ticketType, usedAt, createdAt);
     }

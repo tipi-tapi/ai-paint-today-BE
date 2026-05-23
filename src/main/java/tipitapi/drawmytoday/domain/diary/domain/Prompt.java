@@ -10,7 +10,7 @@ import tipitapi.drawmytoday.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Prompt extends BaseEntity {
 
-    private Long promptId;
+    private String promptId;
 
     private PromptGeneratorResult promptGeneratorResult;
 
@@ -26,7 +26,7 @@ public class Prompt extends BaseEntity {
         this.isSuccess = false;
     }
 
-    private Prompt(Long promptId, PromptGeneratorResult promptGeneratorResult, String promptText,
+    private Prompt(String promptId, PromptGeneratorResult promptGeneratorResult, String promptText,
         boolean isSuccess, java.time.LocalDateTime createdAt) {
         super(createdAt);
         this.promptId = promptId;
@@ -43,7 +43,7 @@ public class Prompt extends BaseEntity {
         return new Prompt(PromptGeneratorResult.createNoUse(), promptText);
     }
 
-    public static Prompt restore(Long promptId, PromptGeneratorResult promptGeneratorResult,
+    public static Prompt restore(String promptId, PromptGeneratorResult promptGeneratorResult,
         String promptText, boolean isSuccess, java.time.LocalDateTime createdAt) {
         return new Prompt(promptId, promptGeneratorResult, promptText, isSuccess, createdAt);
     }

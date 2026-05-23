@@ -11,7 +11,7 @@ import tipitapi.drawmytoday.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Image extends BaseEntity {
 
-    private Long imageId;
+    private String imageId;
 
     @NotNull
     private Diary diary;
@@ -37,7 +37,7 @@ public class Image extends BaseEntity {
         this.isSelected = isSelected;
     }
 
-    private Image(Long imageId, Diary diary, Prompt prompt, String imageUrl, boolean isSelected,
+    private Image(String imageId, Diary diary, Prompt prompt, String imageUrl, boolean isSelected,
         String review, LocalDateTime deletedAt, LocalDateTime createdAt) {
         super(createdAt);
         this.imageId = imageId;
@@ -53,7 +53,7 @@ public class Image extends BaseEntity {
         return new Image(diary, prompt, imageUrl, isSelected);
     }
 
-    public static Image restore(Long imageId, Diary diary, Prompt prompt, String imageUrl,
+    public static Image restore(String imageId, Diary diary, Prompt prompt, String imageUrl,
         boolean isSelected, String review, LocalDateTime deletedAt, LocalDateTime createdAt) {
         return new Image(imageId, diary, prompt, imageUrl, isSelected, review, deletedAt,
             createdAt);

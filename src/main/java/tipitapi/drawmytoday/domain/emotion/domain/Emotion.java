@@ -12,7 +12,7 @@ import tipitapi.drawmytoday.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Emotion extends BaseEntity {
 
-    private Long emotionId;
+    private String emotionId;
 
     @NotNull
     private String name;
@@ -39,7 +39,7 @@ public class Emotion extends BaseEntity {
         this.colorPrompt = colorPrompt;
     }
 
-    private Emotion(Long emotionId, String name, String color, boolean isActive,
+    private Emotion(String emotionId, String name, String color, boolean isActive,
         String emotionPrompt, String colorPrompt, LocalDateTime createdAt) {
         super(createdAt);
         this.emotionId = emotionId;
@@ -50,7 +50,7 @@ public class Emotion extends BaseEntity {
         this.colorPrompt = colorPrompt;
     }
 
-    public static Emotion restore(Long emotionId, String name, String color,
+    public static Emotion restore(String emotionId, String name, String color,
         boolean isActive, String emotionPrompt, String colorPrompt, LocalDateTime createdAt) {
         return new Emotion(emotionId, name, color, isActive, emotionPrompt, colorPrompt, createdAt);
     }

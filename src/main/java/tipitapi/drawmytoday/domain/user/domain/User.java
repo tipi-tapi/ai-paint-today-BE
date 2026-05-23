@@ -13,7 +13,7 @@ import tipitapi.drawmytoday.common.entity.BaseEntityWithUpdate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntityWithUpdate {
 
-    private Long userId;
+    private String userId;
 
     @NotNull
     private String email;
@@ -38,7 +38,7 @@ public class User extends BaseEntityWithUpdate {
         this.userRole = UserRole.USER;
     }
 
-    private User(Long userId, String email, SocialCode socialCode, UserRole userRole,
+    private User(String userId, String email, SocialCode socialCode, UserRole userRole,
                  LocalDateTime lastDiaryDate, LocalDateTime deletedAt,
                  LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdAt, updatedAt);
@@ -50,7 +50,7 @@ public class User extends BaseEntityWithUpdate {
         this.deletedAt = deletedAt;
     }
 
-    public static User restore(Long userId, String email, SocialCode socialCode,
+    public static User restore(String userId, String email, SocialCode socialCode,
                                 UserRole userRole, LocalDateTime lastDiaryDate,
                                 LocalDateTime deletedAt, LocalDateTime createdAt,
                                 LocalDateTime updatedAt) {
