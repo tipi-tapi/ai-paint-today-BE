@@ -95,20 +95,11 @@ public class JwtTokenProvider {
     }
 
     public String createNewAccessTokenFromRefreshToken(String refreshToken) {
-//        Claims claims = parseClaims(refreshToken);
-//
-//        Long userId = Long.parseLong((String) claims.get(CLAIM_USER_ID));
-//        UserRole role = UserRole.valueOf((String) claims.get(CLAIM_USER_ROLE));
-//        return createAccessToken(userId, role);
-        String payload = new String(Base64.getUrlDecoder().decode(refreshToken.split("\\.")[1]));
-        try {
-            JsonNode jsonNode = objectMapper.readTree(payload);
-            Long userId = jsonNode.get(CLAIM_USER_ID).asLong();
-            UserRole role = UserRole.valueOf(jsonNode.get(CLAIM_USER_ROLE).asText());
-            return createAccessToken(userId, role);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        Claims claims = parseClaims(refreshToken);
+
+        Long userId = Long.parseLong((String) claims.get(CLAIM_USER_ID));
+        UserRole role = UserRole.valueOf((String) claims.get(CLAIM_USER_ROLE));
+        return createAccessToken(userId, role);
     }
 
     /**
