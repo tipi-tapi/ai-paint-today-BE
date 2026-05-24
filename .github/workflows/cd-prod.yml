@@ -1,0 +1,17 @@
+name: Deploy Prod
+
+on:
+    push:
+        branches: [ "main" ]
+    workflow_dispatch:
+
+jobs:
+    deploy:
+        uses: ./.github/workflows/_deploy.yml
+        with:
+            service: draw-my-today
+            database_id: draw-my-today-db
+            profile: production
+            environment: prod
+            image_tag: latest
+        secrets: inherit

@@ -1,18 +1,42 @@
-name: Deploy to Cloud Run
+name: Deploy to Cloud Run (reusable)
 
 on:
-    push:
-        branches: [ "develop" ]
+    workflow_call:
+        inputs:
+            service:
+                description: Cloud Run service name
+                required: true
+                type: string
+            database_id:
+                description: Firestore database ID
+                required: true
+                type: string
+            profile:
+                description: Spring profile
+                required: true
+                type: string
+            environment:
+                description: GitHub Environment name (protects secrets / approvals)
+                required: true
+                type: string
+            image_tag:
+                description: Extra image tag in addition to commit SHA (e.g. latest, dev)
+                required: false
+                type: string
+                default: latest
+        secrets:
+            GCP_PROJECT_ID:
+                required: true
+            GCP_SA_KEY:
+                required: true
 
 env:
     REGION: asia-northeast3
-    SERVICE: draw-my-today
-    IMAGE: asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/draw-my-today/app
 
 jobs:
     deploy:
         runs-on: ubuntu-latest
-        environment: prod
+        environment: ${{ inputs.environment }}
 
         permissions:
             contents: read
@@ -46,18 +70,18 @@ jobs:
             -   name: Configure Docker for Artifact Registry
                 run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
-            -   name: Build Docker image
+            -   name: Build & Push Docker image
                 run: |
-                    docker build -t ${{ env.IMAGE }}:${{ github.sha }} \
-                                 -t ${{ env.IMAGE }}:latest .
-
-            -   name: Push Docker image
-                run: |
-                    docker push ${{ env.IMAGE }}:${{ github.sha }}
-                    docker push ${{ env.IMAGE }}:latest
+                    IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/draw-my-today/app
+                    docker build -t $IMAGE:${{ github.sha }} \
+                                 -t $IMAGE:${{ inputs.image_tag }} .
+                    docker push $IMAGE:${{ github.sha }}
+                    docker push $IMAGE:${{ inputs.image_tag }}
 
             -   name: Deploy to Cloud Run
                 run: |
+                    IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/draw-my-today/app
+
                     SECRETS="KAKAO_API_KEY=KAKAO_API_KEY:latest"
                     SECRETS="${SECRETS},KARLO_API_URL=KARLO_API_URL:latest"
                     SECRETS="${SECRETS},NEGATIVE_PROMPT=NEGATIVE_PROMPT:latest"
@@ -91,12 +115,12 @@ jobs:
                     SECRETS="${SECRETS},GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT=GPT_CHAT_COMPLETIONS_REGENERATE_PROMPT:latest"
                     SECRETS="${SECRETS},STABILITY_API_KEY=STABILITY_API_KEY:latest"
 
-                    gcloud run deploy ${{ env.SERVICE }} \
-                        --image ${{ env.IMAGE }}:${{ github.sha }} \
+                    gcloud run deploy ${{ inputs.service }} \
+                        --image $IMAGE:${{ github.sha }} \
                         --region ${{ env.REGION }} \
                         --platform managed \
                         --allow-unauthenticated \
-                        --set-env-vars "PROFILE=develop,SERVER_PORT=8080,FIRESTORE_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},FIRESTORE_DATABASE_ID=draw-my-today-db" \
+                        --set-env-vars "PROFILE=${{ inputs.profile }},SERVER_PORT=8080,FIRESTORE_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},FIRESTORE_DATABASE_ID=${{ inputs.database_id }}" \
                         --set-secrets "${SECRETS}" \
                         --memory 512Mi \
                         --cpu 1 \

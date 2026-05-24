@@ -1,0 +1,17 @@
+name: Deploy Dev
+
+on:
+    push:
+        branches: [ "develop" ]
+    workflow_dispatch:
+
+jobs:
+    deploy:
+        uses: ./.github/workflows/_deploy.yml
+        with:
+            service: draw-my-today-dev
+            database_id: draw-my-today-db-dev
+            profile: develop
+            environment: dev
+            image_tag: dev
+        secrets: inherit
