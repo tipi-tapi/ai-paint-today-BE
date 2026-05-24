@@ -10,10 +10,10 @@ import tipitapi.drawmytoday.common.exception.ErrorCode;
 import tipitapi.drawmytoday.domain.emotion.domain.Emotion;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import tipitapi.drawmytoday.common.util.FirestoreIdUtils;
 import tipitapi.drawmytoday.common.util.IdGenerator;
 
 @Repository
@@ -36,7 +36,7 @@ public class FirestoreEmotionRepository implements EmotionRepository {
                 .get().get().getDocuments()
                 .stream()
                 .map(mapper::fromDocument)
-                .sorted(Comparator.comparing(Emotion::getEmotionId, Comparator.nullsLast(Comparator.naturalOrder())))
+                .sorted((a, b) -> FirestoreIdUtils.ID_COMPARATOR.compare(a.getEmotionId(), b.getEmotionId()))
                 .collect(Collectors.toList());
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);

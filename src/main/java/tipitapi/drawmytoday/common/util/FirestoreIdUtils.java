@@ -1,5 +1,7 @@
 package tipitapi.drawmytoday.common.util;
 
+import java.util.Comparator;
+
 public final class FirestoreIdUtils {
 
     private FirestoreIdUtils() {}
@@ -30,5 +32,30 @@ public final class FirestoreIdUtils {
             return (String) value;
         }
         return fallback;
+    }
+
+    /**
+     * Comparator that preserves legacy Long ordering for numeric IDs while still working with UUIDs.
+     * Numeric IDs sort before non-numeric IDs to keep legacy items in their original positions.
+     * Nulls sort last.
+     */
+    public static final Comparator<String> ID_COMPARATOR = (left, right) -> {
+        if (left == null && right == null) return 0;
+        if (left == null) return 1;
+        if (right == null) return -1;
+        Long leftNum = tryParseLong(left);
+        Long rightNum = tryParseLong(right);
+        if (leftNum != null && rightNum != null) return Long.compare(leftNum, rightNum);
+        if (leftNum != null) return -1;
+        if (rightNum != null) return 1;
+        return left.compareTo(right);
+    };
+
+    private static Long tryParseLong(String value) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }
