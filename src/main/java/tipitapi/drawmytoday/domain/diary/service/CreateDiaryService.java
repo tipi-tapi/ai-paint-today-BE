@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import tipitapi.drawmytoday.common.utils.Encryptor;
 import tipitapi.drawmytoday.domain.diary.domain.Diary;
+import tipitapi.drawmytoday.domain.diary.domain.Image;
 import tipitapi.drawmytoday.domain.diary.domain.Prompt;
+import tipitapi.drawmytoday.domain.diary.exception.ImageNotFoundException;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryRequest;
 import tipitapi.drawmytoday.domain.diary.dto.CreateDiaryResponse;
 import tipitapi.drawmytoday.domain.diary.dto.CreateTestDiaryRequest;
@@ -113,7 +115,7 @@ public class CreateDiaryService {
         Emotion emotion = validateEmotionService.validateEmotionById(
             diary.getEmotion().getEmotionId());
         Prompt prompt = validatePromptService.validatePromptByImageId(
-            diary.getSelectedImage().getImageId());
+            getSelectedImage(diary).getImageId());
 
         String promptGeneratorContent = prompt.getPromptGeneratorResult()
             .getPromptGeneratorContent();
@@ -132,13 +134,23 @@ public class CreateDiaryService {
 
     private void regenerateDiaryImageWithPreviousPrompt(Diary diary)
         throws ImageGeneratorException {
-        String imageId = diary.getSelectedImage().getImageId();
+        String imageId = getSelectedImage(diary).getImageId();
         Prompt prompt = validatePromptService.validatePromptByImageId(imageId);
 
         byte[] image = stabilityImageService.generateImage(prompt);
 
         imageService.unSelectAllImage(diary.getDiaryId());
         imageService.uploadAndCreateImage(diary, prompt, image, true);
+    }
+
+    private Image getSelectedImage(Diary diary) {
+        List<Image> images = imageService.getLatestImages(diary);
+        return images.stream()
+            .filter(Image::isSelected)
+            .findFirst()
+            .orElseGet(() -> images.stream()
+                .findFirst()
+                .orElseThrow(ImageNotFoundException::new));
     }
 
     private Diary saveDiary(String notes, User user, Emotion emotion, LocalDateTime diaryDate,

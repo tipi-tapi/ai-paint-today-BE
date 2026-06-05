@@ -1,6 +1,5 @@
 package tipitapi.drawmytoday.domain.diary.repository;
 
-import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
@@ -231,18 +230,19 @@ public class FirestoreDiaryRepository implements DiaryRepository {
     private List<DocumentSnapshot> findUserDiarySnapshotsInRange(String userId, LocalDateTime startMonth,
         LocalDateTime endMonth) {
         try {
-            Timestamp start = toTimestamp(startMonth);
-            Timestamp end = toTimestamp(endMonth);
             return firestore.collection(DIARIES_COLLECTION)
                 .whereEqualTo(DiaryDocumentMapper.FIELD_USER_ID, FirestoreIdUtils.toStorageType(userId))
-                .whereGreaterThanOrEqualTo(DiaryDocumentMapper.FIELD_DIARY_DATE, start)
-                .whereLessThanOrEqualTo(DiaryDocumentMapper.FIELD_DIARY_DATE, end)
-                .orderBy(DiaryDocumentMapper.FIELD_DIARY_DATE)
                 .get()
                 .get(TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .getDocuments()
                 .stream()
                 .filter(this::isLiveDiary)
+                .filter(snapshot -> isBetween(
+                    toLocalDateTime(snapshot.get(DiaryDocumentMapper.FIELD_DIARY_DATE)),
+                    startMonth, endMonth))
+                .sorted(Comparator.comparing(
+                    snapshot -> toLocalDateTime(snapshot.get(DiaryDocumentMapper.FIELD_DIARY_DATE)),
+                    Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -252,11 +252,6 @@ public class FirestoreDiaryRepository implements DiaryRepository {
         } catch (ExecutionException e) {
             throw new BusinessException(ErrorCode.FIRESTORE_IO_ERROR, e);
         }
-    }
-
-    private Timestamp toTimestamp(LocalDateTime ldt) {
-        var instant = ldt.atZone(ZoneId.systemDefault()).toInstant();
-        return Timestamp.ofTimeSecondsAndNanos(instant.getEpochSecond(), instant.getNano());
     }
 
     private List<DocumentSnapshot> findLiveDiarySnapshots() {
