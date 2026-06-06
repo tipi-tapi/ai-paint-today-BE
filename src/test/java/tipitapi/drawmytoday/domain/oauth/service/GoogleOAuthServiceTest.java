@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.Optional;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,15 +22,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.testdata.TestUser;
+import tipitapi.drawmytoday.domain.oauth.dto.GoogleIdToken;
 import tipitapi.drawmytoday.domain.oauth.dto.OAuthAccessToken;
-import tipitapi.drawmytoday.domain.oauth.dto.OAuthUserProfile;
 import tipitapi.drawmytoday.domain.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.domain.oauth.properties.GoogleProperties;
 import tipitapi.drawmytoday.domain.user.domain.SocialCode;
@@ -96,18 +96,14 @@ class GoogleOAuthServiceTest {
             }
 
             @Test
-            @DisplayName("유저 프로필을 파싱하는데 실패할 경우 오류를 반환한다.")
-            void user_profile_parsing_fail_then_return_error() throws Exception {
+            @DisplayName("idToken 파싱에 실패할 경우 오류를 반환한다.")
+            void idToken_parsing_fail_then_return_error() throws Exception {
                 given(restTemplate.postForEntity(any(String.class), any(HttpEntity.class),
                     any(Class.class))).willReturn(ResponseEntity.of(Optional.of("json body")));
                 given(objectMapper.readValue(any(String.class), eq(OAuthAccessToken.class)))
-                    .willReturn(new OAuthAccessToken());
-                given(googleProperties.getUserInfoUrl()).willReturn("userInfoUrl");
-                given(restTemplate.exchange(any(String.class), any(HttpMethod.class),
-                    any(HttpEntity.class), any(Class.class)))
-                    .willReturn(ResponseEntity.of(Optional.of("json body")));
-                given(objectMapper.readValue(any(String.class), eq(OAuthUserProfile.class)))
-                    .willThrow(JsonProcessingException.class);
+                    .willReturn(new OAuthAccessToken(null, 0, null, null, "idToken.idToken"));
+                given(objectMapper.readValue(any(byte[].class), any(Class.class)))
+                    .willThrow(IOException.class);
 
                 assertThatThrownBy(() -> googleOAuthService.login(request))
                     .isInstanceOf(BusinessException.class);
@@ -127,13 +123,11 @@ class GoogleOAuthServiceTest {
                 given(restTemplate.postForEntity(any(String.class), any(HttpEntity.class),
                     any(Class.class))).willReturn(ResponseEntity.of(Optional.of("json body")));
                 given(objectMapper.readValue(any(String.class), any(Class.class)))
-                    .willReturn(new OAuthAccessToken(null, 0, "refreshToken", null));
-                given(googleProperties.getUserInfoUrl()).willReturn("userInfoUrl");
-                given(restTemplate.exchange(any(String.class), any(HttpMethod.class),
-                    any(HttpEntity.class), any(Class.class)))
-                    .willReturn(ResponseEntity.of(Optional.of("json body")));
-                given(objectMapper.readValue(any(String.class), eq(OAuthUserProfile.class)))
-                    .willReturn(new OAuthUserProfile("email", "googleSub"));
+                    .willReturn(new OAuthAccessToken(null, 0, "refreshToken", null, "idToken.idToken"));
+                GoogleIdToken googleIdToken = new GoogleIdToken();
+                ReflectionTestUtils.setField(googleIdToken, "email", "email");
+                given(objectMapper.readValue(any(byte[].class), any(Class.class)))
+                    .willReturn(googleIdToken);
             }
 
             @Test
@@ -145,7 +139,7 @@ class GoogleOAuthServiceTest {
                 given(validateUserService.validateRegisteredUserByEmail(
                     any(String.class), eq(SocialCode.GOOGLE))).willReturn(null);
                 given(userService.registerUser(any(String.class), eq(SocialCode.GOOGLE),
-                    any(String.class), isNull(), any(String.class))).willReturn(newUser);
+                    any(String.class), any(String.class))).willReturn(newUser);
                 given(jwtTokenProvider.createAccessToken(
                     eq(newUser.getUserId()), eq(newUser.getUserRole())))
                     .willReturn(accessToken);
@@ -156,13 +150,13 @@ class GoogleOAuthServiceTest {
                 ResponseJwtToken responseJwtToken = googleOAuthService.login(request);
 
                 verify(userService).registerUser(any(String.class), eq(SocialCode.GOOGLE),
-                    any(String.class), isNull(), any(String.class));
+                    any(String.class), any(String.class));
                 assertThat(responseJwtToken.getAccessToken()).isEqualTo(accessToken);
                 assertThat(responseJwtToken.getRefreshToken()).isEqualTo(refreshToken);
             }
 
             @Test
-            @DisplayName("유저가 존재할 경우 회원가입을 진행하지 않고 refreshToken을 갱신한 뒤 토큰을 반환한다.")
+            @DisplayName("유저가 존재할 경우 회원가입을 진행하지 않고 refreshToken/idToken을 갱신한다.")
             void user_exist_then_no_register() {
                 User user = TestUser.createUserWithId(1L);
                 String accessToken = "accessToken";
@@ -180,9 +174,10 @@ class GoogleOAuthServiceTest {
                 ResponseJwtToken responseJwtToken = googleOAuthService.login(request);
 
                 verify(userService, never()).registerUser(any(String.class), eq(SocialCode.GOOGLE),
-                    any(String.class), any(), any());
+                    any(), any());
                 verify(userRepository).save(eq(user));
                 assertThat(user.getRefreshToken()).isEqualTo("refreshToken");
+                assertThat(user.getIdToken()).isEqualTo("idToken.idToken");
                 assertThat(responseJwtToken.getAccessToken()).isEqualTo(accessToken);
                 assertThat(responseJwtToken.getRefreshToken()).isEqualTo(refreshToken);
             }

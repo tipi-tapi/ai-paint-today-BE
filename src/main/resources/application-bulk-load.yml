@@ -44,7 +44,6 @@ oauth2:
     client-id: dummy
     client-secret: dummy
     token-url: http://localhost
-    user-info-url: http://localhost
     redirect-uri: http://localhost
     delete-account-url: http://localhost
   apple:

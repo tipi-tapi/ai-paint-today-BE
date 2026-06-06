@@ -71,6 +71,7 @@ public class BulkLoadJob implements CommandLineRunner {
                 "verification is skipped.");
         }
         var data = loadSampleData();
+        applyEmailFilter(data);
 
         // filteredDiaries must be built before imagesByDiary so we can exclude
         // images that belong to is_test diaries — avoiding false negatives in the verifier.
@@ -117,6 +118,39 @@ public class BulkLoadJob implements CommandLineRunner {
         }
         log.info("Loading sample data from: {}", file.getAbsolutePath());
         return objectMapper.readValue(file, SampleData.class);
+    }
+
+    /**
+     * 테스트 용도: BULK_LOAD_FILTER_EMAIL 이 설정되면 해당 email 사용자와
+     * 그 사용자가 작성한 diary 만 적재 대상으로 남긴다.
+     * images 는 run() 에서 diary id 기준으로 자동으로 좁혀지고, prompt 는
+     * image 에 비정규화되어 lookup 으로만 쓰이므로 별도 필터가 필요 없다.
+     * emotions 는 마스터 데이터라 전체 유지한다.
+     */
+    private void applyEmailFilter(SampleData data) {
+        var email = System.getenv("BULK_LOAD_FILTER_EMAIL");
+        if (email == null || email.isBlank()) {
+            return;
+        }
+
+        log.warn("EMAIL FILTER enabled: migrating only user='{}' and their diaries/prompts", email);
+
+        var targetUserIds = data.getUsers().stream()
+            .filter(u -> email.equals(u.getEmail()))
+            .filter(u -> u.getDeletedAt() == null)
+            .map(SampleUser::getUserId)
+            .collect(Collectors.toSet());
+
+        if (targetUserIds.isEmpty()) {
+            throw new IllegalArgumentException(
+                "BULK_LOAD_FILTER_EMAIL set but no user found with email: " + email);
+        }
+
+        data.getUsers().removeIf(u -> !targetUserIds.contains(u.getUserId()));
+        data.getDiaries().removeIf(d -> !targetUserIds.contains(d.getUserId()));
+
+        log.warn("EMAIL FILTER result: {} user(s), {} diaries retained",
+            data.getUsers().size(), data.getDiaries().size());
     }
 
     private void loadEmotions(List<SampleEmotion> items) throws Exception {

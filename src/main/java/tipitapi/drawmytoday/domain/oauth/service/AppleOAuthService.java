@@ -63,11 +63,11 @@ public class AppleOAuthService {
         if (user == null) {
             user = userService.registerUser(
                 appleIdToken.getEmail(), SocialCode.APPLE,
-                oAuthAccessToken.getRefreshToken(), requestAppleLogin.getIdToken(), null);
+                oAuthAccessToken.getRefreshToken(), requestAppleLogin.getIdToken());
         }
 
         user.setRefreshToken(oAuthAccessToken.getRefreshToken());
-        user.setAppleIdToken(requestAppleLogin.getIdToken());
+        user.setIdToken(requestAppleLogin.getIdToken());
         userRepository.save(user);
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),

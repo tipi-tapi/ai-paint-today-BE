@@ -29,9 +29,7 @@ public class User extends BaseEntityWithUpdate {
 
     private String refreshToken;
 
-    private String appleIdToken;
-
-    private String googleSub;
+    private String idToken;
 
     @Builder
     private User(String email, SocialCode socialCode) {
@@ -71,12 +69,8 @@ public class User extends BaseEntityWithUpdate {
         this.refreshToken = refreshToken;
     }
 
-    public void setAppleIdToken(String appleIdToken) {
-        this.appleIdToken = appleIdToken;
-    }
-
-    public void setGoogleSub(String googleSub) {
-        this.googleSub = googleSub;
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
     }
 
     public void deleteUser() {

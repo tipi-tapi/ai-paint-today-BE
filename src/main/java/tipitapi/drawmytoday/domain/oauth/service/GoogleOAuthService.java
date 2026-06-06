@@ -4,11 +4,12 @@ import static tipitapi.drawmytoday.common.exception.ErrorCode.PARSING_ERROR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Base64;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,8 @@ import org.springframework.web.client.RestTemplate;
 import tipitapi.drawmytoday.common.exception.BusinessException;
 import tipitapi.drawmytoday.common.security.jwt.JwtTokenProvider;
 import tipitapi.drawmytoday.common.utils.HeaderUtils;
+import tipitapi.drawmytoday.domain.oauth.dto.GoogleIdToken;
 import tipitapi.drawmytoday.domain.oauth.dto.OAuthAccessToken;
-import tipitapi.drawmytoday.domain.oauth.dto.OAuthUserProfile;
 import tipitapi.drawmytoday.domain.oauth.dto.ResponseJwtToken;
 import tipitapi.drawmytoday.domain.oauth.properties.GoogleProperties;
 import tipitapi.drawmytoday.domain.user.domain.SocialCode;
@@ -48,19 +49,19 @@ public class GoogleOAuthService {
     public ResponseJwtToken login(HttpServletRequest request) {
         OAuthAccessToken accessToken = getAccessToken(request);
 
-        OAuthUserProfile oAuthUserProfile = getUserProfile(accessToken);
+        GoogleIdToken googleIdToken = getGoogleIdToken(accessToken.getIdToken());
 
         User user = validateUserService.validateRegisteredUserByEmail(
-            oAuthUserProfile.getEmail(), SocialCode.GOOGLE);
+            googleIdToken.getEmail(), SocialCode.GOOGLE);
 
         if (user == null) {
             user = userService.registerUser(
-                oAuthUserProfile.getEmail(), SocialCode.GOOGLE, accessToken.getRefreshToken(),
-                null, oAuthUserProfile.getSub());
+                googleIdToken.getEmail(), SocialCode.GOOGLE, accessToken.getRefreshToken(),
+                accessToken.getIdToken());
         }
 
         user.setRefreshToken(accessToken.getRefreshToken());
-        user.setGoogleSub(oAuthUserProfile.getSub());
+        user.setIdToken(accessToken.getIdToken());
         userRepository.save(user);
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
@@ -122,20 +123,12 @@ public class GoogleOAuthService {
         }
     }
 
-    private OAuthUserProfile getUserProfile(OAuthAccessToken accessToken) {
-
-        String userInfoUrl = properties.getUserInfoUrl();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken.getAccessToken());
-        HttpEntity<?> httpEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<String> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET,
-            httpEntity, String.class);
-
+    private GoogleIdToken getGoogleIdToken(String idToken) {
+        String[] jwtParts = idToken.split("\\.");
+        byte[] bytes = Base64.getUrlDecoder().decode(jwtParts[1]);
         try {
-            return objectMapper.readValue(userInfoResponse.getBody(), OAuthUserProfile.class);
-        } catch (JsonProcessingException e) {
+            return objectMapper.readValue(bytes, GoogleIdToken.class);
+        } catch (IOException e) {
             throw new BusinessException(PARSING_ERROR, e);
         }
     }

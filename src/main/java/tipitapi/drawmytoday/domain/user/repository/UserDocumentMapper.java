@@ -24,8 +24,7 @@ public class UserDocumentMapper {
     private static final String FIELD_CREATED_AT = "createdAt";
     private static final String FIELD_UPDATED_AT = "updatedAt";
     private static final String FIELD_REFRESH_TOKEN = "refreshToken";
-    private static final String FIELD_APPLE_ID_TOKEN = "appleIdToken";
-    private static final String FIELD_GOOGLE_SUB = "googleSub";
+    private static final String FIELD_ID_TOKEN = "idToken";
 
     public Map<String, Object> toDocument(User user) {
         var doc = new HashMap<String, Object>();
@@ -38,8 +37,7 @@ public class UserDocumentMapper {
         doc.put(FIELD_CREATED_AT, toTimestamp(user.getCreatedAt()));
         doc.put(FIELD_UPDATED_AT, toTimestamp(user.getUpdatedAt()));
         doc.put(FIELD_REFRESH_TOKEN, user.getRefreshToken());
-        doc.put(FIELD_APPLE_ID_TOKEN, user.getAppleIdToken());
-        doc.put(FIELD_GOOGLE_SUB, user.getGoogleSub());
+        doc.put(FIELD_ID_TOKEN, user.getIdToken());
         return doc;
     }
 
@@ -56,8 +54,7 @@ public class UserDocumentMapper {
         LocalDateTime updatedAt = toLocalDateTime(snapshot.getTimestamp(FIELD_UPDATED_AT));
         User user = User.restore(userId, email, socialCode, userRole, lastDiaryDate, deletedAt, createdAt, updatedAt);
         user.setRefreshToken(snapshot.getString(FIELD_REFRESH_TOKEN));
-        user.setAppleIdToken(snapshot.getString(FIELD_APPLE_ID_TOKEN));
-        user.setGoogleSub(snapshot.getString(FIELD_GOOGLE_SUB));
+        user.setIdToken(snapshot.getString(FIELD_ID_TOKEN));
         return user;
     }
 

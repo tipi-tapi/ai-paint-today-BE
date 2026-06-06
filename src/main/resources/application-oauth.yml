@@ -3,7 +3,6 @@ oauth2:
         client-id: ${GOOGLE_CLIENT_ID}
         client-secret: ${GOOGLE_CLIENT_SECRET}
         token-url: ${GOOGLE_TOKEN_URL}
-        user-info-url: ${GOOGLE_USER_INFO_URL}
         redirect-uri: ${GOOGLE_REDIRECT_URI}
         delete-account-url: ${GOOGLE_DELETE_ACCOUNT_URL}
     apple:

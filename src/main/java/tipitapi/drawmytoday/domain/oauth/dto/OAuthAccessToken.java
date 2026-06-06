@@ -26,5 +26,6 @@ public class OAuthAccessToken {
     private int expiresIn;
     private String refreshToken;
     private String tokenType;
+    private String idToken;
 
 }

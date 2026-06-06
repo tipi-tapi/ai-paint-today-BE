@@ -126,7 +126,7 @@ class AppleOAuthServiceTest {
                 given(restTemplate.postForEntity(any(String.class), any(HttpEntity.class),
                     any(Class.class))).willReturn(ResponseEntity.of(Optional.of("token")));
                 given(objectMapper.readValue(any(String.class), any(Class.class)))
-                    .willReturn(new OAuthAccessToken(null, 0, "refreshToken", null));
+                    .willReturn(new OAuthAccessToken(null, 0, "refreshToken", null, null));
                 AppleIdToken appleIdToken = new AppleIdToken();
                 ReflectionTestUtils.setField(appleIdToken, "email", "email");
                 given(objectMapper.readValue(any(byte[].class), any(Class.class)))
@@ -142,7 +142,7 @@ class AppleOAuthServiceTest {
                 given(validateUserService.validateRegisteredUserByEmail(any(String.class),
                     eq(SocialCode.APPLE))).willReturn(null);
                 given(userService.registerUser(any(String.class), eq(SocialCode.APPLE),
-                    eq("refreshToken"), eq("idToken.idToken"), any())).willReturn(newUser);
+                    eq("refreshToken"), eq("idToken.idToken"))).willReturn(newUser);
                 given(jwtTokenProvider.createAccessToken(
                     eq(newUser.getUserId()), eq(newUser.getUserRole())))
                     .willReturn(accessToken);
@@ -154,7 +154,7 @@ class AppleOAuthServiceTest {
                     requestAppleLogin);
 
                 verify(userService).registerUser(any(String.class), eq(SocialCode.APPLE),
-                    eq("refreshToken"), eq("idToken.idToken"), any());
+                    eq("refreshToken"), eq("idToken.idToken"));
                 assertThat(responseJwtToken.getAccessToken()).isEqualTo(accessToken);
                 assertThat(responseJwtToken.getRefreshToken()).isEqualTo(refreshToken);
             }
@@ -176,10 +176,10 @@ class AppleOAuthServiceTest {
                     request, requestAppleLogin);
 
                 verify(userService, never()).registerUser(any(String.class), eq(SocialCode.APPLE),
-                    any(), any(), any());
+                    any(), any());
                 verify(userRepository).save(eq(user));
                 assertThat(user.getRefreshToken()).isEqualTo("refreshToken");
-                assertThat(user.getAppleIdToken()).isEqualTo("idToken.idToken");
+                assertThat(user.getIdToken()).isEqualTo("idToken.idToken");
                 assertThat(responseJwtToken.getAccessToken()).isEqualTo(accessToken);
                 assertThat(responseJwtToken.getRefreshToken()).isEqualTo(refreshToken);
             }
