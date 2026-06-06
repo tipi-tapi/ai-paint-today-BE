@@ -122,7 +122,7 @@ jobs:
                         --allow-unauthenticated \
                         --set-env-vars "PROFILE=${{ inputs.profile }},SERVER_PORT=8080,FIRESTORE_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }},FIRESTORE_DATABASE_ID=${{ inputs.database_id }}" \
                         --set-secrets "${SECRETS}" \
-                        --memory 512Mi \
+                        --memory 1Gi \
                         --cpu 1 \
                         --min-instances 0 \
                         --max-instances 3 \
