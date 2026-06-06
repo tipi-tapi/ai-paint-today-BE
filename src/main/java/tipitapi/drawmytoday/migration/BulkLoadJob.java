@@ -15,7 +15,6 @@ import tipitapi.drawmytoday.migration.dto.SampleData.SampleDiary;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleEmotion;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleImage;
 import tipitapi.drawmytoday.migration.dto.SampleData.SamplePrompt;
-import tipitapi.drawmytoday.migration.dto.SampleData.SampleTicket;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleUser;
 import tipitapi.drawmytoday.migration.mapper.FirestoreDocumentMapper;
 
@@ -88,16 +87,15 @@ public class BulkLoadJob implements CommandLineRunner {
         loadUsers(data.getUsers());
         loadDiaries(filteredDiaries, emotionMap, imagesByDiary, promptMap);
         loadImages(filteredDiaries, imagesByDiary, promptMap);
-        loadTickets(data.getTickets());
+        // tickets / adRewards are intentionally NOT migrated to Firestore.
 
         var elapsed = Duration.between(globalStart, Instant.now()).getSeconds();
         log.info("=== Bulk load complete in {}s. Loaded: {} emotions, {} users, " +
-                 "{} diaries, {} images, {} tickets ===",
+                 "{} diaries, {} images ===",
             elapsed,
             data.getEmotions().size(), data.getUsers().size(),
             filteredDiaries.size(),
-            imagesByDiary.values().stream().mapToLong(List::size).sum(),
-            data.getTickets().size());
+            imagesByDiary.values().stream().mapToLong(List::size).sum());
 
         verifier.verify(data, imagesByDiary);
     }
@@ -196,21 +194,6 @@ public class BulkLoadJob implements CommandLineRunner {
             }
         }
         flushAndLog(state, "images", total, start);
-    }
-
-    private void loadTickets(List<SampleTicket> items) throws Exception {
-        var start = startCollection("tickets (subcollection)", items.size());
-        var state = new BatchState("users/tickets");
-        for (var item : items) {
-            var ref = firestore.collection("users")
-                .document(String.valueOf(item.getUserId()))
-                .collection("tickets")
-                .document(String.valueOf(item.getTicketId()));
-            state.batch.set(ref, mapper.toTicketDoc(item));
-            state.advance(items.size());
-            if (state.shouldCommit()) commitAndReset(state, "users/tickets");
-        }
-        flushAndLog(state, "tickets", items.size(), start);
     }
 
     private Instant startCollection(String name, int total) {

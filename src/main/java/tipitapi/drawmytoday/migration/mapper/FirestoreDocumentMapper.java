@@ -8,7 +8,6 @@ import tipitapi.drawmytoday.migration.dto.SampleData.SampleDiary;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleEmotion;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleImage;
 import tipitapi.drawmytoday.migration.dto.SampleData.SamplePrompt;
-import tipitapi.drawmytoday.migration.dto.SampleData.SampleTicket;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleUser;
 
 import java.time.LocalDateTime;
@@ -88,15 +87,6 @@ public class FirestoreDocumentMapper {
         doc.put("createdAt", toTimestamp(img.getCreatedAt()));
         doc.put("deletedAt", toTimestamp(img.getDeletedAt()));
         doc.put("prompt", prompt != null ? toPromptEmbedded(prompt) : null);
-        return doc;
-    }
-
-    public Map<String, Object> toTicketDoc(SampleTicket t) {
-        var doc = new HashMap<String, Object>();
-        doc.put("ticketId", t.getTicketId());
-        doc.put("ticketType", t.getTicketType());
-        doc.put("usedAt", toTimestamp(t.getUsedAt()));
-        doc.put("createdAt", toTimestamp(t.getCreatedAt()));
         return doc;
     }
 
