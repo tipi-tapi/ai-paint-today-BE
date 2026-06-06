@@ -25,7 +25,7 @@ public class EmotionDocumentMapper {
     public Map<String, Object> toDocument(Emotion emotion) {
         var doc = new HashMap<String, Object>();
         if (emotion.getEmotionId() != null) {
-            doc.put(FIELD_EMOTION_ID, FirestoreIdUtils.toStorageType(emotion.getEmotionId()));
+            doc.put(FIELD_EMOTION_ID, FirestoreIdUtils.toNumericStorageType(emotion.getEmotionId()));
         }
         doc.put(FIELD_NAME, emotion.getName());
         doc.put(FIELD_COLOR, emotion.getColor());

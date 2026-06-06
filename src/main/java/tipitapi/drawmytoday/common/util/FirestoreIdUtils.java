@@ -7,11 +7,19 @@ public final class FirestoreIdUtils {
     private FirestoreIdUtils() {}
 
     /**
-     * Converts a String ID to the appropriate Firestore storage type for backward compatibility.
-     * Numeric-looking IDs (legacy Long-based) are stored as Long to match existing field values.
-     * UUID strings are stored as String.
+     * Stores entity IDs as String to match the application schema (UUID-based, see
+     * draw-my-today-db-dev). Used for user / diary / image / prompt / ticket ids.
+     * NOTE: emotion ids stay numeric — use {@link #toNumericStorageType(String)} for those.
      */
     public static Object toStorageType(String id) {
+        return id;
+    }
+
+    /**
+     * Stores emotion IDs as Long. Emotions are seeded master data with small numeric ids
+     * and are never queried by value, so they remain numeric to match the dev schema.
+     */
+    public static Object toNumericStorageType(String id) {
         if (id == null) return null;
         try {
             return Long.parseLong(id);

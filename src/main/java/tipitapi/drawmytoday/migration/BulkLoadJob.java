@@ -64,6 +64,12 @@ public class BulkLoadJob implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         var globalStart = Instant.now();
+        var deltaMode = "true".equals(System.getenv("BULK_LOAD_DELTA_MODE"));
+        if (deltaMode) {
+            log.warn("DELTA MODE enabled: input is treated as a partial diff. " +
+                "Only documents present in the file are written; collection-count " +
+                "verification is skipped.");
+        }
         var data = loadSampleData();
 
         // filteredDiaries must be built before imagesByDiary so we can exclude
@@ -97,7 +103,7 @@ public class BulkLoadJob implements CommandLineRunner {
             filteredDiaries.size(),
             imagesByDiary.values().stream().mapToLong(List::size).sum());
 
-        verifier.verify(data, imagesByDiary);
+        verifier.verify(data, imagesByDiary, deltaMode);
     }
 
     private SampleData loadSampleData() throws Exception {

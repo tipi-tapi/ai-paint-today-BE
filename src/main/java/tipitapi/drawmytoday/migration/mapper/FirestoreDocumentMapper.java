@@ -23,9 +23,16 @@ public class FirestoreDocumentMapper {
     // KST — matches MySQL RDS timezone. systemDefault() is unsafe in containers (typically UTC).
     private static final ZoneId MYSQL_ZONE = ZoneId.of("Asia/Seoul");
 
+    // All entity ids are stored as String to match the application schema
+    // (see draw-my-today-db-dev). emotionId is the only id kept numeric.
+    @Nullable
+    private static String idStr(@Nullable Long id) {
+        return id == null ? null : String.valueOf(id);
+    }
+
     public Map<String, Object> toUserDoc(SampleUser u) {
         var doc = new HashMap<String, Object>();
-        doc.put("userId", u.getUserId());
+        doc.put("userId", idStr(u.getUserId()));
         doc.put("email", u.getEmail());
         doc.put("socialCode", u.getSocialCode());
         doc.put("userRole", u.getUserRole());
@@ -59,8 +66,8 @@ public class FirestoreDocumentMapper {
             .orElse(null);
 
         var doc = new HashMap<String, Object>();
-        doc.put("diaryId", d.getDiaryId());
-        doc.put("userId", d.getUserId());
+        doc.put("diaryId", idStr(d.getDiaryId()));
+        doc.put("userId", idStr(d.getUserId()));
         doc.put("diaryDate", toTimestamp(d.getDiaryDate()));
         doc.put("isAi", d.getIsAi());
         doc.put("notes", d.getNotes());
@@ -80,7 +87,7 @@ public class FirestoreDocumentMapper {
 
     public Map<String, Object> toImageDoc(SampleImage img, @Nullable SamplePrompt prompt) {
         var doc = new HashMap<String, Object>();
-        doc.put("imageId", img.getImageId());
+        doc.put("imageId", idStr(img.getImageId()));
         doc.put("imageUrl", img.getImageUrl());
         doc.put("isSelected", img.getIsSelected());
         doc.put("review", img.getReview());
@@ -109,10 +116,10 @@ public class FirestoreDocumentMapper {
 
     private Map<String, Object> toSelectedImageEmbedded(SampleImage img, @Nullable SamplePrompt prompt) {
         var map = new HashMap<String, Object>();
-        map.put("imageId", img.getImageId());
+        map.put("imageId", idStr(img.getImageId()));
         map.put("imageUrl", img.getImageUrl());
         map.put("review", img.getReview());
-        map.put("promptId", img.getPromptId());
+        map.put("promptId", idStr(img.getPromptId()));
         map.put("promptText", prompt != null ? prompt.getPromptText() : null);
         map.put("promptGeneratorType", prompt != null ? prompt.getPromptGeneratorType() : null);
         return map;
@@ -120,7 +127,7 @@ public class FirestoreDocumentMapper {
 
     private Map<String, Object> toPromptEmbedded(SamplePrompt p) {
         var map = new HashMap<String, Object>();
-        map.put("promptId", p.getPromptId());
+        map.put("promptId", idStr(p.getPromptId()));
         map.put("promptText", p.getPromptText());
         map.put("isSuccess", p.getIsSuccess());
         map.put("promptGeneratorType", p.getPromptGeneratorType());

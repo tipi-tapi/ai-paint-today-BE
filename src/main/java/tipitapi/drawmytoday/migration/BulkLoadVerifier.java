@@ -26,11 +26,18 @@ public class BulkLoadVerifier {
 
     private final Firestore firestore;
 
-    public void verify(SampleData data, Map<Long, List<SampleImage>> imagesByDiary) throws Exception {
+    public void verify(SampleData data, Map<Long, List<SampleImage>> imagesByDiary, boolean deltaMode) throws Exception {
         log.info("=== Starting verification ===");
         boolean passed = true;
 
-        passed &= verifyCollectionCounts(data, imagesByDiary);
+        if (deltaMode) {
+            // In delta mode the input holds only changed documents, so the total
+            // Firestore count will not match the file. Skip count checks and rely
+            // on the per-document sample checks below.
+            log.info("[DELTA] skipping collection count verification");
+        } else {
+            passed &= verifyCollectionCounts(data, imagesByDiary);
+        }
         passed &= verifyDiarySample(data.getDiaries(), imagesByDiary);
         passed &= verifyImageSample(imagesByDiary);
 

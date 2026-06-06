@@ -50,4 +50,10 @@ firestore-debug.log
 
 .omc
 .omx
+
+### secrets / local migration data (절대 커밋 금지) ###
+.env
+key.json
+prod-data*.json
+sample-data.json
 src/test/**

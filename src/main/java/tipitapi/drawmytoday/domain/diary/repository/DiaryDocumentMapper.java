@@ -89,7 +89,7 @@ public class DiaryDocumentMapper {
             return null;
         }
         var doc = new HashMap<String, Object>();
-        doc.put(FIELD_EMOTION_ID, FirestoreIdUtils.toStorageType(emotion.getEmotionId()));
+        doc.put(FIELD_EMOTION_ID, FirestoreIdUtils.toNumericStorageType(emotion.getEmotionId()));
         doc.put(FIELD_NAME, emotion.getName());
         doc.put(FIELD_COLOR, emotion.getColor());
         doc.put(FIELD_COLOR_PROMPT, emotion.getColorPrompt());
