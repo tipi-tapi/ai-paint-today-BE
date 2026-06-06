@@ -3,7 +3,7 @@ package tipitapi.drawmytoday.domain.diary.domain;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

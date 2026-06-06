@@ -51,14 +51,13 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-            .rememberMe().disable()
-            .logout().disable()
-            .formLogin().disable()
-            .httpBasic().disable()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+        http.csrf(csrf -> csrf.disable())
+            .rememberMe(rememberMe -> rememberMe.disable())
+            .logout(logout -> logout.disable())
+            .formLogin(formLogin -> formLogin.disable())
+            .httpBasic(httpBasic -> httpBasic.disable())
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, permitAllEndpointList),
                 UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtAuthenticationEntryPoint(objectMapper()),

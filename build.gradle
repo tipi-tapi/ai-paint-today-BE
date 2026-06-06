@@ -1,13 +1,13 @@
 plugins {
     id 'java'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.11'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
 group = 'tipitapi'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = '21'
 
 configurations {
     compileOnly {
@@ -26,7 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation platform('software.amazon.awssdk:bom:2.20.26')
     implementation 'software.amazon.awssdk:s3'
@@ -37,14 +37,14 @@ dependencies {
     // logback 설정
     implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
     implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
 
     //	스프링 시큐리티, jwt 설정
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.security:spring-security-jwt:1.1.1.RELEASE'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+    // Apple 로그인 client secret 생성용 (이전에는 spring-security-jwt가 전이 의존성으로 제공)
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.78.1'
     testImplementation 'org.springframework.security:spring-security-test'
 
     compileOnly 'org.projectlombok:lombok'
@@ -59,15 +59,15 @@ tasks.named('test') {
 
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.12"
 }
 
 jacocoTestReport {
     dependsOn test
     reports {
-        html.enabled true
-        xml.enabled false
-        csv.enabled false
+        html.required = true
+        xml.required = false
+        csv.required = false
     }
     def Qdomains = []
     for (qPattern in "**/QA".."**/QZ") {

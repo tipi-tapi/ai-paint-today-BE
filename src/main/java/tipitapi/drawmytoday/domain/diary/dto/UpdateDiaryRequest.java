@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.domain.diary.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

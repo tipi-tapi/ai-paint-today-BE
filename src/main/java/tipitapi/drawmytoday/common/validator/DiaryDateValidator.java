@@ -1,8 +1,8 @@
 package tipitapi.drawmytoday.common.validator;
 
 import java.time.LocalDate;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class DiaryDateValidator implements ConstraintValidator<ValidDiaryDate, LocalDate> {
 

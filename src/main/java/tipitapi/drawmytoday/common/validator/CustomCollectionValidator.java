@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.common.validator;
 
 import java.util.Collection;
-import javax.validation.Validation;
+import jakarta.validation.Validation;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -49,7 +50,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException e,
         HttpHeaders headers,
-        HttpStatus status,
+        HttpStatusCode status,
         WebRequest request) {
         log.warn("handleIllegalArgument", e);
         ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
@@ -60,7 +61,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
         HttpMessageNotReadableException e,
         HttpHeaders headers,
-        HttpStatus status,
+        HttpStatusCode status,
         WebRequest request) {
         log.warn("handleHttpMessageNotReadable", e);
         return handleExceptionInternal(ErrorCode.INVALID_INPUT_VALUE);

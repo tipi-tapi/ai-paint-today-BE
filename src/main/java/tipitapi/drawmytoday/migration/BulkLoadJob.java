@@ -19,7 +19,7 @@ import tipitapi.drawmytoday.migration.dto.SampleData.SampleTicket;
 import tipitapi.drawmytoday.migration.dto.SampleData.SampleUser;
 import tipitapi.drawmytoday.migration.mapper.FirestoreDocumentMapper;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;

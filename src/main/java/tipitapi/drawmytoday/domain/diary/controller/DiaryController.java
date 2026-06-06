@@ -19,7 +19,7 @@ import tipitapi.drawmytoday.domain.diary.dto.*;
 import tipitapi.drawmytoday.domain.diary.service.CreateDiaryService;
 import tipitapi.drawmytoday.domain.diary.service.DiaryService;
 import tipitapi.drawmytoday.domain.generator.exception.ImageGeneratorException;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController

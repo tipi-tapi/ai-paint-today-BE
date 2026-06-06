@@ -1,7 +1,7 @@
 package tipitapi.drawmytoday.domain.ticket.domain;
 
 import java.time.LocalDateTime;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
