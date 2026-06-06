@@ -18,10 +18,11 @@ public class UserService {
 
     @Transactional
     public User registerUser(String email, SocialCode socialCode, String refreshToken,
-                             String appleIdToken) {
+                             String appleIdToken, String googleSub) {
         User user = User.builder().email(email).socialCode(socialCode).build();
         user.setRefreshToken(refreshToken);
         user.setAppleIdToken(appleIdToken);
+        user.setGoogleSub(googleSub);
         User saved = userRepository.save(user);
         ticketService.createTicketByJoin(saved);
         return saved;

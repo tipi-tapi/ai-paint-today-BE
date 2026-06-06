@@ -63,7 +63,7 @@ public class AppleOAuthService {
         if (user == null) {
             user = userService.registerUser(
                 appleIdToken.getEmail(), SocialCode.APPLE,
-                oAuthAccessToken.getRefreshToken(), requestAppleLogin.getIdToken());
+                oAuthAccessToken.getRefreshToken(), requestAppleLogin.getIdToken(), null);
         } else {
             boolean dirty = false;
             if (StringUtils.hasText(oAuthAccessToken.getRefreshToken())) {

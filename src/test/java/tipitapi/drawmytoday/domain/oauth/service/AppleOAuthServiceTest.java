@@ -142,7 +142,7 @@ class AppleOAuthServiceTest {
                 given(validateUserService.validateRegisteredUserByEmail(any(String.class),
                     eq(SocialCode.APPLE))).willReturn(null);
                 given(userService.registerUser(any(String.class), eq(SocialCode.APPLE),
-                    eq("refreshToken"), eq("idToken.idToken"))).willReturn(newUser);
+                    eq("refreshToken"), eq("idToken.idToken"), any())).willReturn(newUser);
                 given(jwtTokenProvider.createAccessToken(
                     eq(newUser.getUserId()), eq(newUser.getUserRole())))
                     .willReturn(accessToken);
@@ -154,7 +154,7 @@ class AppleOAuthServiceTest {
                     requestAppleLogin);
 
                 verify(userService).registerUser(any(String.class), eq(SocialCode.APPLE),
-                    eq("refreshToken"), eq("idToken.idToken"));
+                    eq("refreshToken"), eq("idToken.idToken"), any());
                 assertThat(responseJwtToken.getAccessToken()).isEqualTo(accessToken);
                 assertThat(responseJwtToken.getRefreshToken()).isEqualTo(refreshToken);
             }
@@ -176,7 +176,7 @@ class AppleOAuthServiceTest {
                     request, requestAppleLogin);
 
                 verify(userService, never()).registerUser(any(String.class), eq(SocialCode.APPLE),
-                    any(), any());
+                    any(), any(), any());
                 verify(userRepository).save(eq(user));
                 assertThat(user.getRefreshToken()).isEqualTo("refreshToken");
                 assertThat(user.getAppleIdToken()).isEqualTo("idToken.idToken");

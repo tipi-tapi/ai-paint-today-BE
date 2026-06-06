@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class OAuthUserProfile {
 
     private String email;
+    private String sub;
 
 }

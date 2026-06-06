@@ -133,7 +133,7 @@ class GoogleOAuthServiceTest {
                     any(HttpEntity.class), any(Class.class)))
                     .willReturn(ResponseEntity.of(Optional.of("json body")));
                 given(objectMapper.readValue(any(String.class), eq(OAuthUserProfile.class)))
-                    .willReturn(new OAuthUserProfile("email"));
+                    .willReturn(new OAuthUserProfile("email", "googleSub"));
             }
 
             @Test
@@ -145,7 +145,7 @@ class GoogleOAuthServiceTest {
                 given(validateUserService.validateRegisteredUserByEmail(
                     any(String.class), eq(SocialCode.GOOGLE))).willReturn(null);
                 given(userService.registerUser(any(String.class), eq(SocialCode.GOOGLE),
-                    any(String.class), isNull())).willReturn(newUser);
+                    any(String.class), isNull(), any(String.class))).willReturn(newUser);
                 given(jwtTokenProvider.createAccessToken(
                     eq(newUser.getUserId()), eq(newUser.getUserRole())))
                     .willReturn(accessToken);
@@ -156,7 +156,7 @@ class GoogleOAuthServiceTest {
                 ResponseJwtToken responseJwtToken = googleOAuthService.login(request);
 
                 verify(userService).registerUser(any(String.class), eq(SocialCode.GOOGLE),
-                    any(String.class), isNull());
+                    any(String.class), isNull(), any(String.class));
                 assertThat(responseJwtToken.getAccessToken()).isEqualTo(accessToken);
                 assertThat(responseJwtToken.getRefreshToken()).isEqualTo(refreshToken);
             }
@@ -180,7 +180,7 @@ class GoogleOAuthServiceTest {
                 ResponseJwtToken responseJwtToken = googleOAuthService.login(request);
 
                 verify(userService, never()).registerUser(any(String.class), eq(SocialCode.GOOGLE),
-                    any(String.class), any());
+                    any(String.class), any(), any());
                 verify(userRepository).save(eq(user));
                 assertThat(user.getRefreshToken()).isEqualTo("refreshToken");
                 assertThat(responseJwtToken.getAccessToken()).isEqualTo(accessToken);
