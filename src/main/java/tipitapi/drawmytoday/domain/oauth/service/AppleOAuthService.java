@@ -64,20 +64,11 @@ public class AppleOAuthService {
             user = userService.registerUser(
                 appleIdToken.getEmail(), SocialCode.APPLE,
                 oAuthAccessToken.getRefreshToken(), requestAppleLogin.getIdToken(), null);
-        } else {
-            boolean dirty = false;
-            if (StringUtils.hasText(oAuthAccessToken.getRefreshToken())) {
-                user.setRefreshToken(oAuthAccessToken.getRefreshToken());
-                dirty = true;
-            }
-            if (StringUtils.hasText(requestAppleLogin.getIdToken())) {
-                user.setAppleIdToken(requestAppleLogin.getIdToken());
-                dirty = true;
-            }
-            if (dirty) {
-                userRepository.save(user);
-            }
         }
+
+        user.setRefreshToken(oAuthAccessToken.getRefreshToken());
+        user.setAppleIdToken(requestAppleLogin.getIdToken());
+        userRepository.save(user);
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
             user.getUserRole());

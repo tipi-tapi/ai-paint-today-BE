@@ -57,20 +57,11 @@ public class GoogleOAuthService {
             user = userService.registerUser(
                 oAuthUserProfile.getEmail(), SocialCode.GOOGLE, accessToken.getRefreshToken(),
                 null, oAuthUserProfile.getSub());
-        } else {
-            boolean dirty = false;
-            if (StringUtils.hasText(accessToken.getRefreshToken())) {
-                user.setRefreshToken(accessToken.getRefreshToken());
-                dirty = true;
-            }
-            if (StringUtils.hasText(oAuthUserProfile.getSub())) {
-                user.setGoogleSub(oAuthUserProfile.getSub());
-                dirty = true;
-            }
-            if (dirty) {
-                userRepository.save(user);
-            }
         }
+
+        user.setRefreshToken(accessToken.getRefreshToken());
+        user.setGoogleSub(oAuthUserProfile.getSub());
+        userRepository.save(user);
 
         String jwtAccessToken = jwtTokenProvider.createAccessToken(user.getUserId(),
             user.getUserRole());
