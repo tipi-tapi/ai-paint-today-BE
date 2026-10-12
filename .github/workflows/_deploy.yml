@@ -24,6 +24,11 @@ on:
                 required: false
                 type: string
                 default: latest
+            openai_secret:
+                description: Secret Manager secret name for OPENAI_API_KEY
+                required: false
+                type: string
+                default: OPENAI_API_KEY
         secrets:
             GCP_PROJECT_ID:
                 required: true
@@ -91,7 +96,7 @@ jobs:
                     SECRETS="${SECRETS},R2_BUCKET_NAME=R2_BUCKET_NAME:latest"
                     SECRETS="${SECRETS},R2_ACCOUNT_ID=R2_ACCOUNT_ID:latest"
                     SECRETS="${SECRETS},R2_CUSTOM_DOMAIN=R2_CUSTOM_DOMAIN:latest"
-                    SECRETS="${SECRETS},OPENAI_API_KEY=OPENAI_API_KEY:latest"
+                    SECRETS="${SECRETS},OPENAI_API_KEY=${{ inputs.openai_secret }}:latest"
                     SECRETS="${SECRETS},DALLE_API_URL=DALLE_API_URL:latest"
                     SECRETS="${SECRETS},AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest"
                     SECRETS="${SECRETS},AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest"

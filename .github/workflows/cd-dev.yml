@@ -18,4 +18,5 @@ jobs:
             profile: develop
             environment: dev
             image_tag: dev
+            openai_secret: OPENAI_API_KEY_DEV
         secrets: inherit
