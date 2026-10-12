@@ -24,12 +24,12 @@ public class GptChatCompletionsRequest {
     private final float temperature = 0;
 
     public GptChatCompletionsRequest() {
-        this.model = "gpt-3.5-turbo";
+        this.model = "gpt-4o-mini";
         this.messages = new ArrayList<>();
     }
 
     private GptChatCompletionsRequest(String gptChatCompletionsPrompt) {
-        this.model = "gpt-3.5-turbo";
+        this.model = "gpt-4o-mini";
         List<Message> messages = new ArrayList<>();
         messages.add(new Message(ChatCompletionsRole.system, gptChatCompletionsPrompt));
         this.messages = messages;
